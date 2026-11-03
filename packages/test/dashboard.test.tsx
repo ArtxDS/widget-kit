@@ -19,10 +19,10 @@ describe("dashboard pages", () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: true, json: async () => ({ testRun: null, coverage: null, averageRenderTimeMs: null }) }));
     withQuality(<OverviewPage />);
 
-    expect(screen.getByRole("heading", { level: 1, name: /build better interfaces/i })).toBeInTheDocument();
-    expect(screen.getByText("No test results yet")).toBeInTheDocument();
-    expect(screen.getAllByText("—")).toHaveLength(2);
     await waitFor(() => expect(fetch).toHaveBeenCalledWith("/api/quality", { cache: "no-store" }));
+    expect(screen.getByRole("heading", { level: 1, name: /build better interfaces/i })).toBeInTheDocument();
+    expect(screen.getByText("Run component or suite tests to record a quality history.")).toBeInTheDocument();
+    expect(screen.getAllByText("—")).toHaveLength(2);
   });
 
   it("filters the registered component catalog by name", () => {

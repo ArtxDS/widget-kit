@@ -19,7 +19,9 @@
       }
     ],
     "paths": {
-      "@/*": ["./packages/*"]
+      "@/*": ["./packages/*"],
+      "@artxds/widget-kit": ["./packages/index.ts"],
+      "@artxds/widget-kit/components": ["./packages/components/ui/index.ts"]
     }
   },
   "include": [

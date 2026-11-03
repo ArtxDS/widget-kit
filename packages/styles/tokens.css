@@ -1,0 +1,49 @@
+:root {
+  --wk-purple: #9d5cff;
+  --wk-purple-bright: #ad6cff;
+  --wk-cyan: #31d9d2;
+  --wk-green: #57e0ac;
+  --wk-amber: #f5c66d;
+  --wk-red: #ff788a;
+
+  --wk-background: #090a0e;
+  --wk-surface: #101117;
+  --wk-surface-raised: #14151d;
+  --wk-surface-soft: #171821;
+  --wk-surface-hover: #1c1d28;
+
+  --wk-foreground: #f2f1f8;
+  --wk-muted: #9293a7;
+  --wk-subtle: #686a7d;
+
+  --wk-line: #242532;
+  --wk-line-soft: #1d1e29;
+
+  --wk-badge-purple-bg: #7b3fd51a;
+  --wk-badge-purple-color: #c195ff;
+  --wk-badge-purple-border: #7248a655;
+
+  --wk-badge-cyan-bg: #25b8b21a;
+  --wk-badge-cyan-color: #5de6df;
+  --wk-badge-cyan-border: #2a9b9555;
+
+  --wk-badge-green-bg: #33b9781a;
+  --wk-badge-green-color: #62dda6;
+  --wk-badge-green-border: #2a8a5e55;
+
+  --wk-badge-amber-bg: #c48a001a;
+  --wk-badge-amber-color: #f5c66d;
+  --wk-badge-amber-border: #9a6a0055;
+
+  --wk-badge-muted-bg: #1b1c27;
+  --wk-badge-muted-color: #9293a7;
+  --wk-badge-muted-border: #2e2f3c;
+
+  --wk-radius-sm: 5px;
+  --wk-radius-md: 8px;
+  --wk-radius-lg: 12px;
+
+  --wk-font-sans: Inter, ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --wk-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}

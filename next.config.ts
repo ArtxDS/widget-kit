@@ -1,10 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   experimental: {
     agentFeedback: true,
   },
+  transpilePackages: ["@artxds/widget-kit"],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

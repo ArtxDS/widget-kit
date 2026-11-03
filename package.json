@@ -1,15 +1,46 @@
 {
-  "name": "widget-kit",
+  "name": "@artxds/widget-kit",
   "version": "0.1.0",
+  "description": "Personal library of reusable React components, widgets, hooks, and utilities.",
   "private": true,
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./components": {
+      "import": "./dist/components.mjs",
+      "types": "./dist/types/components/ui/index.d.ts"
+    },
+    "./styles": "./packages/styles/index.css",
+    "./styles/tokens.css": "./packages/styles/tokens.css",
+    "./styles/components.css": "./packages/styles/components.css",
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/types/index.d.ts",
+  "files": [
+    "dist",
+    "packages/styles",
+    "README.md"
+  ],
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "lib:build": "vite build --config vite.lib.config.ts && tsc --project tsconfig.lib.json --emitDeclarationOnly",
+    "lib:build:watch": "vite build --config vite.lib.config.ts --watch",
+    "lib:typecheck": "tsc --project tsconfig.lib.json --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "dependencies": {
     "lucide-react": "^1.67.0",

@@ -1,0 +1,53 @@
+.wk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border: 1px solid var(--wk-badge-muted-border);
+  border-radius: var(--wk-radius-sm);
+  color: var(--wk-badge-muted-color);
+  background: var(--wk-badge-muted-bg);
+  font-size: 10px;
+  font-weight: 580;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.wk-badge--purple {
+  border-color: var(--wk-badge-purple-border);
+  color: var(--wk-badge-purple-color);
+  background: var(--wk-badge-purple-bg);
+}
+
+.wk-badge--cyan {
+  border-color: var(--wk-badge-cyan-border);
+  color: var(--wk-badge-cyan-color);
+  background: var(--wk-badge-cyan-bg);
+}
+
+.wk-badge--green {
+  border-color: var(--wk-badge-green-border);
+  color: var(--wk-badge-green-color);
+  background: var(--wk-badge-green-bg);
+}
+
+.wk-badge--amber {
+  border-color: var(--wk-badge-amber-border);
+  color: var(--wk-badge-amber-color);
+  background: var(--wk-badge-amber-bg);
+}
+
+.wk-badge--muted {
+  border-color: var(--wk-badge-muted-border);
+  color: var(--wk-badge-muted-color);
+  background: var(--wk-badge-muted-bg);
+}
+
+.wk-badge__dot {
+  width: 5px;
+  height: 5px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.9;
+}

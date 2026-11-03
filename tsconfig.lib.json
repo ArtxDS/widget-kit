@@ -1,0 +1,37 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "outDir": "./dist",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": ["./packages/*"]
+    }
+  },
+  "include": [
+    "packages/index.ts",
+    "packages/components/ui/**/*.ts",
+    "packages/components/ui/**/*.tsx",
+    "packages/widgets/**/*.ts",
+    "packages/widgets/**/*.tsx",
+    "packages/hooks/**/*.ts",
+    "packages/hooks/**/*.tsx",
+    "packages/types/**/*.ts",
+    "packages/lib/tailwind.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "packages/components/dashboard",
+    "packages/lib/catalog.ts",
+    "packages/lib/quality.ts",
+    "packages/test",
+    "app",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
+}
+

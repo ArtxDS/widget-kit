@@ -1,7 +1,6 @@
 "use client";
 
-import type { BadgeTone } from "@/components/ui";
-import { Badge } from "@/components/ui";
+import { Badge, type BadgeTone } from "@artxds/widget-kit";
 import type { ComponentDefinition } from "@/lib/catalog";
 import { components, getComponent, widgets } from "@/lib/catalog";
 import type {
@@ -2141,7 +2140,7 @@ export function DocumentationPage() {
         <pre>
           <code>
             {
-              'import { Badge } from "@/components/ui";\n\n<Badge tone="green" dot>Ready</Badge>'
+              'import { Badge } from "@artxds/widget-kit";\n\n<Badge tone="green" dot>Ready</Badge>'
             }
           </code>
         </pre>

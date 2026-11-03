@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-import type { ReactNode } from "react";
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
 import { tw } from "@/lib/tailwind";
+import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import "./globals.css";
 
 export const metadata: Metadata = {
   title: "widget-kit — Component workspace",
   description:
-    "Biblioteca pessoal de componentes, widgets e utilitários reutilizáveis.",
+    "Personal library of reusable components, widgets, and utilities.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
