@@ -6,7 +6,7 @@ export type ComponentDefinition = {
   category: ComponentCategory;
   description: string;
   source: string;
-  test: string;
+  test?: string;
 };
 
 export type WidgetDefinition = {
@@ -16,6 +16,7 @@ export type WidgetDefinition = {
   description: string;
   status: "In development" | "Ready";
   source: string;
+  test: string;
 };
 
 export const components: ComponentDefinition[] = [
@@ -27,10 +28,32 @@ export const components: ComponentDefinition[] = [
     source: "packages/components/ui/badge.tsx",
     test: "packages/components/ui/badge.test.tsx",
   },
+  {
+    slug: "toast",
+    name: "Toast",
+    category: "Feedback",
+    description: "A compact notification with loading, success, warning, error, and step states.",
+    source: "packages/components/ui/toast.tsx",
+  },
 ];
 
-export const widgets: WidgetDefinition[] = [];
+export const widgets: WidgetDefinition[] = [
+  {
+    slug: "mascot",
+    name: "Mascot",
+    category: "Feedback",
+    description:
+      "Animated robot mascot that follows the pointer, blinks, waves, and reacts to host events.",
+    status: "Ready",
+    source: "packages/widgets/mascot/src",
+    test: "packages/widgets/mascot/tests",
+  },
+];
 
 export function getComponent(slug: string) {
   return components.find((component) => component.slug === slug);
+}
+
+export function getWidget(slug: string) {
+  return widgets.find((widget) => widget.slug === slug);
 }

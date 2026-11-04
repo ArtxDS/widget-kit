@@ -1,0 +1,25 @@
+import type { ThemeTokens } from "../core/types";
+
+export const ocean: ThemeTokens = {
+  accentA: "#0EA5E9",
+  accentMid: "#22D3EE",
+  accentB: "#34D399",
+  eyeFrom: "#67E8F9",
+  eyeTo: "#2563EB",
+  shell1: "#f7fbff",
+  shell2: "#e8f1f8",
+  shell3: "#b9c9d8",
+  shellEdge: "#3d6a88",
+  screen1: "#0b1b2a",
+  screen2: "#02060c",
+  neck1: "#3d5a73",
+  neck2: "#8eacc0",
+  neck3: "#2f4a61",
+  base1: "#fff",
+  base2: "#cfe0ec",
+  shadow: "#12324a",
+  bubbleBg: "#f4fbff",
+  bubbleFg: "#0b1b2a",
+  bubbleBorderA: "#0EA5E9",
+  bubbleBorderB: "#34D399",
+};

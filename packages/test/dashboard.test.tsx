@@ -1,9 +1,26 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ComponentsPage, NotesPage, OverviewPage, PlaygroundPage, TestsPage } from "@/components/dashboard/pages";
-import { QualityProvider } from "@/components/dashboard/quality-provider";
+import { ComponentsPage, NotesPage, OverviewPage, PlaygroundPage, TestsPage, WidgetsPage } from "@/components/dashboard/pages";
+import { QualityProvider } from "@/components/dashboard/quality/quality-provider";
 import { components } from "@/lib/catalog";
+
+function stubMascotRuntime() {
+  vi.stubGlobal("requestAnimationFrame", (cb: FrameRequestCallback) =>
+    window.setTimeout(() => cb(performance.now()), 16),
+  );
+  vi.stubGlobal("cancelAnimationFrame", (id: number) => window.clearTimeout(id));
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: false,
+    media: query,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    onchange: null,
+  }));
+}
 
 function withQuality(ui: ReactNode) {
   return render(<QualityProvider>{ui}</QualityProvider>);
@@ -37,6 +54,18 @@ describe("dashboard pages", () => {
     expect(components).toHaveLength(1);
   });
 
+  it("shows a live mascot preview in the widget catalog", async () => {
+    stubMascotRuntime();
+    render(<WidgetsPage />);
+
+    expect(screen.getByRole("heading", { name: "Mascot" })).toBeInTheDocument();
+    expect(await screen.findByRole("img", { name: "Mascot widget preview" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Mascot/i })).toHaveAttribute(
+      "href",
+      "/playground?item=mascot",
+    );
+  });
+
   it("updates the badge preview and code for tone and dot settings", () => {
     render(<PlaygroundPage />);
 
@@ -48,6 +77,18 @@ describe("dashboard pages", () => {
     expect(screen.getByText("Ready")).toHaveClass("wk-badge--purple");
     expect(screen.getByText("Ready").querySelector(".wk-badge__dot")).not.toBeInTheDocument();
     expect(screen.getByText('<Badge tone="purple">Ready</Badge>')).toBeInTheDocument();
+  });
+
+  it("opens the mascot playground with live SVG and customizations", async () => {
+    stubMascotRuntime();
+    render(<PlaygroundPage initialItem="mascot" />);
+
+    expect(await screen.findByRole("img", { name: "Playground mascot" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Theme preset" }));
+    fireEvent.click(screen.getByRole("menuitemradio", { name: "ocean" }));
+    fireEvent.click(screen.getByRole("button", { name: "say" }));
+    expect(await screen.findByText("Eu sou o mascote.")).toBeInTheDocument();
+    expect(screen.getByText(/theme: "ocean"/)).toBeInTheDocument();
   });
 
   it("lists the individual test cases for each registered component", async () => {

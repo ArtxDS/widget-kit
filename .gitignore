@@ -18,6 +18,7 @@
 # production
 /build
 /dist
+/packages/generated/prisma
 
 # misc
 .DS_Store
@@ -30,6 +31,7 @@ yarn-error.log*
 .pnpm-debug.log*
 
 .env*
+!.env.example
 
 # vercel
 .vercel

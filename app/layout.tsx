@@ -1,4 +1,4 @@
-import { DashboardShell } from "@/components/dashboard/dashboard-shell";
+import { DashboardShell } from "@/components/dashboard/shell/dashboard-shell";
 import { tw } from "@/lib/tailwind";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";

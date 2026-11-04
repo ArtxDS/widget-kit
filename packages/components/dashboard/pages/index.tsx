@@ -1,14 +1,12 @@
 "use client";
 
-import { Badge, type BadgeTone } from "@artxds/widget-kit";
 import type { ComponentDefinition } from "@/lib/catalog";
-import { components, getComponent, widgets } from "@/lib/catalog";
-import type {
-  ComponentTestResult,
-  QualityTestEvent,
-  QualityTestFailure,
-} from "@/lib/quality";
+import { components, getComponent, getWidget, widgets } from "@/lib/catalog";
+import type { TestCase, TestRunSummary, TestTargetType } from "@/lib/quality";
+import { itemTestKey } from "@/lib/quality";
 import { tw } from "@/lib/tailwind";
+import { Badge, type BadgeTone } from "@artxds/widget-kit";
+import { Toast } from "@/components/ui/toast";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -20,10 +18,16 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import { Dropdown } from "./dropdown";
-import type { IconName } from "./icon";
-import { Icon } from "./icon";
-import { useQuality } from "./quality-provider";
+import {
+  MascotPlaygroundControls,
+  MascotPlaygroundStage,
+  WidgetMascotPreview,
+  useMascotPlayground,
+} from "../mascot-playground";
+import { useQuality } from "../quality/quality-provider";
+import { Dropdown } from "../shared/dropdown";
+import type { IconName } from "../shared/icon";
+import { Icon } from "../shared/icon";
 
 const badgeTones = [
   { label: "Purple", value: "purple" },
@@ -138,17 +142,61 @@ function DashboardToggle({
 }
 
 function ComponentPreview({
+  slug = "badge",
   tone = "green",
   dot = true,
 }: {
+  slug?: string;
   tone?: BadgeTone;
   dot?: boolean;
 }) {
+  if (slug === "toast") {
+    return <ToastPreview />;
+  }
+
   return (
     <div className={tw("badge-preview")}>
       <Badge tone={tone} dot={dot}>
         Ready
       </Badge>
+    </div>
+  );
+}
+
+function ComponentLibraryMiniPreview() {
+  return (
+    <div className={tw("component-library-mini-preview")}>
+      <ComponentPreview />
+      <div className={tw("component-library-mini-preview__toast")}>
+        <ToastPreview compact />
+      </div>
+    </div>
+  );
+}
+
+function ToastPreview({
+  variant = "success",
+  mode = "normal",
+  compact = false,
+}: {
+  variant?: "loading" | "success" | "warning" | "error";
+  mode?: "normal" | "steps";
+  compact?: boolean;
+}) {
+  return (
+    <div aria-hidden="true" className={tw(`toast-preview-frame${compact ? " toast-preview-frame--compact" : ""}`)}>
+      <Toast
+        description={compact ? undefined : variant === "loading" ? "Working on your changes…" : "Your update is ready."}
+        mode={mode}
+        open
+        placement="inline"
+        steps={mode === "steps" ? [
+          { label: "Preparing changes", status: "complete" },
+          { label: "Saving update", status: variant === "loading" ? "current" : "complete" },
+        ] : undefined}
+        title={compact ? "Toast" : variant === "loading" ? "Saving changes" : "Changes saved"}
+        variant={variant}
+      />
     </div>
   );
 }
@@ -160,12 +208,21 @@ function TestStatus({
   slug: string;
   compact?: boolean;
 }) {
-  const { snapshot } = useQuality();
-  const result = snapshot.componentTests?.[slug];
+  const { snapshot, loading } = useQuality();
+  const result = snapshot.itemTests?.[itemTestKey("component", slug)];
+  const hasTest = getComponent(slug)?.test !== undefined;
+  if (loading)
+    return (
+      <span
+        aria-label="Loading test status"
+        className={tw("dashboard-skeleton dashboard-skeleton--test-status")}
+        role="status"
+      />
+    );
   if (!result?.total)
     return (
       <Badge tone="muted" dot>
-        {compact ? "Not tested" : "No component tests yet"}
+        {!hasTest ? "No tests registered" : compact ? "Not tested" : "No component tests yet"}
       </Badge>
     );
   if (result.failed > 0)
@@ -185,11 +242,7 @@ function TestStatus({
   );
 }
 
-function TestCaseList({
-  assertions,
-}: {
-  assertions: ComponentTestResult["assertions"];
-}) {
+function TestCaseList({ assertions }: { assertions: TestCase[] }) {
   return (
     <ul className={tw("component-test-cases")}>
       {assertions.map((testCase, index) => (
@@ -223,50 +276,6 @@ function TestCaseList({
   );
 }
 
-function SuiteFailurePanel({
-  failures,
-  completedAt,
-}: {
-  failures: QualityTestFailure[];
-  completedAt?: string;
-}) {
-  if (!failures.length) return null;
-  return (
-    <section
-      className={tw("suite-failure-panel")}
-      aria-label="Latest full-suite failures"
-    >
-      <div className={tw("suite-failure-heading")}>
-        <Icon name="activity" size={17} />
-        <div>
-          <strong>
-            {failures.length} full-suite{" "}
-            {failures.length === 1 ? "failure" : "failures"}
-          </strong>
-          <span>
-            {completedAt
-              ? `Latest suite · ${new Date(completedAt).toLocaleString()}`
-              : "Latest full-suite report"}
-          </span>
-        </div>
-      </div>
-      <ul>
-        {failures.map((failure, index) => (
-          <li key={`${failure.file}-${failure.name}-${index}`}>
-            <strong>{failure.name}</strong>
-            <code>{failure.file}</code>
-            {failure.messages[0] && (
-              <pre>
-                {failure.messages[0].trim().split("\n").slice(0, 4).join("\n")}
-              </pre>
-            )}
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 function ComponentCard({ component }: { component: ComponentDefinition }) {
   return (
     <article className={tw("component-card")}>
@@ -275,7 +284,7 @@ function ComponentCard({ component }: { component: ComponentDefinition }) {
         href={`/components/${component.slug}`}
         aria-label={`Open ${component.name} details`}
       >
-        <ComponentPreview />
+        <ComponentPreview slug={component.slug} />
       </Link>
       <div className={tw("component-card__body")}>
         <div className={tw("component-card__heading")}>
@@ -302,18 +311,29 @@ function StatCard({
   value,
   icon,
   color,
+  visual,
+  visualType,
   chartValues,
   chartLabel,
+  chartType = "line",
   emptyLabel = "No data yet",
+  loading = false,
+  href,
 }: {
   label: string;
   value: string;
   icon: "components" | "widgets" | "tests" | "clock";
   color: "purple" | "cyan" | "green" | "blue";
-  chartValues: number[];
-  chartLabel: string;
+  visual?: ReactNode;
+  visualType?: "component" | "widget";
+  chartValues?: number[];
+  chartLabel?: string;
+  chartType?: "line" | "bars";
   emptyLabel?: string;
+  loading?: boolean;
+  href?: string;
 }) {
+  chartValues ??= [];
   const points = chartValues.map((item, index) => {
     const x =
       chartValues.length === 1
@@ -328,80 +348,127 @@ function StatCard({
     points.length > 1
       ? `M ${points[0]} L ${points.slice(1).join(" L ")} L 132,40 L 5,40 Z`
       : "";
+  const maxBarValue = Math.max(...chartValues, 0);
+  const barWidth = 8;
+  const barGap = 5;
+  const barGroupWidth =
+    chartValues.length * barWidth +
+    Math.max(0, chartValues.length - 1) * barGap;
+  const firstBarX = (140 - barGroupWidth) / 2;
 
   return (
-    <article className={tw("stat-card")}>
+    <article
+      aria-busy={loading}
+      className={tw(`stat-card${href ? " is-link" : ""}`)}
+    >
+      {href && (
+        <Link
+          className={tw("stat-card__link")}
+          href={href}
+          aria-label={label}
+        />
+      )}
       <div className={tw(`stat-icon stat-icon--${color}`)}>
         <Icon name={icon} size={26} />
       </div>
       <div className={tw("stat-card__copy")}>
-        <strong>{value}</strong>
+        {loading ? (
+          <span
+            aria-hidden="true"
+            className={tw("dashboard-skeleton dashboard-skeleton--stat-value")}
+          />
+        ) : (
+          <strong>{value}</strong>
+        )}
         <span>{label}</span>
       </div>
-      <svg
-        className={tw(
-          `stat-sparkline stat-sparkline--${color}${points.length ? "" : " is-empty"}`,
-        )}
-        role="img"
-        aria-label={chartLabel}
-        viewBox="0 0 140 44"
-        preserveAspectRatio="none"
-      >
-        <line
-          className={tw("stat-sparkline-baseline")}
-          x1="0"
-          x2="140"
-          y1="40"
-          y2="40"
+      {loading ? (
+        <span
+          aria-hidden="true"
+          className={tw("dashboard-skeleton dashboard-skeleton--stat-chart")}
         />
-        {areaPath && (
-          <path className={tw("stat-sparkline-area")} d={areaPath} />
-        )}
-        {points.length > 1 && (
-          <polyline
-            className={tw("stat-sparkline-line")}
-            pathLength={1}
-            points={points.join(" ")}
+      ) : visual ? (
+        <div
+          aria-hidden="true"
+          className={tw(
+            `stat-card-preview stat-card-preview--${visualType ?? "component"}`,
+          )}
+        >
+          {visual}
+        </div>
+      ) : (
+        <svg
+          className={tw(
+            `stat-sparkline stat-sparkline--${color}${points.length ? "" : " is-empty"}`,
+          )}
+          role="img"
+          aria-label={chartLabel}
+          viewBox="0 0 140 44"
+          preserveAspectRatio="none"
+        >
+          <line
+            className={tw("stat-sparkline-baseline")}
+            x1="0"
+            x2="140"
+            y1="40"
+            y2="40"
           />
-        )}
-        {points.length === 1 && (
-          <circle
-            className={tw("stat-sparkline-point")}
-            cx={points[0].split(",")[0]}
-            cy={points[0].split(",")[1]}
-            r="4.5"
-          >
-            <title>{`${chartValues[0]} recorded value`}</title>
-          </circle>
-        )}
-        {!points.length && (
-          <text
-            className={tw("stat-sparkline-empty-label")}
-            x="134"
-            y="30"
-            textAnchor="end"
-          >
-            {emptyLabel}
-          </text>
-        )}
-      </svg>
+          {chartType === "line" && areaPath && (
+            <path className={tw("stat-sparkline-area")} d={areaPath} />
+          )}
+          {chartType === "bars" && maxBarValue > 0
+            ? chartValues.map((value, index) => {
+                const barHeight = Math.max(2, (value / maxBarValue) * 27);
+                return (
+                  <rect
+                    key={`${index}-${value}`}
+                    x={firstBarX + index * (barWidth + barGap)}
+                    y={40 - barHeight}
+                    width={barWidth}
+                    height={barHeight}
+                    rx="2"
+                    fill="currentColor"
+                    opacity={0.45 + (value / maxBarValue) * 0.55}
+                  >
+                    <title>{`Run ${index + 1}: ${value.toFixed(2)} seconds`}</title>
+                  </rect>
+                );
+              })
+            : null}
+          {chartType === "line" && points.length > 1 && (
+            <polyline
+              className={tw("stat-sparkline-line")}
+              pathLength={1}
+              points={points.join(" ")}
+            />
+          )}
+          {chartType === "line" && points.length === 1 && (
+            <circle
+              className={tw("stat-sparkline-point")}
+              cx={points[0].split(",")[0]}
+              cy={points[0].split(",")[1]}
+              r="4.5"
+            >
+              <title>{`${chartValues[0]} recorded value`}</title>
+            </circle>
+          )}
+          {!points.length && (
+            <text
+              className={tw("stat-sparkline-empty-label")}
+              x="134"
+              y="30"
+              textAnchor="end"
+            >
+              {emptyLabel}
+            </text>
+          )}
+        </svg>
+      )}
     </article>
   );
 }
 
-type OverviewTestRun = {
-  total: number;
-  passed: number;
-  failed: number;
-  pending: number;
-  passedPercentage: number | null;
-  coverageLines: number | null;
-  completedAt: string;
-  durationMs: number;
-  name: string;
-  kind: "suite" | "component";
-  failures?: QualityTestFailure[];
-};
+type OverviewTestRun = TestRunSummary;
 
 function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
   const runs = history.slice(0, 8).reverse();
@@ -416,21 +483,11 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
     )
     .filter((point): point is string => point !== null)
     .join(" ");
-  const coveragePoints = runs
-    .map((item, index) =>
-      item.coverageLines == null
-        ? null
-        : `${x(index)},${y(item.coverageLines)}`,
-    )
-    .filter((point): point is string => point !== null)
-    .join(" ");
-  const hasCoverage = runs.some((item) => item.coverageLines != null);
-
   return (
     <div className={tw("history-chart")}>
       <svg
         role="img"
-        aria-label={`Test pass rate across ${runs.length} recent runs${hasCoverage ? " with line coverage" : ""}`}
+        aria-label={`Test pass rate across ${runs.length} recent individual runs`}
         viewBox="0 0 600 150"
         preserveAspectRatio="none"
       >
@@ -449,15 +506,8 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
             points={passingPoints}
           />
         )}
-        {coveragePoints && (
-          <polyline
-            className={tw("history-line history-line--coverage")}
-            pathLength={1}
-            points={coveragePoints}
-          />
-        )}
         {runs.map((item, index) => (
-          <g key={`${item.kind}-${item.name}-${item.completedAt}`}>
+          <g key={`${item.itemType}-${item.itemSlug}-${item.completedAt}`}>
             {item.passedPercentage !== null && (
               <circle
                 className={tw("history-point history-point--passing")}
@@ -467,17 +517,6 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
                 r="3.5"
               >
                 <title>{`Run ${index + 1}: ${item.passedPercentage}% tests passing`}</title>
-              </circle>
-            )}
-            {item.coverageLines != null && (
-              <circle
-                className={tw("history-point history-point--coverage")}
-                style={{ animationDelay: `${index * 75}ms` }}
-                cx={x(index)}
-                cy={y(item.coverageLines)}
-                r="3"
-              >
-                <title>{`Run ${index + 1}: ${item.coverageLines}% line coverage`}</title>
               </circle>
             )}
             <text
@@ -507,8 +546,8 @@ type OverviewActivity = {
   total: number;
   passed: number;
   failed: number;
-  name: string;
-  kind: "suite" | "component";
+  itemName: string;
+  itemType: TestTargetType;
 };
 
 function activityTime(date: string) {
@@ -516,106 +555,26 @@ function activityTime(date: string) {
 }
 
 export function OverviewPage() {
-  const { snapshot, running, runTests, renderTimeHistory } = useQuality();
-  const run = snapshot.testRun;
-  const suiteHistory: OverviewTestRun[] = (
-    snapshot.history?.length ? snapshot.history : run ? [run] : []
-  ).map((item) => ({
-    ...item,
-    name: "Test suite",
-    kind: "suite" as const,
-  }));
-  const suiteTimestamps = new Set(suiteHistory.map((item) => item.completedAt));
-  const storedComponentEvents = (snapshot.testEventHistory ?? []).filter(
-    (item) => item.scope === "component",
-  );
-  const storedComponentKeys = new Set(
-    storedComponentEvents.map(
-      (item) => `${item.componentSlug}-${item.completedAt}`,
-    ),
-  );
-  const componentHistory: OverviewTestRun[] = [
-    ...storedComponentEvents.map((item) => ({
-      total: item.total,
-      passed: item.passed,
-      failed: item.failed,
-      pending: item.pending,
-      passedPercentage: item.passedPercentage,
-      coverageLines: null,
-      completedAt: item.completedAt,
-      durationMs: item.durationMs,
-      name: item.componentName ?? item.componentSlug ?? "Component",
-      kind: "component" as const,
-    })),
-    ...components.flatMap((component) => {
-      const result = snapshot.componentTests?.[component.slug];
-      if (
-        !result?.completedAt ||
-        suiteTimestamps.has(result.completedAt) ||
-        storedComponentKeys.has(`${component.slug}-${result.completedAt}`)
-      )
-        return [];
-      return [
-        {
-          completedAt: result.completedAt,
-          durationMs: result.durationMs ?? 0,
-          total: result.total,
-          passed: result.passed,
-          failed: result.failed,
-          pending: result.pending,
-          passedPercentage:
-            result.total > 0
-              ? Math.round((result.passed / result.total) * 1000) / 10
-              : null,
-          coverageLines: null,
-          name: component.name,
-          kind: "component" as const,
-        },
-      ];
-    }),
-  ];
-  const chartHistory = [...suiteHistory, ...componentHistory]
-    .sort(
-      (first, second) =>
-        Date.parse(second.completedAt) - Date.parse(first.completedAt),
-    )
-    .slice(0, 10);
-  const latestEvent = snapshot.latestTestEvent;
-  const latestTestRun: OverviewTestRun | undefined = latestEvent
-    ? {
-        total: latestEvent.total,
-        passed: latestEvent.passed,
-        failed: latestEvent.failed,
-        pending: latestEvent.pending,
-        passedPercentage: latestEvent.passedPercentage,
-        coverageLines: latestEvent.coverageLines,
-        completedAt: latestEvent.completedAt,
-        durationMs: latestEvent.durationMs,
-        name:
-          latestEvent.componentName ??
-          latestEvent.componentSlug ??
-          "Test suite",
-        kind: latestEvent.scope,
-        failures: latestEvent.failures,
-      }
-    : chartHistory[0];
+  const { snapshot, loading } = useQuality();
+  const chartHistory: OverviewTestRun[] = snapshot.history ?? [];
+  const latestTestRun = chartHistory[0];
   const activityItems: OverviewActivity[] = chartHistory
     .slice(0, 4)
     .map((item) => ({
-      key: `${item.kind}-${item.completedAt}-${item.name}`,
+      key: `${item.itemType}-${item.itemSlug}-${item.completedAt}`,
       completedAt: item.completedAt,
       durationMs: item.durationMs,
       total: item.total,
       passed: item.passed,
       failed: item.failed,
-      name: item.name,
-      kind: item.kind,
+      itemName: item.itemName,
+      itemType: item.itemType,
     }));
-  const componentCategories = ["Controls", "Forms", "Feedback"];
-  const componentChartValues = componentCategories.map(
-    (category) =>
-      components.filter((item) => item.category === category).length,
-  );
+  const averageItemDurationMs = snapshot.averageItemDurationMs;
+  const itemDurationHistory = chartHistory
+    .slice(0, 8)
+    .reverse()
+    .map((item) => item.durationMs / 1000);
   const testChartValues = chartHistory
     .slice(0, 8)
     .reverse()
@@ -641,7 +600,7 @@ export function OverviewPage() {
           </div>
           <div className={tw("hero-art")}>
             <Image
-              src="/neon_robot_banner.png"
+              src="/assets/img/neon_robot_banner.png"
               alt="Neon robot mascot holding a code panel"
               width={1672}
               height={942}
@@ -657,19 +616,21 @@ export function OverviewPage() {
             value={String(components.length)}
             icon="components"
             color="purple"
-            chartValues={componentChartValues}
-            chartLabel={`Component counts by category: ${componentCategories.map((category, index) => `${category} ${componentChartValues[index]}`).join(", ")}`}
+            href="/components"
+            visual={<ComponentLibraryMiniPreview />}
+            visualType="component"
           />
           <StatCard
             label="Widgets"
             value={String(widgets.length)}
             icon="widgets"
             color="cyan"
-            chartValues={[]}
-            chartLabel="No widget data has been recorded"
+            href="/widgets"
+            visual={<WidgetMascotPreview size={36} />}
+            visualType="widget"
           />
           <StatCard
-            label="Tests passing"
+            label="Latest test pass rate"
             value={
               latestTestRun?.passedPercentage == null
                 ? "—"
@@ -677,53 +638,61 @@ export function OverviewPage() {
             }
             icon="tests"
             color="green"
+            loading={loading}
             chartValues={testChartValues}
             chartLabel={
               testChartValues.length
-                ? `Pass percentage across ${testChartValues.length} actual suite and component test runs`
-                : "No test run history yet"
+                ? `Pass percentage across ${testChartValues.length} recent individual runs`
+                : "No individual test runs yet"
             }
           />
           <StatCard
-            label="Avg Render Time"
+            label="Avg Individual Test Duration"
             value={
-              snapshot.averageRenderTimeMs == null
+              averageItemDurationMs == null
                 ? "—"
-                : `${snapshot.averageRenderTimeMs.toFixed(2)} ms`
+                : averageItemDurationMs >= 1000
+                  ? `${(averageItemDurationMs / 1000).toFixed(1)} s`
+                  : `${Math.round(averageItemDurationMs)} ms`
             }
             icon="clock"
             color="blue"
-            chartValues={renderTimeHistory}
+            loading={loading}
+            chartValues={itemDurationHistory}
+            chartType="bars"
             chartLabel={
-              renderTimeHistory.length
-                ? `${renderTimeHistory.length} actual React Profiler samples this session`
-                : "No render measurements yet"
+              itemDurationHistory.length
+                ? `Duration of the ${itemDurationHistory.length} most recent saved individual runs, in seconds`
+                : "No saved individual test durations yet"
             }
-            emptyLabel="Profile a component"
+            emptyLabel="Run an individual test"
           />
         </section>
       </section>
 
       <div className={tw("dashboard-grid dashboard-grid--primary")}>
-        <section className={tw("panel test-performance-panel")}>
+        <section
+          aria-busy={loading}
+          className={tw("panel test-performance-panel")}
+        >
           <SectionTitle title="Test performance" href="/tests" icon="tests" />
-          {chartHistory.length > 1 && (
+          {loading ? (
+            <div aria-hidden="true" className={tw("chart-loading-skeleton")}>
+              <span
+                className={tw("dashboard-skeleton dashboard-skeleton--chart")}
+              />
+            </div>
+          ) : chartHistory.length > 1 ? (
             <div className={tw("chart-legend")}>
               <span>
                 <i className={tw("legend-dot legend-dot--cyan")} /> Passing
                 tests
               </span>
-              {chartHistory.some((item) => item.coverageLines !== null) && (
-                <span>
-                  <i className={tw("legend-dot legend-dot--purple")} /> Line
-                  coverage
-                </span>
-              )}
             </div>
-          )}
-          {chartHistory.length > 1 ? (
+          ) : null}
+          {!loading && chartHistory.length > 1 ? (
             <TestHistoryGraph history={chartHistory} />
-          ) : latestTestRun ? (
+          ) : !loading && latestTestRun ? (
             <div
               className={tw("result-chart")}
               aria-label={`${latestTestRun.passed} tests passed, ${latestTestRun.failed} failed, ${latestTestRun.pending} pending`}
@@ -741,36 +710,28 @@ export function OverviewPage() {
                 <span>{latestTestRun.pending} pending</span>
               </div>
               <p>
-                {latestTestRun.kind === "component"
-                  ? `${latestTestRun.name} component tests`
-                  : "Latest suite run"}{" "}
-                · {new Date(latestTestRun.completedAt).toLocaleString()}
+                {latestTestRun.itemName} {latestTestRun.itemType} tests ·{" "}
+                {new Date(latestTestRun.completedAt).toLocaleString()}
               </p>
             </div>
-          ) : (
+          ) : !loading ? (
             <div className={tw("chart-empty")}>
               <div className={tw("chart-placeholder")}>
                 <Icon name="activity" size={20} />
                 <span>
-                  Run component or suite tests to record a quality history.
+                  Run an individual component or widget test to record quality
+                  history.
                 </span>
               </div>
             </div>
-          )}
-          {snapshot.coverage ? (
-            <div className={tw("coverage-line")}>
-              <span>Line coverage</span>
-              <strong>{snapshot.coverage.lines}%</strong>
-            </div>
-          ) : (
-            <div className={tw("coverage-line")}>
-              <span>Coverage</span>
-              <Badge tone="muted">Not collected</Badge>
-            </div>
-          )}
+          ) : null}
+          <div className={tw("coverage-line")}>
+            <span>Test durations</span>
+            <Badge tone="muted">Individual runs only</Badge>
+          </div>
         </section>
 
-        <section className={tw("panel activity-panel")}>
+        <section aria-busy={loading} className={tw("panel activity-panel")}>
           <div className={tw("activity-heading")}>
             <span className={tw("activity-heading-icon")}>
               <Icon name="activity" size={20} />
@@ -782,12 +743,49 @@ export function OverviewPage() {
               View all <Icon name="arrow-right" size={14} />
             </Link>
           </div>
-          {activityItems.length ? (
+          {loading ? (
+            <ol
+              aria-hidden="true"
+              className={tw("activity-list activity-skeleton-list")}
+            >
+              {[0, 1, 2].map((item) => (
+                <li className={tw("activity-skeleton-row")} key={item}>
+                  <span
+                    className={tw(
+                      "dashboard-skeleton dashboard-skeleton--timeline",
+                    )}
+                  />
+                  <span
+                    className={tw(
+                      "dashboard-skeleton dashboard-skeleton--activity-time",
+                    )}
+                  />
+                  <span
+                    className={tw(
+                      "dashboard-skeleton dashboard-skeleton--activity-icon",
+                    )}
+                  />
+                  <span className={tw("activity-skeleton-copy")}>
+                    <span
+                      className={tw(
+                        "dashboard-skeleton dashboard-skeleton--activity-title",
+                      )}
+                    />
+                    <span
+                      className={tw(
+                        "dashboard-skeleton dashboard-skeleton--activity-meta",
+                      )}
+                    />
+                  </span>
+                </li>
+              ))}
+            </ol>
+          ) : activityItems.length ? (
             <ol className={tw("activity-list")}>
               {activityItems.map((item) => (
                 <li
                   className={tw(
-                    `activity-item activity-item--${item.kind}${item.failed ? " has-failures" : ""}`,
+                    `activity-item activity-item--${item.itemType}${item.failed ? " has-failures" : ""}`,
                   )}
                   key={item.key}
                 >
@@ -800,18 +798,17 @@ export function OverviewPage() {
                       name={
                         item.failed
                           ? "activity"
-                          : item.kind === "component"
+                          : item.itemType === "component"
                             ? "components"
-                            : "check"
+                            : "widgets"
                       }
                       size={16}
                     />
                   </span>
                   <div>
                     <strong>
-                      {item.kind === "component"
-                        ? `${item.name} component tests ${item.failed ? "failed" : "passed"}`
-                        : `Test suite ${item.failed ? "reported failures" : "passed"}`}
+                      {item.itemName} {item.itemType} tests{" "}
+                      {item.failed ? "failed" : "passed"}
                     </strong>
                     <span>
                       {item.passed}/{item.total} passed · {item.failed} failed ·{" "}
@@ -842,84 +839,6 @@ export function OverviewPage() {
         </section>
       </div>
 
-      <div className={tw("dashboard-grid dashboard-grid--secondary")}>
-        <section className={tw("panel component-overview-panel")}>
-          <SectionTitle
-            title="Components overview"
-            href="/components"
-            icon="components"
-          />
-          <div className={tw("overview-component-list")}>
-            {components.slice(0, 4).map((component) => (
-              <Link
-                className={tw("overview-component")}
-                href={`/components/${component.slug}`}
-                key={component.slug}
-              >
-                <span
-                  className={tw(
-                    `overview-component__icon icon-${component.slug}`,
-                  )}
-                >
-                  <Icon name="sparkles" size={22} />
-                </span>
-                <span>
-                  <strong>{component.name}</strong>
-                  <small>{component.category}</small>
-                </span>
-                <TestStatus slug={component.slug} compact />
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        <section className={tw("panel quick-actions-panel")}>
-          <SectionTitle title="Quick actions" icon="play" />
-          <div className={tw("quick-actions")}>
-            <Link href="/playground">
-              <Icon name="play" size={17} />
-              <span>Open Playground</span>
-              <Icon
-                className={tw("quick-arrow")}
-                name="arrow-right"
-                size={15}
-              />
-            </Link>
-            <button onClick={() => void runTests()} disabled={running}>
-              <Icon name="tests" size={17} />
-              <span>{running ? "Running tests…" : "Run Tests"}</span>
-              <Icon
-                className={tw("quick-arrow")}
-                name="arrow-right"
-                size={15}
-              />
-            </button>
-            <Link href="/components">
-              <Icon name="components" size={17} />
-              <span>Browse Components</span>
-              <Icon
-                className={tw("quick-arrow")}
-                name="arrow-right"
-                size={15}
-              />
-            </Link>
-            <Link href="/docs">
-              <Icon name="book" size={17} />
-              <span>View Documentation</span>
-              <Icon
-                className={tw("quick-arrow")}
-                name="arrow-right"
-                size={15}
-              />
-            </Link>
-          </div>
-          {snapshot.error && (
-            <p className={tw("inline-error")} role="status">
-              {snapshot.error}
-            </p>
-          )}
-        </section>
-      </div>
     </div>
   );
 }
@@ -1096,11 +1015,22 @@ function DetailPreview({
             }}
           >
             <div className={tw("component-stage__center")}>
-              <ComponentPreview tone={badgeTone} dot={dot} />
+            <ComponentPreview slug={slug} tone={badgeTone} dot={dot} />
             </div>
           </Profiler>
         </div>
       </div>
+      {slug === "toast" ? (
+        <div className={tw("preview-properties")}>
+          <span className={tw("render-measure")}>
+            <Icon name="sparkles" size={14} /> Notification preview
+          </span>
+          <span className={tw("render-measure")}>
+            <Icon name="clock" size={14} />{" "}
+            {duration === null ? "Measuring render…" : `${duration.toFixed(2)} ms actual render`}
+          </span>
+        </div>
+      ) : (
       <div className={tw("preview-properties")}>
         <div className={tw("property-control")}>
           <span>Color tone</span>
@@ -1126,6 +1056,7 @@ function DetailPreview({
             : `${duration.toFixed(2)} ms actual render`}
         </span>
       </div>
+      )}
     </div>
   );
 }
@@ -1133,9 +1064,8 @@ function DetailPreview({
 export function ComponentDetailPage({ slug }: { slug: string }) {
   const component = getComponent(slug);
   const componentSlug = component?.slug;
-  const { snapshot, running, runningComponentSlug, runComponentTests } =
-    useQuality();
-  const componentTest = snapshot.componentTests?.[slug];
+  const { snapshot, runningItemKey, runItemTests } = useQuality();
+  const componentTest = snapshot.itemTests?.[itemTestKey("component", slug)];
   const [tab, setTab] = useState("Preview");
   const [copied, setCopied] = useState(false);
   const [componentRenderTimeMs, setComponentRenderTimeMs] = useState<
@@ -1179,9 +1109,11 @@ export function ComponentDetailPage({ slug }: { slug: string }) {
   }, [componentSlug, tab]);
 
   if (!component) return <NotFoundPage />;
-  const usage = '<Badge tone="green" dot>Ready</Badge>';
-  const componentTestRunning = runningComponentSlug === slug;
-  const componentTestsBusy = running || runningComponentSlug !== null;
+  const usage = component?.slug === "toast"
+    ? '<Toast variant="success" title="Changes saved" description="Your update is ready." />'
+    : '<Badge tone="green" dot>Ready</Badge>';
+  const componentTestRunning =
+    runningItemKey === itemTestKey("component", slug);
 
   async function copyUsage() {
     await navigator.clipboard.writeText(usage);
@@ -1206,8 +1138,8 @@ export function ComponentDetailPage({ slug }: { slug: string }) {
             <button
               className={tw("button button-primary")}
               type="button"
-              disabled={componentTestsBusy}
-              onClick={() => void runComponentTests(slug)}
+              disabled={runningItemKey !== null || !component.test}
+              onClick={() => void runItemTests("component", slug)}
             >
               <Icon name="play" size={14} />
               {componentTestRunning
@@ -1257,16 +1189,33 @@ export function ComponentDetailPage({ slug }: { slug: string }) {
             detail="Rendered with the library component itself"
           />
           <div className={tw("variant-samples")}>
-            {badgeTones.map(({ label, value }) => (
-              <div key={value}>
-                <ComponentPreview tone={value as BadgeTone} />
-                <span>{label}</span>
-              </div>
-            ))}
-            <div>
-              <ComponentPreview dot={false} />
-              <span>Without status dot</span>
-            </div>
+            {component.slug === "toast" ? (
+              <>
+                {(["loading", "success", "warning", "error"] as const).map((variant) => (
+                  <div key={variant}>
+                    <ToastPreview variant={variant} />
+                    <span>{variant}</span>
+                  </div>
+                ))}
+                <div>
+                  <ToastPreview mode="steps" />
+                  <span>Steps</span>
+                </div>
+              </>
+            ) : (
+              <>
+                {badgeTones.map(({ label, value }) => (
+                  <div key={value}>
+                    <ComponentPreview tone={value as BadgeTone} />
+                    <span>{label}</span>
+                  </div>
+                ))}
+                <div>
+                  <ComponentPreview dot={false} />
+                  <span>Without status dot</span>
+                </div>
+              </>
+            )}
           </div>
         </section>
       )}
@@ -1274,7 +1223,7 @@ export function ComponentDetailPage({ slug }: { slug: string }) {
         <section className={tw("panel quality-detail-panel")}>
           <SectionTitle
             title="Test results"
-            detail="Latest results for this component, plus full-suite failures"
+            detail="Latest individual test run for this component"
           />
           {componentTest && componentTest.total > 0 ? (
             <>
@@ -1301,42 +1250,28 @@ export function ComponentDetailPage({ slug }: { slug: string }) {
                 </div>
               </div>
               <div className={tw("component-test-result-meta")}>
-                Latest{" "}
-                {componentTest.scope === "component"
-                  ? "component run"
-                  : "suite run"}
+                Latest individual component run
                 {componentTest.completedAt
                   ? ` · ${new Date(componentTest.completedAt).toLocaleString()}`
                   : ""}
               </div>
               <TestCaseList assertions={componentTest.assertions} />
               <div className={tw("detail-test-source")}>
-                <Icon name="code" size={14} /> {component.test}
+                <Icon name="code" size={14} /> {component.test ?? "No individual test registered"}
                 <span>
-                  Suite coverage:{" "}
-                  {snapshot.coverage
-                    ? `${snapshot.coverage.lines}% lines`
-                    : "not available"}
+                  Duration: {(componentTest.durationMs / 1000).toFixed(2)}s
                 </span>
               </div>
             </>
-          ) : snapshot.testRun ? (
-            <EmptyState
-              icon="tests"
-              title="No tests mapped to this component"
-              description={`The latest Vitest report did not include test cases from ${component.test}.`}
-            />
           ) : (
             <EmptyState
               icon="tests"
               title="No test results yet"
-              description={`Run the Vitest suite to collect results for ${component.test}.`}
+              description={component.test
+                ? `Run this component's individual test to collect results for ${component.test}.`
+                : "This component is cataloged for preview, but does not have an individual test file registered yet."}
             />
           )}
-          <SuiteFailurePanel
-            failures={snapshot.suiteFailures ?? []}
-            completedAt={snapshot.testRun?.completedAt}
-          />
         </section>
       )}
       {tab === "Performance" && (
@@ -1411,7 +1346,7 @@ export function ComponentDetailPage({ slug }: { slug: string }) {
             <section>
               <div className={tw("source-file-heading")}>
                 <span>Tests</span>
-                <code>{component.test}</code>
+                <code>{component.test ?? "No individual test registered"}</code>
               </div>
               <pre>
                 <code>
@@ -1451,9 +1386,17 @@ export function WidgetsPage() {
       {widgets.length ? (
         <div className={tw("widget-catalog-grid")}>
           {widgets.map((widget) => (
-            <article className={tw("panel widget-card")} key={widget.slug}>
+            <Link
+              className={tw("panel widget-card")}
+              href={`/playground?item=${widget.slug}`}
+              key={widget.slug}
+            >
               <div className={tw("widget-card__preview")}>
-                <Icon name="widgets" size={25} />
+                {widget.slug === "mascot" ? (
+                  <WidgetMascotPreview />
+                ) : (
+                  <Icon name="widgets" size={25} />
+                )}
               </div>
               <div className={tw("widget-card__body")}>
                 <div>
@@ -1469,7 +1412,7 @@ export function WidgetsPage() {
                 <p>{widget.description}</p>
                 <code>{widget.source}</code>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
       ) : (
@@ -1504,13 +1447,45 @@ export function WidgetsPage() {
   );
 }
 
-export function PlaygroundPage() {
-  const [slug, setSlug] = useState(components[0]?.slug ?? "badge");
+export function PlaygroundPage({
+  initialItem,
+}: {
+  initialItem?: string;
+} = {}) {
+  const playgroundItems = [
+    ...components.map((component) => ({
+      label: `${component.name} · component`,
+      value: component.slug,
+    })),
+    ...widgets.map((widget) => ({
+      label: `${widget.name} · widget`,
+      value: widget.slug,
+    })),
+  ];
+  const defaultItem = playgroundItems.some((item) => item.value === initialItem)
+    ? initialItem!
+    : (components[0]?.slug ?? "badge");
+  const [slug, setSlug] = useState(defaultItem);
   const [badgeTone, setBadgeTone] = useState<BadgeTone>("green");
   const [dot, setDot] = useState(true);
   const [viewport, setViewport] = useState("Desktop");
-  const selected = getComponent(slug);
-  const snippet = `<Badge tone="${badgeTone}"${dot ? " dot" : ""}>Ready</Badge>`;
+  const [toastVariant, setToastVariant] = useState<"loading" | "success" | "warning" | "error">("loading");
+  const [toastMode, setToastMode] = useState<"normal" | "steps">("normal");
+  const mascotPlayground = useMascotPlayground();
+  const selectedComponent = getComponent(slug);
+  const selectedWidget = getWidget(slug);
+  const isMascot = slug === "mascot";
+  const isToast = slug === "toast";
+  const snippet = isMascot
+    ? mascotPlayground.snippet
+    : isToast
+      ? `<Toast variant="${toastVariant}" mode="${toastMode}" title="Saving changes" />`
+      : `<Badge tone="${badgeTone}"${dot ? " dot" : ""}>Ready</Badge>`;
+  const detailsHref = selectedComponent
+    ? `/components/${selectedComponent.slug}`
+    : selectedWidget
+      ? "/widgets"
+      : "/components";
 
   return (
     <div className={tw("page-stack")}>
@@ -1531,37 +1506,61 @@ export function PlaygroundPage() {
             </div>
           </div>
           <div className={tw("control-label")}>
-            <span>Component</span>
+            <span>Item</span>
             <Dropdown
-              label="Component"
+              label="Playground item"
               value={slug}
               onChange={setSlug}
-              options={components.map((component) => ({
-                label: component.name,
-                value: component.slug,
-              }))}
+              options={playgroundItems}
             />
           </div>
-          <div className={tw("control-label")}>
-            <span>Color tone</span>
-            <Dropdown
-              label="Color tone"
-              value={badgeTone}
-              onChange={(value) => setBadgeTone(value as BadgeTone)}
-              options={badgeTones}
-            />
-          </div>
-          <div className={tw("control-toggle")}>
-            <span>
-              <strong>Status dot</strong>
-              <small>Show the badge indicator</small>
-            </span>
-            <DashboardToggle
-              checked={dot}
-              onChange={setDot}
-              label="Show status dot"
-            />
-          </div>
+          {isMascot ? (
+            <MascotPlaygroundControls playground={mascotPlayground} />
+          ) : isToast ? (
+            <>
+              <div className={tw("control-label")}>
+                <span>Toast variant</span>
+                <Dropdown
+                  label="Toast variant"
+                  value={toastVariant}
+                  onChange={(value) => setToastVariant(value as typeof toastVariant)}
+                  options={["loading", "success", "warning", "error"].map((value) => ({ label: value, value }))}
+                />
+              </div>
+              <div className={tw("control-label")}>
+                <span>Display</span>
+                <Dropdown
+                  label="Toast display"
+                  value={toastMode}
+                  onChange={(value) => setToastMode(value as typeof toastMode)}
+                  options={["normal", "steps"].map((value) => ({ label: value, value }))}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className={tw("control-label")}>
+                <span>Color tone</span>
+                <Dropdown
+                  label="Color tone"
+                  value={badgeTone}
+                  onChange={(value) => setBadgeTone(value as BadgeTone)}
+                  options={badgeTones}
+                />
+              </div>
+              <div className={tw("control-toggle")}>
+                <span>
+                  <strong>Status dot</strong>
+                  <small>Show the badge indicator</small>
+                </span>
+                <DashboardToggle
+                  checked={dot}
+                  onChange={setDot}
+                  label="Show status dot"
+                />
+              </div>
+            </>
+          )}
           <div className={tw("control-divider")} />
           <div className={tw("viewport-picker")}>
             <strong>Viewport</strong>
@@ -1589,11 +1588,9 @@ export function PlaygroundPage() {
               ))}
             </div>
           </div>
-          <Link
-            className={tw("control-detail-link")}
-            href={selected ? `/components/${selected.slug}` : "/components"}
-          >
-            Open component details <Icon name="arrow-right" size={14} />
+          <Link className={tw("control-detail-link")} href={detailsHref}>
+            {selectedWidget ? "Open widget catalog" : "Open component details"}{" "}
+            <Icon name="arrow-right" size={14} />
           </Link>
         </aside>
 
@@ -1612,17 +1609,25 @@ export function PlaygroundPage() {
               `playground-stage playground-stage--${viewport.toLowerCase()}`,
             )}
           >
-            <div className={tw("playground-canvas")}>
-              <ComponentPreview tone={badgeTone} dot={dot} />
+            <div
+              className={tw(
+                `playground-canvas${isMascot ? " playground-canvas--mascot" : ""}`,
+              )}
+            >
+              {isMascot ? (
+                <MascotPlaygroundStage playground={mascotPlayground} />
+              ) : isToast ? (
+                <ToastPreview variant={toastVariant} mode={toastMode} />
+              ) : (
+                <ComponentPreview slug={slug} tone={badgeTone} dot={dot} />
+              )}
             </div>
           </div>
           <div className={tw("code-preview-heading")}>
             <span>
               <Icon name="code" size={15} /> Example
             </span>
-            <Link
-              href={selected ? `/components/${selected.slug}` : "/components"}
-            >
+            <Link href={detailsHref}>
               View source <Icon name="arrow-right" size={14} />
             </Link>
           </div>
@@ -1636,51 +1641,36 @@ export function PlaygroundPage() {
 }
 
 export function TestsPage() {
-  const {
-    snapshot,
-    running,
-    runningComponentSlug,
-    loading,
-    runTests,
-    runComponentTests,
-    refresh,
-  } = useQuality();
-  const latestEvent = snapshot.latestTestEvent;
-  const run = latestEvent ?? snapshot.testRun;
-  const runScope = latestEvent?.scope ?? "suite";
-  const runName =
-    latestEvent?.componentName ?? latestEvent?.componentSlug ?? "Component";
-  const runHistory: QualityTestEvent[] = snapshot.testEventHistory?.length
-    ? snapshot.testEventHistory
-    : snapshot.history?.length
-      ? snapshot.history.map((item) => ({ ...item, scope: "suite" as const }))
-      : latestEvent
-        ? [latestEvent]
-        : run
-          ? [{ ...run, scope: "suite" as const }]
-          : [];
-  const testsBusy = running || runningComponentSlug !== null;
+  const { snapshot, runningItemKey, loading, runItemTests, refresh } =
+    useQuality();
+  const runHistory = snapshot.history ?? [];
+  const run = runHistory[0] ?? null;
+  const testsBusy = runningItemKey !== null;
+  const targets: Array<{
+    itemType: TestTargetType;
+    slug: string;
+    name: string;
+    test?: string;
+  }> = [
+    ...components.map((item) => ({
+      itemType: "component" as const,
+      slug: item.slug,
+      name: item.name,
+      test: item.test,
+    })),
+    ...widgets.map((item) => ({
+      itemType: "widget" as const,
+      slug: item.slug,
+      name: item.name,
+      test: item.test,
+    })),
+  ];
   return (
     <div className={tw("page-stack")}>
       <PageTitle
         eyebrow="QUALITY / VITEST"
         title="Tests & Performance"
-        description="Real suite results and browser measurements for the component library."
-        action={
-          <button
-            className={tw("button button-primary")}
-            type="button"
-            onClick={() => void runTests()}
-            disabled={testsBusy}
-          >
-            <Icon name="play" size={15} />{" "}
-            {running
-              ? "Running test suite…"
-              : runningComponentSlug
-                ? `Running ${runningComponentSlug} tests…`
-                : "Run test suite"}
-          </button>
-        }
+        description="Run tests for one component or widget at a time and review each saved result."
       />
       {snapshot.error && (
         <div className={tw("error-banner")} role="alert">
@@ -1692,12 +1682,12 @@ export function TestsPage() {
       <div className={tw("quality-kpis quality-kpis--wide")}>
         <div>
           <span>
-            {runScope === "component" ? `${runName} tests` : "Total tests"}
+            {run ? `${run.itemName} ${run.itemType} tests` : "Latest test run"}
           </span>
           <strong>{loading ? "…" : (run?.total ?? "—")}</strong>
           <small>
             {run
-              ? `${runScope === "component" ? "Latest component run" : "Latest suite run"} · ${new Date(run.completedAt).toLocaleString()}`
+              ? `Individual run · ${new Date(run.completedAt).toLocaleString()}`
               : "No test results yet"}
           </small>
         </div>
@@ -1709,7 +1699,7 @@ export function TestsPage() {
           <small>
             {run
               ? `${run.passedPercentage ?? "—"}% pass rate`
-              : "Run the suite to collect results"}
+              : "Run an individual test to collect results"}
           </small>
         </div>
         <div>
@@ -1725,24 +1715,22 @@ export function TestsPage() {
           <small>{run ? "Reported by Vitest" : "No test results yet"}</small>
         </div>
       </div>
-      <SuiteFailurePanel
-        failures={snapshot.suiteFailures ?? []}
-        completedAt={snapshot.testRun?.completedAt}
-      />
       <section className={tw("panel component-test-overview")}>
         <SectionTitle
-          title="What each component tests"
-          detail="Individual test cases from the latest component or suite run"
+          title="Individual test targets"
+          detail="Choose a component or widget to run only its registered Vitest path"
         />
         <div className={tw("component-test-groups")}>
-          {components.map((component) => {
-            const result = snapshot.componentTests?.[component.slug];
+          {targets.map((target) => {
+            const key = itemTestKey(target.itemType, target.slug);
+            const result = snapshot.itemTests?.[key];
+            const isRunning = runningItemKey === key;
             return (
-              <div className={tw("component-test-group")} key={component.slug}>
-                <details open={components.length === 1}>
+              <div className={tw("component-test-group")} key={key}>
+                <details>
                   <summary>
                     <span className={tw("component-test-group-name")}>
-                      {component.name}
+                      {target.name} <small>{target.itemType}</small>
                     </span>
                     <Badge
                       tone={
@@ -1753,7 +1741,7 @@ export function TestsPage() {
                             : "muted"
                       }
                     >
-                      {result?.total
+                      {result
                         ? `${result.passed}/${result.total} passed`
                         : "Not tested"}
                     </Badge>
@@ -1761,33 +1749,33 @@ export function TestsPage() {
                   </summary>
                   {result?.completedAt && (
                     <div className={tw("component-test-result-meta")}>
-                      Latest{" "}
-                      {result.scope === "component"
-                        ? "component run"
-                        : "suite run"}{" "}
-                      · {new Date(result.completedAt).toLocaleString()}
+                      Latest individual run ·{" "}
+                      {new Date(result.completedAt).toLocaleString()} ·{" "}
+                      {(result.durationMs / 1000).toFixed(2)}s
                     </div>
                   )}
                   {result?.assertions.length ? (
                     <TestCaseList assertions={result.assertions} />
                   ) : (
                     <p className={tw("component-test-unavailable")}>
-                      {run
-                        ? "No test cases were found for this component in its latest run."
-                        : "Run the suite to collect test cases for this component."}
+                      {result
+                        ? "No test cases were returned by this run."
+                        : target.test
+                          ? `No individual result yet. Test path: ${target.test}`
+                          : "No individual test file registered for this target."}
                     </p>
                   )}
                 </details>
                 <button
                   className={tw("button button-quiet component-test-run")}
                   type="button"
-                  onClick={() => void runComponentTests(component.slug)}
-                  disabled={testsBusy}
+                  onClick={() =>
+                    void runItemTests(target.itemType, target.slug)
+                  }
+                  disabled={testsBusy || !target.test}
                 >
                   <Icon name="play" size={13} />
-                  {runningComponentSlug === component.slug
-                    ? "Running tests…"
-                    : `Run ${component.name} tests`}
+                  {isRunning ? "Running tests…" : `Run ${target.name} tests`}
                 </button>
               </div>
             );
@@ -1797,15 +1785,15 @@ export function TestsPage() {
       <div className={tw("dashboard-grid dashboard-grid--primary")}>
         <section className={tw("panel quality-panel")}>
           <SectionTitle
-            title="Test runs"
-            detail="Latest suite and component runs"
+            title="Individual test activity"
+            detail="Recent runs, each scoped to one component or widget"
           />
           {runHistory.length ? (
             <ol className={tw("run-history")}>
               {runHistory.map((item) => (
                 <li
                   className={tw("run-row")}
-                  key={`${item.scope}-${item.completedAt}-${item.componentSlug ?? ""}`}
+                  key={`${item.itemType}-${item.itemSlug}-${item.completedAt}`}
                 >
                   <span
                     className={tw(
@@ -1818,9 +1806,7 @@ export function TestsPage() {
                   </span>
                   <div>
                     <strong>
-                      {item.scope === "component"
-                        ? `${item.componentName ?? "Component"} tests`
-                        : "Vitest suite"}
+                      {item.itemName} {item.itemType} tests
                     </strong>
                     <small>
                       {item.total} tests · {item.passed} passed · {item.failed}{" "}
@@ -1840,42 +1826,7 @@ export function TestsPage() {
             <EmptyState
               icon="tests"
               title="No test runs yet"
-              description="Run the Vitest suite to record pass, fail, and pending counts."
-              action={
-                <button
-                  className={tw("button button-primary")}
-                  type="button"
-                  onClick={() => void runTests()}
-                  disabled={testsBusy}
-                >
-                  Run tests
-                </button>
-              }
-            />
-          )}
-        </section>
-        <section className={tw("panel quality-panel")}>
-          <SectionTitle
-            title="Coverage"
-            detail="Read from the latest Vitest coverage report"
-          />
-          {snapshot.coverage ? (
-            <div className={tw("coverage-grid")}>
-              {Object.entries(snapshot.coverage).map(([key, value]) => (
-                <div key={key}>
-                  <span>{key}</span>
-                  <strong>{value}%</strong>
-                  <div className={tw("coverage-track")}>
-                    <span style={{ width: `${value}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              icon="activity"
-              title="Coverage not collected"
-              description="Run a coverage-enabled Vitest pass to produce line, statement, function, and branch metrics."
+              description="Choose an individual test target above to record pass, fail, pending counts, and duration."
             />
           )}
         </section>
@@ -1906,9 +1857,8 @@ export function TestsPage() {
         </div>
       </section>
       <p className={tw("quality-footnote")}>
-        <Icon name="sparkles" size={15} /> Suite and component test counts come
-        from Vitest JSON output. Coverage comes from its generated coverage
-        summary.
+        <Icon name="sparkles" size={15} /> Counts, test cases, and durations
+        come from each target&apos;s individual Vitest run.
       </p>
     </div>
   );
@@ -2106,8 +2056,8 @@ export function DocumentationPage() {
           </span>
           <h2>Quality reports</h2>
           <p>
-            Run Tests calls Vitest with JSON and coverage reporters. Counts and
-            coverage are read from the new run output.
+            Run a component or widget test individually. Saved results include
+            its cases and duration, and feed the Home activity and average.
           </p>
           <Link className={tw("text-link")} href="/tests">
             View quality <Icon name="arrow-right" size={14} />

@@ -1,0 +1,25 @@
+import type { ThemeTokens } from "../core/types";
+
+export const mono: ThemeTokens = {
+  accentA: "#111111",
+  accentMid: "#6b7280",
+  accentB: "#d1d5db",
+  eyeFrom: "#e5e7eb",
+  eyeTo: "#9ca3af",
+  shell1: "#ffffff",
+  shell2: "#f3f4f6",
+  shell3: "#d1d5db",
+  shellEdge: "#6b7280",
+  screen1: "#111827",
+  screen2: "#030712",
+  neck1: "#4b5563",
+  neck2: "#9ca3af",
+  neck3: "#374151",
+  base1: "#ffffff",
+  base2: "#e5e7eb",
+  shadow: "#111827",
+  bubbleBg: "#ffffff",
+  bubbleFg: "#111827",
+  bubbleBorderA: "#111111",
+  bubbleBorderB: "#9ca3af",
+};

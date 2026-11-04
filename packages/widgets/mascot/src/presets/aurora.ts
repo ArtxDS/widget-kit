@@ -1,0 +1,25 @@
+import type { ThemeTokens } from "../core/types";
+
+export const aurora: ThemeTokens = {
+  accentA: "#9945FF",
+  accentMid: "#5E8DF2",
+  accentB: "#14F195",
+  eyeFrom: "#14F195",
+  eyeTo: "#00C2FF",
+  shell1: "#fff",
+  shell2: "#f2effb",
+  shell3: "#c0b8e2",
+  shellEdge: "#6d4fc0",
+  screen1: "#14102a",
+  screen2: "#020106",
+  neck1: "#6a5fa0",
+  neck2: "#a79fd0",
+  neck3: "#5a4f90",
+  base1: "#fff",
+  base2: "#d9d3ee",
+  shadow: "#3c1e78",
+  bubbleBg: "#ffffff",
+  bubbleFg: "#1b1530",
+  bubbleBorderA: "#9945FF",
+  bubbleBorderB: "#14F195",
+};

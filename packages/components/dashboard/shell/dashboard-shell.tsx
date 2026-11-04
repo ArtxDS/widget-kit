@@ -4,10 +4,12 @@ import { tw } from "@/lib/tailwind";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { components } from "@/lib/catalog";
-import type { IconName } from "./icon";
-import { Icon } from "./icon";
-import { QualityProvider } from "./quality-provider";
+import { Blocks } from "lucide-react";
+import { components, widgets } from "@/lib/catalog";
+import type { IconName } from "../shared/icon";
+import { Icon } from "../shared/icon";
+import { QualityProvider } from "../quality/quality-provider";
+import { TestRunToast } from "../quality/test-run-toast";
 
 const navItems: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Overview", icon: "overview" },
@@ -60,7 +62,14 @@ export function DashboardShell({ children }: { children: ReactNode }) {
       kind: "Component",
       key: component.slug,
     }));
-    return [...pages, ...catalogItems].filter((item) =>
+    const widgetItems = widgets.map((widget) => ({
+      href: `/playground?item=${widget.slug}`,
+      label: widget.name,
+      icon: "widgets" as const,
+      kind: "Widget",
+      key: widget.slug,
+    }));
+    return [...pages, ...catalogItems, ...widgetItems].filter((item) =>
       normalized ? item.label.toLowerCase().includes(normalized) : true,
     );
   }, [query]);
@@ -72,7 +81,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         <aside className={tw("sidebar")}>
           <Link className={tw("brand")} href="/" aria-label="widget-kit overview">
             <span className={tw("brand-mark")} aria-hidden="true">
-              <i /><i /><i />
+              <Blocks size={28} strokeWidth={2.3} />
             </span>
             <span className={tw("brand-copy")}>
               <strong>widget-kit</strong>
@@ -151,7 +160,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
           <main className={tw(`main-content${pathname === "/" ? " main-content--overview" : ""}`)}>{children}</main>
         </div>
       </div>
-
+      <TestRunToast />
     </QualityProvider>
   );
 }

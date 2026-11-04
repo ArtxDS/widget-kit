@@ -1,0 +1,25 @@
+import type { ThemeTokens } from "../core/types";
+
+export const sunset: ThemeTokens = {
+  accentA: "#F97316",
+  accentMid: "#FB7185",
+  accentB: "#FBBF24",
+  eyeFrom: "#FBBF24",
+  eyeTo: "#FB7185",
+  shell1: "#fffaf5",
+  shell2: "#f8ece3",
+  shell3: "#e0c4b3",
+  shellEdge: "#b45a38",
+  screen1: "#2a120c",
+  screen2: "#0c0402",
+  neck1: "#8a4a38",
+  neck2: "#d4a090",
+  neck3: "#6e3828",
+  base1: "#fff",
+  base2: "#ead4c6",
+  shadow: "#5a2414",
+  bubbleBg: "#fff8f2",
+  bubbleFg: "#2a120c",
+  bubbleBorderA: "#F97316",
+  bubbleBorderB: "#FBBF24",
+};

@@ -1,0 +1,117 @@
+.wk-mascot-host,
+.wk-mascot {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  width: 220px;
+  max-width: 100%;
+}
+
+.wk-mascot__svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  cursor: pointer;
+  touch-action: manipulation;
+  outline: none;
+}
+
+.wk-mascot__bubble {
+  position: absolute;
+  z-index: 2;
+  max-width: 220px;
+  padding: 1px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  color: var(--mascot-bubble-fg, #1b1530);
+  background:
+    linear-gradient(var(--mascot-bubble-bg, #fff), var(--mascot-bubble-bg, #fff)) padding-box,
+    linear-gradient(120deg, var(--mascot-bubble-border-a, #9945FF), var(--mascot-bubble-border-b, #14F195)) border-box;
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--mascot-shadow, #3c1e78) 28%, transparent);
+  pointer-events: none;
+  transform-origin: 50% 100%;
+  animation: wk-mascot-bubble-in 180ms ease-out;
+}
+
+.wk-mascot__bubble--top {
+  bottom: calc(100% - 12px);
+}
+
+.wk-mascot__bubble--left {
+  right: calc(100% - 8px);
+  top: 18%;
+}
+
+.wk-mascot__bubble--right {
+  left: calc(100% - 8px);
+  top: 18%;
+}
+
+.wk-mascot__bubble-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+}
+
+.wk-mascot__bubble-title {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.wk-mascot__bubble-text {
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.wk-mascot__bubble-emoji {
+  font-size: 16px;
+}
+
+.wk-mascot-avatar {
+  display: inline-flex;
+  width: 36px;
+  line-height: 0;
+}
+
+.wk-mascot-avatar__svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.wk-mascot-avatar .wk-mascot-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: wk-mascot-blink 4.2s ease-in-out 1;
+}
+
+@keyframes wk-mascot-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes wk-mascot-blink {
+  0%,
+  88%,
+  100% {
+    transform: scaleY(1);
+  }
+  92% {
+    transform: scaleY(0.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wk-mascot__bubble,
+  .wk-mascot-avatar .wk-mascot-eye {
+    animation: none;
+  }
+}

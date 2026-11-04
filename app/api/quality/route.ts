@@ -1,23 +1,29 @@
+import { components, widgets } from "@/lib/catalog";
+import { getDb } from "@/lib/db";
+import {
+  emptyQualitySnapshot,
+  itemTestKey,
+  type ItemTestResult,
+  type QualitySnapshot,
+  type TestCase,
+  type TestRunSummary,
+  type TestTargetType,
+} from "@/lib/quality";
+import { NextResponse } from "next/server";
 import { spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { NextResponse } from "next/server";
-import type { ComponentTestResult, CoverageSummary, QualitySnapshot, QualityTestEvent, QualityTestFailure, TestRunSummary } from "@/lib/quality";
-import { components } from "@/lib/catalog";
 
 type VitestAssertion = {
   status?: string;
   title?: string;
   ancestorTitles?: string[];
-  failureMessages?: string[];
 };
 
 type VitestFile = {
   assertionResults?: VitestAssertion[];
-  status?: string;
-  name?: string;
 };
 
 type VitestJson = {
@@ -25,226 +31,240 @@ type VitestJson = {
   numPassedTests?: number;
   numFailedTests?: number;
   numPendingTests?: number;
-  startTime?: number;
   testResults?: VitestFile[];
 };
 
-let lastRun: TestRunSummary | null = null;
-let lastCoverage: CoverageSummary | null = null;
-let lastComponentTests: QualitySnapshot["componentTests"] = {};
-let runHistory: TestRunSummary[] = [];
-let latestTestEvent: QualityTestEvent | null = null;
-let testEventHistory: QualityTestEvent[] = [];
-let lastSuiteFailures: QualityTestFailure[] = [];
+function toSummary(run: {
+  itemType: string;
+  itemSlug: string;
+  itemName: string;
+  total: number;
+  passed: number;
+  failed: number;
+  pending: number;
+  durationMs: number;
+  completedAt: Date;
+}): TestRunSummary {
+  return {
+    itemType: run.itemType as TestTargetType,
+    itemSlug: run.itemSlug,
+    itemName: run.itemName,
+    total: run.total,
+    passed: run.passed,
+    failed: run.failed,
+    pending: run.pending,
+    passedPercentage:
+      run.total > 0 ? Math.round((run.passed / run.total) * 1000) / 10 : null,
+    completedAt: run.completedAt.toISOString(),
+    durationMs: run.durationMs,
+  };
+}
 
 export async function GET(request: Request) {
-  // Reading a request value keeps this quality snapshot request-time under Cache Components.
   void request.url;
+
+  let db: ReturnType<typeof getDb>;
+  try {
+    db = getDb();
+  } catch (error) {
+    return NextResponse.json(
+      {
+        ...emptyQualitySnapshot,
+        error:
+          error instanceof Error ? error.message : "Database is not configured.",
+      },
+      { status: 503 },
+    );
+  }
+
+  const [runs, durationAggregate] = await Promise.all([
+    db.itemTestRun.findMany({
+      orderBy: { completedAt: "desc" },
+      take: 20,
+      include: { assertions: true },
+    }),
+    db.itemTestRun.aggregate({ _avg: { durationMs: true } }),
+  ]);
+
+  const history = runs.map(toSummary);
+  const itemTests: Record<string, ItemTestResult> = {};
+  for (const run of runs) {
+    const key = itemTestKey(run.itemType as TestTargetType, run.itemSlug);
+    if (!itemTests[key]) {
+      itemTests[key] = {
+        ...toSummary(run),
+        assertions: run.assertions.map((assertion) => ({
+          name: assertion.name,
+          status: assertion.status as TestCase["status"],
+        })),
+      };
+    }
+  }
+
   const snapshot: QualitySnapshot = {
-    testRun: lastRun,
-    latestTestEvent,
-    testEventHistory,
-    suiteFailures: lastSuiteFailures,
-    history: runHistory,
-    componentTests: lastComponentTests,
-    coverage: lastCoverage,
+    history,
+    itemTests,
+    averageItemDurationMs: durationAggregate._avg.durationMs,
     averageRenderTimeMs: null,
   };
+
   return NextResponse.json(snapshot);
 }
 
 export async function POST(request: Request) {
-  let requestedSlug: string | undefined;
+  let db: ReturnType<typeof getDb>;
   try {
-    const body = await request.json() as { componentSlug?: unknown };
-    if (typeof body.componentSlug === "string") requestedSlug = body.componentSlug;
-    else if (body.componentSlug !== undefined) {
-      return NextResponse.json({ error: "componentSlug must be a string." }, { status: 400 });
-    }
-  } catch {
-    // An empty POST runs the complete test suite for backwards compatibility.
-  }
-  const component = requestedSlug === undefined ? undefined : components.find(({ slug }) => slug === requestedSlug);
-  if (requestedSlug !== undefined && !component) {
-    return NextResponse.json({ error: "This component is not registered." }, { status: 404 });
-  }
-
-  const reportDirectory = await mkdtemp(path.join(os.tmpdir(), `widget-kit-vitest-${randomUUID()}-`));
-  const reportPath = path.join(reportDirectory, "tests.json");
-  const coverageDirectory = path.join(reportDirectory, "coverage");
-  const executable = path.join(process.cwd(), "node_modules", "vitest", "vitest.mjs");
-  const startedAt = Date.now();
-  const vitestArgs = ["run", "--reporter=json", `--outputFile=${reportPath}`];
-  if (component) {
-    vitestArgs.push(component.test);
-  } else {
-    vitestArgs.push("--coverage", "--coverage.reporter=json-summary", `--coverage.reportsDirectory=${coverageDirectory}`);
-  }
-
-  const result = await new Promise<{ code: number | null; error: string | null }>((resolve) => {
-    const child = spawn(
-      process.execPath,
-      [executable, ...vitestArgs],
-      { cwd: process.cwd(), stdio: "ignore", env: process.env },
+    db = getDb();
+  } catch (error) {
+    return NextResponse.json(
+      {
+        ...emptyQualitySnapshot,
+        error:
+          error instanceof Error ? error.message : "Database is not configured.",
+      },
+      { status: 503 },
     );
-    let settled = false;
-    const finish = (value: { code: number | null; error: string | null }) => {
-      if (settled) return;
-      settled = true;
-      resolve(value);
-    };
-    child.once("error", (error) => finish({ code: null, error: error.message }));
-    child.once("close", (code) => finish({ code, error: null }));
-  });
+  }
+
+  let body: { itemType?: unknown; itemSlug?: unknown };
+  try {
+    body = (await request.json()) as { itemType?: unknown; itemSlug?: unknown };
+  } catch {
+    return NextResponse.json(
+      { error: "Choose one component or widget to test." },
+      { status: 400 },
+    );
+  }
+
+  if (
+    (body.itemType !== "component" && body.itemType !== "widget") ||
+    typeof body.itemSlug !== "string"
+  ) {
+    return NextResponse.json(
+      { error: "itemType and itemSlug are required." },
+      { status: 400 },
+    );
+  }
+
+  const itemType = body.itemType as TestTargetType;
+  const item =
+    itemType === "component"
+      ? components.find(({ slug }) => slug === body.itemSlug)
+      : widgets.find(({ slug }) => slug === body.itemSlug);
+
+  if (!item) {
+    return NextResponse.json(
+      { error: `This ${itemType} is not registered.` },
+      { status: 404 },
+    );
+  }
+  const testPath = item.test;
+  if (!testPath) {
+    return NextResponse.json(
+      { error: `No individual test file is registered for ${item.name}.` },
+      { status: 400 },
+    );
+  }
+
+  const reportDirectory = await mkdtemp(
+    path.join(os.tmpdir(), `widget-kit-vitest-${randomUUID()}-`),
+  );
+  const reportPath = path.join(reportDirectory, "tests.json");
+  const executable = path.join(
+    process.cwd(),
+    "node_modules",
+    "vitest",
+    "vitest.mjs",
+  );
+  const startedAt = Date.now();
+  const result = await new Promise<{ code: number | null; error: string | null }>(
+    (resolve) => {
+      const child = spawn(
+        process.execPath,
+        [executable, "run", "--reporter=json", `--outputFile=${reportPath}`, testPath],
+        {
+          cwd: process.cwd(),
+          stdio: "ignore",
+          env: process.env,
+        },
+      );
+      let settled = false;
+      const finish = (value: { code: number | null; error: string | null }) => {
+        if (settled) return;
+        settled = true;
+        resolve(value);
+      };
+      child.once("error", (error) => finish({ code: null, error: error.message }));
+      child.once("close", (code) => finish({ code, error: null }));
+    },
+  );
+  const durationMs = Date.now() - startedAt;
 
   let report: VitestJson | null = null;
-  let coverageReport: { total?: Record<string, { pct?: number }> } | null = null;
   try {
     report = JSON.parse(await readFile(reportPath, "utf8")) as VitestJson;
-    coverageReport = JSON.parse(
-      await readFile(path.join(coverageDirectory, "coverage-summary.json"), "utf8"),
-    ) as { total?: Record<string, { pct?: number }> };
   } catch {
-    if (!report) report = null;
+    report = null;
   } finally {
-    await rm(reportDirectory, { recursive: true, force: true }).catch(() => undefined);
+    await rm(reportDirectory, { recursive: true, force: true }).catch(
+      () => undefined,
+    );
   }
-
-  const passed = report?.numPassedTests ?? 0;
-  const failed = report?.numFailedTests ?? 0;
-  const pending = report?.numPendingTests ?? 0;
-  const total = report?.numTotalTests ?? passed + failed + pending;
-  const suiteFailures: QualityTestFailure[] = (report?.testResults ?? []).flatMap((file) => {
-    const reportedName = (file.name ?? "Unknown test file").replaceAll("\\", "/");
-    const filePath = path.isAbsolute(reportedName)
-      ? path.relative(process.cwd(), reportedName).replaceAll("\\", "/")
-      : reportedName;
-    return (file.assertionResults ?? [])
-      .filter((assertion) => assertion.status === "failed")
-      .map((assertion) => ({
-        file: filePath,
-        name: [...(assertion.ancestorTitles ?? []), assertion.title ?? "Untitled test"].join(" › "),
-        messages: assertion.failureMessages ?? [],
-      }));
-  });
-  const reportedComponentTests = report?.testResults
-    ? Object.fromEntries(
-        components.map((component) => {
-          const testPath = component.test.replaceAll("\\", "/");
-          const testFile = report.testResults?.find((file) =>
-            (file.name ?? "").replaceAll("\\", "/").endsWith(`/${testPath}`),
-          );
-          const assertions = testFile?.assertionResults ?? [];
-          const testCases = assertions.map((assertion) => ({
-            name: [...(assertion.ancestorTitles ?? []), assertion.title ?? "Untitled test"].join(" › "),
-            status: assertion.status === "passed"
-              ? "passed" as const
-              : assertion.status === "failed"
-                ? "failed" as const
-                : "pending" as const,
-          }));
-          const result: ComponentTestResult = {
-            total: assertions.length,
-            passed: testCases.filter((testCase) => testCase.status === "passed").length,
-            failed: testCases.filter((testCase) => testCase.status === "failed").length,
-            pending: testCases.filter((testCase) => testCase.status === "pending").length,
-            assertions: testCases,
-            scope: "suite",
-          };
-          return [component.slug, result];
-        }),
-      )
-    : {};
 
   if (!report || result.code === null) {
     const snapshot: QualitySnapshot = {
-      testRun: null,
-      coverage: null,
-      averageRenderTimeMs: null,
-      error: result.error ?? "Vitest did not produce a readable JSON report.",
+      ...emptyQualitySnapshot,
+      error: result.error ?? `Vitest did not produce a report for ${item.name}.`,
     };
     return NextResponse.json(snapshot, { status: 500 });
   }
 
-  const completedAt = new Date().toISOString();
-  const durationMs = Date.now() - startedAt;
-  const reportedResults = reportedComponentTests as Record<string, ComponentTestResult>;
-  let testRun = lastRun;
-  let testEvent: QualityTestEvent;
+  const testCases: TestCase[] = (report.testResults ?? []).flatMap((file) =>
+    (file.assertionResults ?? []).map((assertion) => ({
+      name: [
+        ...(assertion.ancestorTitles ?? []),
+        assertion.title ?? "Untitled test",
+      ].join(" › "),
+      status:
+        assertion.status === "passed"
+          ? ("passed" as const)
+          : assertion.status === "failed"
+            ? ("failed" as const)
+            : ("pending" as const),
+    })),
+  );
+  const passed = report.numPassedTests ?? testCases.filter((test) => test.status === "passed").length;
+  const failed = report.numFailedTests ?? testCases.filter((test) => test.status === "failed").length;
+  const pending = report.numPendingTests ?? testCases.filter((test) => test.status === "pending").length;
+  const total = report.numTotalTests ?? passed + failed + pending;
 
-  if (component) {
-    const componentResult = reportedResults[component.slug] ?? {
-      total: 0,
-      passed: 0,
-      failed: 0,
-      pending: 0,
-      assertions: [],
-    };
-    lastComponentTests = {
-      ...(lastComponentTests ?? {}),
-      [component.slug]: { ...componentResult, scope: "component", completedAt, durationMs },
-    };
-    testEvent = {
-      total: componentResult.total,
-      passed: componentResult.passed,
-      failed: componentResult.failed,
-      pending: componentResult.pending,
-      passedPercentage: componentResult.total > 0 ? Math.round((componentResult.passed / componentResult.total) * 1000) / 10 : null,
-      coverageLines: null,
-      completedAt,
-      durationMs,
-      scope: "component",
-      componentSlug: component.slug,
-      componentName: component.name,
-      failures: suiteFailures,
-    };
-  } else {
-    const totalCoverage = coverageReport?.total;
-    lastCoverage = totalCoverage
-      ? {
-          lines: totalCoverage.lines?.pct ?? 0,
-          statements: totalCoverage.statements?.pct ?? 0,
-          functions: totalCoverage.functions?.pct ?? 0,
-          branches: totalCoverage.branches?.pct ?? 0,
-        }
-      : null;
-    lastComponentTests = Object.fromEntries(
-      components.map(({ slug }) => [slug, {
-        ...(reportedResults[slug] ?? { total: 0, passed: 0, failed: 0, pending: 0, assertions: [] }),
-        scope: "suite",
-        completedAt,
-        durationMs,
-      }]),
-    );
-    testRun = {
+  await db.itemTestRun.create({
+    data: {
+      itemType,
+      itemSlug: item.slug,
+      itemName: item.name,
       total,
       passed,
       failed,
       pending,
-      passedPercentage: total > 0 ? Math.round((passed / total) * 1000) / 10 : null,
-      coverageLines: lastCoverage?.lines ?? null,
-      completedAt,
       durationMs,
-    };
-    lastRun = testRun;
-    runHistory = [testRun, ...runHistory].slice(0, 10);
-    lastSuiteFailures = suiteFailures;
-    testEvent = { ...testRun, scope: "suite", failures: suiteFailures };
+      completedAt: new Date(),
+      assertions: {
+        create: testCases.map((testCase) => ({
+          name: testCase.name,
+          status: testCase.status,
+        })),
+      },
+    },
+  });
+
+  const freshResponse = await GET(request);
+  const snapshot = (await freshResponse.json()) as QualitySnapshot;
+  if (result.code !== 0) {
+    snapshot.error = `${failed} test${failed === 1 ? "" : "s"} failed in ${item.name}.`;
   }
 
-  latestTestEvent = testEvent;
-  testEventHistory = [testEvent, ...testEventHistory].slice(0, 10);
-
-  const snapshot: QualitySnapshot = {
-    testRun,
-    latestTestEvent,
-    testEventHistory,
-    suiteFailures: lastSuiteFailures,
-    history: runHistory,
-    componentTests: lastComponentTests,
-    coverage: lastCoverage,
-    averageRenderTimeMs: null,
-    ...(result.code !== 0 ? { error: `${failed} test${failed === 1 ? "" : "s"} failed${component ? ` in ${component.name}` : ""}.` } : {}),
-  };
-  return NextResponse.json(snapshot, { status: result.code === 0 ? 200 : 422 });
+  return NextResponse.json(snapshot, {
+    status: result.code === 0 ? 200 : 422,
+  });
 }

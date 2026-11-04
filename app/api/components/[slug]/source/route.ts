@@ -12,10 +12,11 @@ export async function GET(
   if (!component) return NextResponse.json({ error: "Component not found." }, { status: 404 });
 
   try {
-    const componentDirectory = path.join(process.cwd(), "packages", "components", "ui");
     const [source, testSource] = await Promise.all([
-      readFile(path.join(componentDirectory, `${component.slug}.tsx`), "utf8"),
-      readFile(path.join(componentDirectory, `${component.slug}.test.tsx`), "utf8"),
+      readFile(path.join(process.cwd(), component.source), "utf8"),
+      component.test
+        ? readFile(path.join(process.cwd(), component.test), "utf8")
+        : Promise.resolve("No dedicated test file is registered for this component."),
     ]);
     return NextResponse.json({ source, testSource });
   } catch {

@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../packages/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model ItemTestRun {
+  id          String   @id @default(cuid())
+  itemType    String   // "component" | "widget"
+  itemSlug    String
+  itemName    String
+  total       Int
+  passed      Int
+  failed      Int
+  pending     Int
+  durationMs  Int
+  completedAt DateTime
+
+  assertions ItemTestCase[]
+
+  createdAt DateTime @default(now())
+
+  @@index([itemType, itemSlug, completedAt(sort: Desc)])
+  @@index([completedAt(sort: Desc)])
+}
+
+model ItemTestCase {
+  id           String @id @default(cuid())
+  itemTestRunId String
+  name         String
+  status       String // "passed" | "failed" | "pending"
+
+  itemTestRun ItemTestRun @relation(fields: [itemTestRunId], references: [id], onDelete: Cascade)
+
+  @@index([itemTestRunId])
+}
