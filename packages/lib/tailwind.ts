@@ -1,4 +1,3 @@
-// The semantic names remain as DOM hooks; their styling is supplied by Tailwind utilities below.
 const utilityClasses: Record<string, string> = {
   "activity-skeleton-copy": "[min-width:0] [display:flex] [flex-direction:column] [gap:7px]",
   "chart-loading-skeleton": "[min-height:150px] [display:flex] [align-items:center] [padding-top:8px]",
