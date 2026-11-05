@@ -1,0 +1,121 @@
+/* ==========================================================================
+   Orbit UI — Tests & Performance Studio (`/tests`)
+   Strict Dark Theme, Motion Specs & Design Tokens
+   ========================================================================== */
+
+:root {
+  --tp-bg-canvas: #0b0c0f;
+  --tp-surface-card: #121318;
+  --tp-surface-elevated: #181a22;
+  --tp-surface-hover: #1f222b;
+  --tp-border-subtle: #1c1e26;
+  --tp-border-default: #20222b;
+  --tp-border-focus: #7c3aed;
+  --tp-accent-purple: #7c3aed;
+  --tp-accent-glow: rgba(124, 58, 237, 0.25);
+  --tp-status-passed: #10b981;
+  --tp-status-failed: #f43f5e;
+  --tp-status-pending: #f59e0b;
+}
+
+/* Donut Chart Animation */
+@keyframes fillDonut {
+  from {
+    stroke-dashoffset: 251.2;
+  }
+  to {
+    stroke-dashoffset: var(--target-dashoffset, 0);
+  }
+}
+
+.donut-arc {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  transition: stroke-dasharray 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+              stroke-dashoffset 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: fillDonut 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Latency Timeline Bar Growth */
+@keyframes growBar {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.latency-bar {
+  transform-origin: bottom;
+  animation: growBar 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--bar-index, 0) * 25ms);
+}
+
+/* Running Card Glow Pulse */
+@keyframes pulseActiveCard {
+  0%, 100% {
+    border-color: rgba(124, 58, 237, 0.3);
+    box-shadow: 0 0 14px rgba(124, 58, 237, 0.12);
+  }
+  50% {
+    border-color: rgba(124, 58, 237, 0.85);
+    box-shadow: 0 0 28px rgba(124, 58, 237, 0.35);
+  }
+}
+
+.card-running-pulse {
+  animation: pulseActiveCard 1.6s ease-in-out infinite;
+}
+
+/* Pulsing Failed Segment */
+@keyframes pulseFailedSegment {
+  0%, 100% {
+    opacity: 0.85;
+    box-shadow: 0 0 4px rgba(244, 63, 94, 0.3);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(244, 63, 94, 0.7);
+  }
+}
+
+.segment-failed-pulse {
+  animation: pulseFailedSegment 1.5s ease-in-out infinite;
+}
+
+/* Heatstrip Live Glow */
+@keyframes heatstripGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(124, 58, 237, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(124, 58, 237, 0.6);
+  }
+}
+
+.heatstrip-active-glow {
+  animation: heatstripGlow 1.8s ease-in-out infinite;
+}
+
+/* Custom Scrollbars for Details / Assertions */
+.tp-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.tp-scroll::-webkit-scrollbar-track {
+  background: #121318;
+}
+
+.tp-scroll::-webkit-scrollbar-thumb {
+  background: #252836;
+  border-radius: 999px;
+}
+
+.tp-scroll::-webkit-scrollbar-thumb:hover {
+  background: #363a4d;
+}
+

@@ -1,7 +1,6 @@
-export { Badge } from "./components/ui/badge";
-export type { BadgeTone } from "./components/ui/badge";
+export { Badge, Toast } from "./components/ui";
+export type { BadgeTone } from "./components/ui";
 
-export { Toast } from "./components/ui/toast";
 export type {
   ToastMode,
   ToastProps,
@@ -9,7 +8,7 @@ export type {
   ToastStep,
   ToastStepStatus,
   ToastVariant,
-} from "./components/ui/toast";
+} from "./components/ui";
 
 export {
   Mascot,

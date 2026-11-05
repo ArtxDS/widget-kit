@@ -38,7 +38,7 @@ describe("dashboard pages", () => {
 
     await waitFor(() => expect(fetch).toHaveBeenCalledWith("/api/quality", { cache: "no-store" }));
     expect(screen.getByRole("heading", { level: 1, name: /build better interfaces/i })).toBeInTheDocument();
-    expect(screen.getByText("Run component or suite tests to record a quality history.")).toBeInTheDocument();
+    expect(screen.getByText(/Run an individual component or widget test to record quality history/i)).toBeInTheDocument();
     expect(screen.getAllByText("—")).toHaveLength(2);
   });
 
@@ -51,7 +51,7 @@ describe("dashboard pages", () => {
     expect(screen.getByRole("heading", { name: "Badge" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Button" })).not.toBeInTheDocument();
     expect(screen.getByText("1 component")).toBeInTheDocument();
-    expect(components).toHaveLength(1);
+    expect(components).toHaveLength(2);
   });
 
   it("shows a live mascot preview in the widget catalog", async () => {
@@ -67,28 +67,29 @@ describe("dashboard pages", () => {
   });
 
   it("updates the badge preview and code for tone and dot settings", () => {
-    render(<PlaygroundPage />);
+    withQuality(<PlaygroundPage />);
 
     fireEvent.click(screen.getByRole("button", { name: "Color tone" }));
     fireEvent.click(screen.getByRole("menuitemradio", { name: "Purple" }));
     const dotSwitch = screen.getByRole("switch", { name: "Show status dot" });
     fireEvent.click(dotSwitch);
     expect(dotSwitch).toHaveAttribute("aria-checked", "false");
-    expect(screen.getByText("Ready")).toHaveClass("wk-badge--purple");
-    expect(screen.getByText("Ready").querySelector(".wk-badge__dot")).not.toBeInTheDocument();
-    expect(screen.getByText('<Badge tone="purple">Ready</Badge>')).toBeInTheDocument();
+    const badge = document.querySelector(".wk-badge");
+    expect(badge).toHaveClass("wk-badge--purple");
+    expect(badge?.querySelector(".wk-badge__dot")).not.toBeInTheDocument();
+    expect(Array.from(document.querySelectorAll(".studio-code")).map(el => el.textContent).join("\n")).toContain('<Badge tone="purple">Ready</Badge>');
   });
 
   it("opens the mascot playground with live SVG and customizations", async () => {
     stubMascotRuntime();
-    render(<PlaygroundPage initialItem="mascot" />);
+    withQuality(<PlaygroundPage initialItem="mascot" />);
 
     expect(await screen.findByRole("img", { name: "Playground mascot" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Theme preset" }));
     fireEvent.click(screen.getByRole("menuitemradio", { name: "ocean" }));
     fireEvent.click(screen.getByRole("button", { name: "say" }));
     expect(await screen.findByText("Eu sou o mascote.")).toBeInTheDocument();
-    expect(screen.getByText(/theme: "ocean"/)).toBeInTheDocument();
+    expect(Array.from(document.querySelectorAll(".studio-code")).map(el => el.textContent).join("\n")).toContain('theme: "ocean"');
   });
 
   it("lists the individual test cases for each registered component", async () => {
@@ -153,7 +154,7 @@ describe("dashboard pages", () => {
     expect(fetchMock).toHaveBeenLastCalledWith("/api/quality", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ componentSlug: "badge" }),
+      body: JSON.stringify({ itemType: "component", itemSlug: "badge" }),
     });
   });
 

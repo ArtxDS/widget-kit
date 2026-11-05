@@ -1,7 +1,7 @@
 "use client";
 
-import { Toast } from "../../ui/toast";
-import type { ToastStep } from "../../ui/toast";
+import { Toast } from "../../ui";
+import type { ToastStep } from "../../ui";
 import { useQuality } from "./quality-provider";
 
 const stepLabels = [

@@ -9,8 +9,15 @@ import {
   type MascotOutEvent,
   type ThemePreset,
 } from "@artxds/widget-kit";
-import { tw } from "@/lib/tailwind";
-import { useMemo, useRef, useState } from "react";
+import { Pipette } from "lucide-react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { Dropdown } from "../shared/dropdown";
 
 const moods = [
@@ -51,6 +58,268 @@ const outEvents: MascotOutEvent[] = [
   "waveend",
 ];
 
+const accentAPresets = [
+  { label: "Aurora", color: themePresets.aurora.accentA },
+  { label: "Ocean", color: themePresets.ocean.accentA },
+  { label: "Sunset", color: themePresets.sunset.accentA },
+];
+
+const accentBPresets = [
+  { label: "Aurora", color: themePresets.aurora.accentB },
+  { label: "Ocean", color: themePresets.ocean.accentB },
+  { label: "Sunset", color: themePresets.sunset.accentB },
+];
+
+function normalizeHexColor(value: string) {
+  const digits = value.trim().replace(/^#/, "");
+  if (/^[\da-f]{3}$/i.test(digits)) {
+    return `#${digits.split("").map((digit) => `${digit}${digit}`).join("")}`.toUpperCase();
+  }
+  return /^[\da-f]{6}$/i.test(digits) ? `#${digits}`.toUpperCase() : null;
+}
+
+function hexToRgb(value: string): [number, number, number] {
+  const hex = normalizeHexColor(value) ?? "#9945FF";
+  return [
+    Number.parseInt(hex.slice(1, 3), 16),
+    Number.parseInt(hex.slice(3, 5), 16),
+    Number.parseInt(hex.slice(5, 7), 16),
+  ];
+}
+
+function rgbToHsl([red, green, blue]: [number, number, number]) {
+  const r = red / 255;
+  const g = green / 255;
+  const b = blue / 255;
+  const maximum = Math.max(r, g, b);
+  const minimum = Math.min(r, g, b);
+  const difference = maximum - minimum;
+  const lightness = (maximum + minimum) / 2;
+  let hue = 0;
+  let saturation = 0;
+
+  if (difference) {
+    saturation = difference / (1 - Math.abs(2 * lightness - 1));
+    if (maximum === r) hue = ((g - b) / difference) % 6;
+    else if (maximum === g) hue = (b - r) / difference + 2;
+    else hue = (r - g) / difference + 4;
+    hue = (hue * 60 + 360) % 360;
+  }
+
+  return { hue, saturation, lightness };
+}
+
+function hslToRgb(hue: number, saturation: number, lightness: number) {
+  const normalizedHue = ((hue % 360) + 360) % 360;
+  const chroma = (1 - Math.abs(2 * lightness - 1)) * saturation;
+  const segment = normalizedHue / 60;
+  const secondary = chroma * (1 - Math.abs((segment % 2) - 1));
+  const match = lightness - chroma / 2;
+  let rgb: [number, number, number];
+
+  if (segment < 1) rgb = [chroma, secondary, 0];
+  else if (segment < 2) rgb = [secondary, chroma, 0];
+  else if (segment < 3) rgb = [0, chroma, secondary];
+  else if (segment < 4) rgb = [0, secondary, chroma];
+  else if (segment < 5) rgb = [secondary, 0, chroma];
+  else rgb = [chroma, 0, secondary];
+
+  return rgb.map((channel) => Math.round((channel + match) * 255)) as [number, number, number];
+}
+
+function rgbToHex([red, green, blue]: [number, number, number]) {
+  return `#${[red, green, blue]
+    .map((channel) => Math.round(channel).toString(16).padStart(2, "0"))
+    .join("")}`.toUpperCase();
+}
+
+function colorFromWheel(hue: number, intensity: number) {
+  const base = hslToRgb(hue, 1, 0.5);
+  return rgbToHex(
+    base.map((channel) => 255 + (channel - 255) * intensity) as [number, number, number],
+  );
+}
+
+function wheelPositionFromColor(value: string) {
+  const rgb = hexToRgb(value);
+  const hsl = rgbToHsl(rgb);
+  return {
+    hue: hsl.hue,
+    intensity: hsl.saturation < 0.04 ? 0 : 1 - Math.min(...rgb) / 255,
+  };
+}
+
+function AccentColorControl({
+  label,
+  onChange,
+  presets,
+  value,
+}: {
+  label: string;
+  onChange: (color: string) => void;
+  presets: { label: string; color: string }[];
+  value: string;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [hexDraft, setHexDraft] = useState(value.toUpperCase());
+  const rootRef = useRef<HTMLDivElement>(null);
+  const hexColor = normalizeHexColor(value) ?? "#9945FF";
+  const wheelPoint = wheelPositionFromColor(hexColor);
+  const wheelAngle = ((wheelPoint.hue - 90) * Math.PI) / 180;
+  const wheelLeft = 50 + Math.cos(wheelAngle) * wheelPoint.intensity * 42;
+  const wheelTop = 50 + Math.sin(wheelAngle) * wheelPoint.intensity * 42;
+  const pickerId = label === "Accent A" ? "accent-a-color-picker" : "accent-b-color-picker";
+
+  useEffect(() => setHexDraft(value.toUpperCase()), [value]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function closeOnOutsidePointer(event: globalThis.PointerEvent) {
+      if (!rootRef.current?.contains(event.target as Node)) setIsOpen(false);
+    }
+
+    function closeOnEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsOpen(false);
+    }
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [isOpen]);
+
+  function selectWheelColor(event: ReactPointerEvent<HTMLDivElement>) {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const deltaX = event.clientX - (bounds.left + bounds.width / 2);
+    const deltaY = event.clientY - (bounds.top + bounds.height / 2);
+    const maxRadius = Math.max(1, Math.min(bounds.width, bounds.height) / 2 - 7);
+    const intensity = Math.min(Math.hypot(deltaX, deltaY) / maxRadius, 1);
+    const hue = (Math.atan2(deltaY, deltaX) * 180 / Math.PI + 90 + 360) % 360;
+    onChange(colorFromWheel(hue, intensity));
+  }
+
+  function adjustWheelWithKeyboard(event: ReactKeyboardEvent<HTMLDivElement>) {
+    const keyChanges: Record<string, [number, number]> = {
+      ArrowUp: [0, 0.05],
+      ArrowDown: [0, -0.05],
+      ArrowRight: [5, 0],
+      ArrowLeft: [-5, 0],
+    };
+    const change = keyChanges[event.key];
+    if (!change) return;
+    event.preventDefault();
+    const nextHue = (wheelPoint.hue + change[0] + 360) % 360;
+    const nextIntensity = Math.min(1, Math.max(0, wheelPoint.intensity + change[1]));
+    onChange(colorFromWheel(nextHue, nextIntensity));
+  }
+
+  return (
+    <div
+      className={`mascot-token-row accent-color-control flex items-center justify-between [gap:10px] [margin-top:12px] [font-size:11.5px] [color:#9596a7]${isOpen ? " has-open-picker" : ""}`}
+      ref={rootRef}
+    >
+      <span>{label}</span>
+      <div className="accent-color-swatches" role="group" aria-label={`${label} color presets`}>
+        {presets.map((preset) => {
+          const selected = hexColor.toLowerCase() === preset.color.toLowerCase();
+          return (
+            <button
+              aria-label={`${label}: ${preset.label} (${preset.color})`}
+              aria-pressed={selected}
+              className={`accent-color-swatch${selected ? " is-active" : ""}`}
+              key={preset.label}
+              onClick={() => {
+                onChange(preset.color);
+                setIsOpen(false);
+              }}
+              style={{ backgroundColor: preset.color }}
+              title={`${preset.label} ${preset.color}`}
+              type="button"
+            />
+          );
+        })}
+        <button
+          aria-controls={pickerId}
+          aria-expanded={isOpen}
+          aria-haspopup="dialog"
+          aria-label={`Choose a custom color for ${label}`}
+          className={`accent-picker-trigger${isOpen ? " is-open" : ""}`}
+          onClick={() => setIsOpen((open) => !open)}
+          title="Custom color"
+          type="button"
+        >
+          <Pipette aria-hidden="true" size={13} strokeWidth={1.8} />
+        </button>
+      </div>
+      {isOpen && (
+        <div
+          className="accent-picker-popover"
+          id={pickerId}
+          role="dialog"
+          aria-label={`Custom ${label} color`}
+        >
+          <div className="accent-picker-heading">
+            <span>Custom color</span>
+            <button
+              aria-label="Close color picker"
+              className="accent-picker-close"
+              onClick={() => setIsOpen(false)}
+              type="button"
+            >
+              ×
+            </button>
+          </div>
+          <div
+            aria-label={`${label} color wheel. Use arrow keys to adjust hue and intensity.`}
+            aria-valuemax={360}
+            aria-valuemin={0}
+            aria-valuenow={Math.round(wheelPoint.hue)}
+            aria-valuetext={hexColor}
+            className="accent-picker-wheel"
+            onKeyDown={adjustWheelWithKeyboard}
+            onPointerDown={(event) => {
+              event.currentTarget.setPointerCapture(event.pointerId);
+              selectWheelColor(event);
+            }}
+            onPointerMove={(event) => {
+              if (event.buttons === 1) selectWheelColor(event);
+            }}
+            role="slider"
+            tabIndex={0}
+          >
+            <span
+              aria-hidden="true"
+              className="accent-picker-wheel-dot"
+              style={{ left: `${wheelLeft}%`, top: `${wheelTop}%` }}
+            />
+          </div>
+          <label className="accent-picker-hex">
+            <span>HEX</span>
+            <input
+              aria-label={`${label} hex color`}
+              autoCapitalize="characters"
+              maxLength={7}
+              onBlur={() => setHexDraft(value.toUpperCase())}
+              onChange={(event) => {
+                const draft = event.target.value;
+                setHexDraft(draft);
+                const normalized = normalizeHexColor(draft);
+                if (normalized) onChange(normalized);
+              }}
+              placeholder="#9945FF"
+              spellCheck={false}
+              value={hexDraft}
+            />
+          </label>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function PlayToggle({
   checked,
   label,
@@ -63,7 +332,24 @@ function PlayToggle({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <div className={tw("control-toggle")}>
+    <div className={`control-toggle
+        flex
+        items-center
+        justify-between
+        [gap:12px]
+        [margin-top:16px]
+        [padding:12px_14px]
+        [border:1px_solid_#262736]
+        [border-radius:10px]
+        [background:#151620]
+        [&>span]:flex
+        [&>span]:flex-col
+        [&>span]:[gap:2px]
+        [&_strong]:[font-size:12.5px]
+        [&_strong]:[font-weight:600]
+        [&_small]:[color:#8a8b9e]
+        [&_small]:[font-size:11px]
+      `}>
       <span>
         <strong>{label}</strong>
         <small>{detail}</small>
@@ -71,7 +357,28 @@ function PlayToggle({
       <button
         aria-checked={checked}
         aria-label={label}
-        className={tw(`dashboard-toggle${checked ? " is-checked" : ""}`)}
+        className={(`dashboard-toggle${checked ? " is-checked" : ""}`) + `
+        relative
+        [width:38px]
+        [height:23px]
+        [flex:0_0_auto]
+        [padding:3px]
+        [border:1px_solid_#4a4b5a]
+        [border-radius:12px]
+        [background:#242532]
+        [cursor:pointer]
+        [transition:background_0.16s,_border-color_0.16s]
+        [&>span]:block
+        [&>span]:[width:15px]
+        [&>span]:[height:15px]
+        [&>span]:[border-radius:50%]
+        [&>span]:[background:#d9dae5]
+        [&>span]:[transition:transform_0.16s,_background_0.16s]
+        [&.is-checked]:[border-color:#9258e4]
+        [&.is-checked]:[background:#763bc2]
+        [&.is-checked>span]:[transform:translateX(15px)]
+        [&.is-checked>span]:[background:white]
+      `}
         onClick={() => onChange(!checked)}
         role="switch"
         type="button"
@@ -203,6 +510,32 @@ export function useMascotPlayground() {
     instanceRef.current?.setTheme(next);
   }
 
+  function reset() {
+    const defaults = themePresets.aurora;
+    setTheme("aurora");
+    setMood("idle");
+    setEars(true);
+    setTopCap(true);
+    setChest(true);
+    setArms(true);
+    setBase(true);
+    setAccessory("none");
+    setReduced(false);
+    setFollow(true);
+    setAutoBlink(true);
+    setAutoWave(false);
+    setMuted(false);
+    setBubblePosition("top");
+    setSize(220);
+    setAccentA(defaults.accentA);
+    setAccentB(defaults.accentB);
+    setEyeFrom(defaults.eyeFrom);
+    setLog([]);
+    instanceRef.current?.setTheme("aurora");
+    instanceRef.current?.setMood("idle");
+    instanceRef.current?.mute(false);
+  }
+
   function attach(instance: MascotInstance) {
     instanceRef.current = instance;
     instance.mute(muted);
@@ -241,6 +574,7 @@ export function useMascotPlayground() {
     muted,
     options,
     reduced,
+    reset,
     setAccessory,
     setAccentA,
     setAccentB,
@@ -317,7 +651,29 @@ export function MascotPlaygroundControls({
 
   return (
     <>
-      <div className={tw("control-label")}>
+      <div className={`control-label
+        flex
+        flex-col
+        [gap:8px]
+        [margin-top:16px]
+        [color:#cfd0de]
+        [font-size:12px]
+        [font-weight:600]
+        [&_.dropdown]:[width:100%]
+        [&_textarea]:[resize:vertical]
+        [&_textarea]:[min-height:120px]
+        [&_textarea]:[max-height:240px]
+        [&_textarea]:[overflow-y:auto]
+        [&_textarea]:[padding:12px]
+        [&_textarea]:[border:1px_solid_#343544]
+        [&_textarea]:[border-radius:8px]
+        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:[background:#111219]
+        [&_textarea]:[font-size:12.5px]
+        [&_textarea]:[line-height:1.6]
+        [&_textarea:focus-visible]:[border-color:#9865d2]
+        [&_textarea::placeholder]:[color:#7b7d90]
+      `}>
         <span>Theme preset</span>
         <Dropdown
           label="Theme preset"
@@ -329,25 +685,32 @@ export function MascotPlaygroundControls({
           }))}
         />
       </div>
-      <div className={tw("mascot-token-row")}>
-        <span>Accent A</span>
-        <input
-          aria-label="Accent A"
-          type="color"
-          value={accentA}
-          onChange={(event) => setAccentA(event.target.value)}
-        />
-      </div>
-      <div className={tw("mascot-token-row")}>
-        <span>Accent B</span>
-        <input
-          aria-label="Accent B"
-          type="color"
-          value={accentB}
-          onChange={(event) => setAccentB(event.target.value)}
-        />
-      </div>
-      <div className={tw("mascot-token-row")}>
+      <AccentColorControl
+        label="Accent A"
+        onChange={setAccentA}
+        presets={accentAPresets}
+        value={accentA}
+      />
+      <AccentColorControl
+        label="Accent B"
+        onChange={setAccentB}
+        presets={accentBPresets}
+        value={accentB}
+      />
+      <div className={`mascot-token-row
+        flex
+        items-center
+        justify-between
+        [gap:10px]
+        [margin-top:12px]
+        [font-size:11.5px]
+        [color:#9596a7]
+        [&_input]:[width:32px]
+        [&_input]:[height:24px]
+        [&_input]:[padding:0]
+        [&_input]:[border:0]
+        [&_input]:[background:transparent]
+      `}>
         <span>Eye color</span>
         <input
           aria-label="Eye color"
@@ -356,7 +719,29 @@ export function MascotPlaygroundControls({
           onChange={(event) => setEyeFrom(event.target.value)}
         />
       </div>
-      <div className={tw("control-label")}>
+      <div className={`control-label
+        flex
+        flex-col
+        [gap:8px]
+        [margin-top:16px]
+        [color:#cfd0de]
+        [font-size:12px]
+        [font-weight:600]
+        [&_.dropdown]:[width:100%]
+        [&_textarea]:[resize:vertical]
+        [&_textarea]:[min-height:120px]
+        [&_textarea]:[max-height:240px]
+        [&_textarea]:[overflow-y:auto]
+        [&_textarea]:[padding:12px]
+        [&_textarea]:[border:1px_solid_#343544]
+        [&_textarea]:[border-radius:8px]
+        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:[background:#111219]
+        [&_textarea]:[font-size:12.5px]
+        [&_textarea]:[line-height:1.6]
+        [&_textarea:focus-visible]:[border-color:#9865d2]
+        [&_textarea::placeholder]:[color:#7b7d90]
+      `}>
         <span>Mood</span>
         <Dropdown
           label="Mood"
@@ -369,7 +754,29 @@ export function MascotPlaygroundControls({
           options={moods.map((value) => ({ label: value, value }))}
         />
       </div>
-      <div className={tw("control-label")}>
+      <div className={`control-label
+        flex
+        flex-col
+        [gap:8px]
+        [margin-top:16px]
+        [color:#cfd0de]
+        [font-size:12px]
+        [font-weight:600]
+        [&_.dropdown]:[width:100%]
+        [&_textarea]:[resize:vertical]
+        [&_textarea]:[min-height:120px]
+        [&_textarea]:[max-height:240px]
+        [&_textarea]:[overflow-y:auto]
+        [&_textarea]:[padding:12px]
+        [&_textarea]:[border:1px_solid_#343544]
+        [&_textarea]:[border-radius:8px]
+        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:[background:#111219]
+        [&_textarea]:[font-size:12.5px]
+        [&_textarea]:[line-height:1.6]
+        [&_textarea:focus-visible]:[border-color:#9865d2]
+        [&_textarea::placeholder]:[color:#7b7d90]
+      `}>
         <span>Accessory</span>
         <Dropdown
           label="Accessory"
@@ -380,7 +787,29 @@ export function MascotPlaygroundControls({
           options={accessories.map((value) => ({ label: value, value }))}
         />
       </div>
-      <div className={tw("control-label")}>
+      <div className={`control-label
+        flex
+        flex-col
+        [gap:8px]
+        [margin-top:16px]
+        [color:#cfd0de]
+        [font-size:12px]
+        [font-weight:600]
+        [&_.dropdown]:[width:100%]
+        [&_textarea]:[resize:vertical]
+        [&_textarea]:[min-height:120px]
+        [&_textarea]:[max-height:240px]
+        [&_textarea]:[overflow-y:auto]
+        [&_textarea]:[padding:12px]
+        [&_textarea]:[border:1px_solid_#343544]
+        [&_textarea]:[border-radius:8px]
+        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:[background:#111219]
+        [&_textarea]:[font-size:12.5px]
+        [&_textarea]:[line-height:1.6]
+        [&_textarea:focus-visible]:[border-color:#9865d2]
+        [&_textarea::placeholder]:[color:#7b7d90]
+      `}>
         <span>Bubble</span>
         <Dropdown
           label="Bubble"
@@ -391,7 +820,29 @@ export function MascotPlaygroundControls({
           options={bubblePositions.map((value) => ({ label: value, value }))}
         />
       </div>
-      <div className={tw("control-label")}>
+      <div className={`control-label
+        flex
+        flex-col
+        [gap:8px]
+        [margin-top:16px]
+        [color:#cfd0de]
+        [font-size:12px]
+        [font-weight:600]
+        [&_.dropdown]:[width:100%]
+        [&_textarea]:[resize:vertical]
+        [&_textarea]:[min-height:120px]
+        [&_textarea]:[max-height:240px]
+        [&_textarea]:[overflow-y:auto]
+        [&_textarea]:[padding:12px]
+        [&_textarea]:[border:1px_solid_#343544]
+        [&_textarea]:[border-radius:8px]
+        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:[background:#111219]
+        [&_textarea]:[font-size:12.5px]
+        [&_textarea]:[line-height:1.6]
+        [&_textarea:focus-visible]:[border-color:#9865d2]
+        [&_textarea::placeholder]:[color:#7b7d90]
+      `}>
         <span>Size ({size}px)</span>
         <input
           aria-label="Mascot size"
@@ -465,7 +916,23 @@ export function MascotPlaygroundControls({
           instanceRef.current?.mute(value);
         }}
       />
-      <div className={tw("mascot-play-actions")}>
+      <div className={`mascot-play-actions
+        flex
+        flex-wrap
+        [gap:8px]
+        [margin-top:10px]
+        [&_button]:[min-height:34px]
+        [&_button]:[padding:0_12px]
+        [&_button]:[border:1px_solid_#2c2d3a]
+        [&_button]:[border-radius:8px]
+        [&_button]:[color:#dad9e7]
+        [&_button]:[background:#15161f]
+        [&_button]:[font-size:11.5px]
+        [&_button]:[font-weight:550]
+        [&_button]:[cursor:pointer]
+        [&_button:hover]:[border-color:#53436a]
+        [&_button:hover]:[background:#1c1d28]
+      `}>
         {events.map((name) => (
           <button key={name} onClick={() => emit(name)} type="button">
             {name}
@@ -506,7 +973,18 @@ export function MascotPlaygroundControls({
           look pointer
         </button>
       </div>
-      <ol aria-label="Mascot output events" className={tw("mascot-play-log")}>
+      <ol aria-label="Mascot output events" className={`mascot-play-log
+        [max-height:160px]
+        overflow-auto
+        [margin:10px_0_0]
+        [padding:12px]
+        [border:1px_solid_#292a37]
+        [border-radius:9px]
+        [background:#0b0c11]
+        [color:#c0c1d2]
+        [font:11.5px/1.6_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+        [&_li]:[margin:0]
+      `}>
         {log.length ? (
           log.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)
         ) : (
@@ -525,14 +1003,14 @@ export function MascotPlaygroundStage({
   const { attach, bubblePosition, options, theme } = playground;
 
   return (
-    <div className={tw("mascot-play-stage")}>
+    <div className={"mascot-play-stage flex flex-col items-center justify-center [padding:36px_16px_16px] [min-height:360px]"}>
       <Mascot
         aria-label="Playground mascot"
         key={bubblePosition}
         onReady={attach}
         options={options}
       />
-      <div className={tw("mascot-play-avatars")} aria-label="Mascot avatars">
+      <div className={"mascot-play-avatars flex [gap:10px] justify-center [margin-top:12px]"} aria-label="Mascot avatars">
         <MascotAvatar mood="happy" size={36} theme={theme} />
         <MascotAvatar mood="loading" size={36} theme={theme} />
         <MascotAvatar mood="error" size={36} theme={theme} />

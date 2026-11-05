@@ -1,4 +1,3 @@
-import { tw } from "@/lib/tailwind";
 import type { HTMLAttributes } from "react";
 
 export type BadgeTone = "purple" | "cyan" | "green" | "amber" | "muted";
@@ -17,10 +16,10 @@ export function Badge({
 }: BadgeProps) {
   return (
     <span
-      className={tw(`wk-badge wk-badge--${tone} ${className}`.trim())}
+      className={`wk-badge wk-badge--${tone} ${className}`.trim()}
       {...props}
     >
-      {dot && <span className={tw("wk-badge__dot")} aria-hidden="true" />}
+      {dot && <span className={"wk-badge__dot [width:6px] [height:6px] [border-radius:50%] [background:currentColor]"} aria-hidden="true" />}
       {children}
     </span>
   );

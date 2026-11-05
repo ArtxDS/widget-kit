@@ -1,6 +1,5 @@
 "use client";
 
-import { tw } from "@/lib/tailwind";
 import { useEffect, useId, useRef, useState } from "react";
 import { Icon } from "./icon";
 
@@ -46,7 +45,7 @@ export function Dropdown({
 
   return (
     <div
-      className={tw(`dropdown ${className}`.trim())}
+      className={`dropdown relative ${className}`.trim()}
       onBlur={(event) => {
         const next = event.relatedTarget as Node | null;
         if (!next || !event.currentTarget.contains(next)) setOpen(false);
@@ -58,19 +57,86 @@ export function Dropdown({
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label={label}
-        className={tw("dropdown-trigger")}
+        className={`dropdown-trigger
+        [width:100%]
+        [min-height:38px]
+        flex
+        items-center
+        justify-between
+        [gap:10px]
+        [padding:0_12px]
+        [border:1px_solid_#414248]
+        [border-radius:8px]
+        [color:#e2e2e5]
+        [background:linear-gradient(180deg,_#242529,_#1b1c20)]
+        [text-align:left]
+        [font-size:12px]
+        [cursor:pointer]
+        [transition:border-color_0.15s,_background_0.15s,_box-shadow_0.15s]
+        [&:hover]:[border-color:#55565c]
+        [&:hover]:[background:#2b2c30]
+        [&[aria-expanded="true"]]:[border-color:#55565c]
+        [&[aria-expanded="true"]]:[background:#2b2c30]
+        [&[aria-expanded="true"]]:[box-shadow:0_0_0_3px_#ffffff0d]
+        [&>span]:min-w-0
+        [&>span]:overflow-hidden
+        [&>span]:[text-overflow:ellipsis]
+        [&>span]:[white-space:nowrap]
+        [&>svg]:[flex:0_0_auto]
+        [&>svg]:[color:#9fa0b4]
+        [&>svg]:[transition:transform_0.16s]
+        [&>svg.is-open]:[transform:rotate(180deg)]
+        [&>svg.is-open]:[color:#e0e0e3]
+      `}
         onClick={() => setOpen((current) => !current)}
         ref={triggerRef}
         type="button"
       >
         <span>{selected?.label ?? "Choose an option"}</span>
-        <Icon className={tw(open ? "is-open" : "")} name="chevron-down" size={15} />
+        <Icon className={open ? "is-open" : ""} name="chevron-down" size={15} />
       </button>
-      <div className={tw("dropdown-menu")} id={menuId} role="menu" aria-label={label} hidden={!open}>
+      <div className={`dropdown-menu
+        absolute
+        [z-index:60]
+        [top:calc(100%_+_6px)]
+        [left:0]
+        [min-width:100%]
+        [width:max-content]
+        [max-width:min(280px,_calc(100vw_-_36px))]
+        [max-height:260px]
+        [overflow-y:auto]
+        [padding:6px]
+        [border:1px_solid_#414248]
+        [border-radius:10px]
+        [background:#202125]
+        [box-shadow:0_14px_38px_#0009]
+      `} id={menuId} role="menu" aria-label={label} hidden={!open}>
         {options.map((option) => (
           <button
             aria-checked={option.value === value}
-            className={tw(`dropdown-option${option.value === value ? " is-selected" : ""}`)}
+            className={(`dropdown-option${option.value === value ? " is-selected" : ""}`) + `
+        [width:100%]
+        [min-height:36px]
+        flex
+        items-center
+        justify-between
+        [gap:18px]
+        [padding:0_12px]
+        [border:0]
+        [border-radius:7px]
+        [color:#c4c4d2]
+        [background:transparent]
+        [text-align:left]
+        [font-size:12px]
+        [cursor:pointer]
+        [&:hover]:[color:white]
+        [&:hover]:[background:#2c2d32]
+        [&:focus-visible]:[color:white]
+        [&:focus-visible]:[background:#2c2d32]
+        [&.is-selected]:[color:#f0f0f2]
+        [&.is-selected]:[background:#292a30]
+        [&>svg]:[color:#c6c7cc]
+      `}
             key={option.value}
             onClick={() => {
               onChange(option.value);

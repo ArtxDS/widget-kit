@@ -25,15 +25,15 @@ export const components: ComponentDefinition[] = [
     name: "Badge",
     category: "Feedback",
     description: "A small status label for states, categories, and metadata.",
-    source: "packages/components/ui/badge.tsx",
-    test: "packages/components/ui/badge.test.tsx",
+    source: "packages/components/ui/badge/badge.tsx",
+    test: "packages/components/ui/badge/badge.test.tsx",
   },
   {
     slug: "toast",
     name: "Toast",
     category: "Feedback",
     description: "A compact notification with loading, success, warning, error, and step states.",
-    source: "packages/components/ui/toast.tsx",
+    source: "packages/components/ui/toast/toast.tsx",
   },
 ];
 

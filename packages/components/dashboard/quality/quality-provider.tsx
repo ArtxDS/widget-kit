@@ -105,7 +105,19 @@ export function QualityProvider({ children }: { children: ReactNode }) {
           | null;
         throw new Error(data?.error ?? "Could not load the quality report.");
       }
-      const data = (await response.json()) as QualitySnapshot;
+      const data = (await response.json()) as QualitySnapshot & {
+        componentTests?: Record<string, any>;
+      };
+      const itemTests = { ...(data.itemTests ?? {}) };
+      if (data.componentTests) {
+        for (const [slug, val] of Object.entries(data.componentTests)) {
+          const k = itemTestKey("component", slug);
+          if (!itemTests[k]) {
+            itemTests[k] = val;
+          }
+        }
+      }
+      data.itemTests = itemTests;
       setSnapshot((current) => ({
         ...data,
         averageRenderTimeMs:
@@ -171,7 +183,19 @@ export function QualityProvider({ children }: { children: ReactNode }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ itemType, itemSlug }),
         });
-        const data = (await response.json()) as QualitySnapshot;
+        const data = (await response.json()) as QualitySnapshot & {
+          componentTests?: Record<string, any>;
+        };
+        const itemTests = { ...(data.itemTests ?? {}) };
+        if (data.componentTests) {
+          for (const [slug, val] of Object.entries(data.componentTests)) {
+            const k = itemTestKey("component", slug);
+            if (!itemTests[k]) {
+              itemTests[k] = val;
+            }
+          }
+        }
+        data.itemTests = itemTests;
         const result = data.history?.find(
           (run) => run.itemType === itemType && run.itemSlug === itemSlug,
         );

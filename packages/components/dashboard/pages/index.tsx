@@ -4,30 +4,26 @@ import type { ComponentDefinition } from "@/lib/catalog";
 import { components, getComponent, getWidget, widgets } from "@/lib/catalog";
 import type { TestCase, TestRunSummary, TestTargetType } from "@/lib/quality";
 import { itemTestKey } from "@/lib/quality";
-import { tw } from "@/lib/tailwind";
 import { Badge, type BadgeTone } from "@artxds/widget-kit";
-import { Toast } from "@/components/ui/toast";
+import { Toast } from "@/components/ui";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  Profiler,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type FormEvent,
   type ReactNode,
 } from "react";
 import {
-  MascotPlaygroundControls,
-  MascotPlaygroundStage,
   WidgetMascotPreview,
-  useMascotPlayground,
 } from "../mascot-playground";
 import { useQuality } from "../quality/quality-provider";
 import { Dropdown } from "../shared/dropdown";
 import type { IconName } from "../shared/icon";
 import { Icon } from "../shared/icon";
+import { WidgetKitStudio } from "../studio";
+import { TestsStudioPage } from "../tests-studio";
 
 const badgeTones = [
   { label: "Purple", value: "purple" },
@@ -49,13 +45,34 @@ function PageTitle({
   action?: ReactNode;
 }) {
   return (
-    <div className={tw("page-title-row")}>
+    <div className={`page-title-row
+        flex
+        items-end
+        justify-between
+        [gap:24px]
+        [&_h1]:[margin:0]
+        [&_h1]:[font-size:clamp(28px,_2.5vw,_36px)]
+        [&_h1]:[font-weight:700]
+        [&_h1]:[letter-spacing:-0.04em]
+        [&_h1]:[line-height:1.18]
+        [@media(max-width:580px)]:items-start
+        [@media(max-width:580px)]:flex-col
+        [@media(max-width:580px)]:[gap:12px]
+        [@media(max-width:580px)]:[&_h1]:[font-size:26px]
+      `}>
       <div>
-        <p className={tw("eyebrow")}>{eyebrow}</p>
+        <p className={"eyebrow [margin:0_0_8px] [color:#c084fc] [font-size:11.5px] [font-weight:740] [letter-spacing:0.12em]"}>{eyebrow}</p>
         <h1>{title}</h1>
-        <p className={tw("page-description")}>{description}</p>
+        <p className={`page-description
+        [max-width:760px]
+        [margin:8px_0_0]
+        [color:#9da0b3]
+        [font-size:13.5px]
+        [line-height:1.65]
+        [@media(max-width:580px)]:[font-size:12px]
+      `}>{description}</p>
       </div>
-      {action && <div className={tw("page-title-action")}>{action}</div>}
+      {action && <div className={"page-title-action [flex:0_0_auto] [@media(max-width:580px)]:[align-self:flex-start]"}>{action}</div>}
     </div>
   );
 }
@@ -72,11 +89,39 @@ function SectionTitle({
   icon?: IconName;
 }) {
   return (
-    <div className={tw("section-title-row")}>
-      <div className={tw(`section-title-copy${icon ? " has-icon" : ""}`)}>
+    <div className={`section-title-row
+        flex
+        items-center
+        justify-between
+        [gap:16px]
+        [&_h2]:[margin:0]
+        [&_h2]:[font-size:16.5px]
+        [&_h2]:[font-weight:650]
+        [&_h2]:[letter-spacing:-0.015em]
+        [&_p]:[margin:3px_0_0]
+        [&_p]:[color:#8d8f9f]
+        [&_p]:[font-size:12px]
+      `}>
+      <div className={(`section-title-copy${icon ? " has-icon" : ""}`) + " min-w-0 flex items-center [gap:14px]"}>
         {icon && (
           <span
-            className={tw(`section-title-icon section-title-icon--${icon}`)}
+            className={(`section-title-icon section-title-icon--${icon}`) + `
+        [width:40px]
+        [height:40px]
+        [flex:0_0_auto]
+        grid
+        [place-items:center]
+        [border:1px_solid_#7545a955]
+        [border-radius:11px]
+        [color:#bb85ff]
+        [background:linear-gradient(145deg,_#9146df2b,_#46227124)]
+        [&.section-title-icon--tests]:[border-color:#3a8d8b66]
+        [&.section-title-icon--tests]:[color:#48d8d0]
+        [&.section-title-icon--tests]:[background:linear-gradient(145deg,_#23b9b126,_#17464324)]
+        [&.section-title-icon--play]:[border-color:#3b70a366]
+        [&.section-title-icon--play]:[color:#79baff]
+        [&.section-title-icon--play]:[background:linear-gradient(145deg,_#398ed526,_#263e6924)]
+      `}
           >
             <Icon name={icon} size={24} />
           </span>
@@ -87,7 +132,17 @@ function SectionTitle({
         </div>
       </div>
       {href && (
-        <Link className={tw("text-link")} href={href}>
+        <Link className={`text-link
+        inline-flex
+        items-center
+        [gap:6px]
+        [margin-top:1px]
+        [color:#c084fc]
+        [font-size:12px]
+        [font-weight:600]
+        [white-space:nowrap]
+        [&:hover]:[color:#d9b8ff]
+      `} href={href}>
           View all <Icon name="arrow-right" size={17} />
         </Link>
       )}
@@ -107,37 +162,41 @@ function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className={tw("empty-state")}>
-      <span className={tw("empty-state-icon")}>
+    <div className={`empty-state
+        [min-height:180px]
+        flex
+        flex-col
+        items-center
+        justify-center
+        [padding:28px_20px]
+        [text-align:center]
+        [&>strong]:[font-size:14px]
+        [&>strong]:[font-weight:650]
+        [&>strong]:[color:#e6e5f2]
+        [&>p]:[max-width:380px]
+        [&>p]:[margin:6px_0_0]
+        [&>p]:[color:#8e90a2]
+        [&>p]:[font-size:12.5px]
+        [&>p]:[line-height:1.6]
+        [&>.button]:[margin-top:16px]
+      `}>
+      <span className={`empty-state-icon
+        [width:44px]
+        [height:44px]
+        grid
+        [place-items:center]
+        [margin-bottom:12px]
+        [border:1px_solid_#3b3648]
+        [border-radius:12px]
+        [color:#b57eff]
+        [background:#8c45dd1a]
+      `}>
         <Icon name={icon} size={20} />
       </span>
       <strong>{title}</strong>
       <p>{description}</p>
       {action}
     </div>
-  );
-}
-
-function DashboardToggle({
-  checked,
-  label,
-  onChange,
-}: {
-  checked: boolean;
-  label: string;
-  onChange: (checked: boolean) => void;
-}) {
-  return (
-    <button
-      aria-checked={checked}
-      aria-label={label}
-      className={tw(`dashboard-toggle${checked ? " is-checked" : ""}`)}
-      onClick={() => onChange(!checked)}
-      role="switch"
-      type="button"
-    >
-      <span />
-    </button>
   );
 }
 
@@ -155,7 +214,7 @@ function ComponentPreview({
   }
 
   return (
-    <div className={tw("badge-preview")}>
+    <div className={"badge-preview flex flex-wrap justify-center items-center [gap:10px]"}>
       <Badge tone={tone} dot={dot}>
         Ready
       </Badge>
@@ -165,9 +224,9 @@ function ComponentPreview({
 
 function ComponentLibraryMiniPreview() {
   return (
-    <div className={tw("component-library-mini-preview")}>
+    <div className={"component-library-mini-preview"}>
       <ComponentPreview />
-      <div className={tw("component-library-mini-preview__toast")}>
+      <div className={"component-library-mini-preview__toast"}>
         <ToastPreview compact />
       </div>
     </div>
@@ -184,7 +243,7 @@ function ToastPreview({
   compact?: boolean;
 }) {
   return (
-    <div aria-hidden="true" className={tw(`toast-preview-frame${compact ? " toast-preview-frame--compact" : ""}`)}>
+    <div aria-hidden="true" className={`toast-preview-frame${compact ? " toast-preview-frame--compact" : ""}`}>
       <Toast
         description={compact ? undefined : variant === "loading" ? "Working on your changes…" : "Your update is ready."}
         mode={mode}
@@ -215,7 +274,17 @@ function TestStatus({
     return (
       <span
         aria-label="Loading test status"
-        className={tw("dashboard-skeleton dashboard-skeleton--test-status")}
+        className={`dashboard-skeleton
+        dashboard-skeleton--test-status
+        block
+        [border-radius:6px]
+        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
+        [background-size:200%_100%]
+        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        [width:76px]
+        [height:21px]
+        [border-radius:99px]
+      `}
         role="status"
       />
     );
@@ -244,18 +313,59 @@ function TestStatus({
 
 function TestCaseList({ assertions }: { assertions: TestCase[] }) {
   return (
-    <ul className={tw("component-test-cases")}>
+    <ul className={`component-test-cases
+        flex
+        flex-col
+        [gap:9px]
+        [margin:16px_0_0]
+        [padding:0]
+        [list-style:none]
+        [&>li]:[min-height:52px]
+        [&>li]:flex
+        [&>li]:items-center
+        [&>li]:[gap:12px]
+        [&>li]:[padding:10px_14px]
+        [&>li]:[border:1px_solid_#262734]
+        [&>li]:[border-radius:9px]
+        [&>li]:[background:#14151e]
+      `}>
       {assertions.map((testCase, index) => (
         <li key={`${testCase.name}-${index}`}>
           <span
-            className={tw(`test-case-icon test-case-icon--${testCase.status}`)}
+            className={(`test-case-icon test-case-icon--${testCase.status}`) + `
+        [width:28px]
+        [height:28px]
+        [flex:0_0_auto]
+        grid
+        [place-items:center]
+        [border-radius:50%]
+        [color:#65dca9]
+        [background:#43ca901d]
+        [&.test-case-icon--failed]:[color:#ff8798]
+        [&.test-case-icon--failed]:[background:#d64d691c]
+        [&.test-case-icon--pending]:[color:#a7a8b8]
+        [&.test-case-icon--pending]:[background:#88889a1c]
+      `}
           >
             <Icon
               name={testCase.status === "passed" ? "check" : "activity"}
               size={14}
             />
           </span>
-          <span className={tw("test-case-copy")}>
+          <span className={`test-case-copy
+        min-w-0
+        [flex:1]
+        flex
+        flex-col
+        [gap:3px]
+        [&_strong]:[overflow-wrap:anywhere]
+        [&_strong]:[color:#dad9e5]
+        [&_strong]:[font-size:13px]
+        [&_strong]:[font-weight:570]
+        [&_small]:[color:#888a9c]
+        [&_small]:[font-size:11px]
+        [&_small]:[text-transform:capitalize]
+      `}>
             <strong>{testCase.name}</strong>
             <small>{testCase.status}</small>
           </span>
@@ -278,16 +388,57 @@ function TestCaseList({ assertions }: { assertions: TestCase[] }) {
 
 function ComponentCard({ component }: { component: ComponentDefinition }) {
   return (
-    <article className={tw("component-card")}>
+    <article className={`component-card
+        overflow-hidden
+        [border:1px_solid_#282938]
+        [border-radius:14px]
+        [background:linear-gradient(160deg,_#151620,_#101117_80%)]
+        [box-shadow:0_10px_28px_#0004]
+        [transition:all_0.2s_cubic-bezier(0.2,_0.8,_0.2,_1)]
+        [&:hover]:[transform:translateY(-3px)]
+        [&:hover]:[border-color:#7848c4]
+        [&:hover]:[box-shadow:0_16px_36px_#0006,_0_0_20px_#9d5cff15]
+      `}>
       <Link
-        className={tw("component-card__preview")}
+        className={`component-card__preview
+        [min-height:190px]
+        grid
+        [place-items:center]
+        [padding:24px]
+        [border-bottom:1px_solid_#232431]
+        [background:radial-gradient(ellipse_at_50%_120%,_#46287933,_transparent_65%),_repeating-linear-gradient(0deg,_transparent_0,_transparent_23px,_#ffffff05_24px),_repeating-linear-gradient(90deg,_transparent_0,_transparent_23px,_#ffffff05_24px),_#111218]
+        [@media(max-width:580px)]:[min-height:150px]
+      `}
         href={`/components/${component.slug}`}
         aria-label={`Open ${component.name} details`}
       >
         <ComponentPreview slug={component.slug} />
       </Link>
-      <div className={tw("component-card__body")}>
-        <div className={tw("component-card__heading")}>
+      <div className={`component-card__body
+        [padding:18px_20px_20px]
+        [&>p]:[min-height:42px]
+        [&>p]:[margin:10px_0_16px]
+        [&>p]:[color:#9da0b3]
+        [&>p]:[font-size:13px]
+        [&>p]:[line-height:1.6]
+      `}>
+        <div className={`component-card__heading
+        flex
+        justify-between
+        items-start
+        [gap:8px]
+        [&_h3]:[margin:0]
+        [&_h3]:[font-size:16px]
+        [&_h3]:[font-weight:650]
+        [&_h3]:[letter-spacing:-0.01em]
+        [&>div>span]:block
+        [&>div>span]:[margin-top:3px]
+        [&>div>span]:[color:#8e90a2]
+        [&>div>span]:[font-size:11px]
+        [&>div>span]:[font-weight:600]
+        [&>div>span]:[text-transform:uppercase]
+        [&>div>span]:[letter-spacing:0.08em]
+      `}>
           <div>
             <h3>{component.name}</h3>
             <span>{component.category}</span>
@@ -296,7 +447,17 @@ function ComponentCard({ component }: { component: ComponentDefinition }) {
         </div>
         <p>{component.description}</p>
         <Link
-          className={tw("component-open")}
+          className={`component-open
+        inline-flex
+        items-center
+        [gap:7px]
+        [color:#c084fc]
+        [font-size:12px]
+        [font-weight:600]
+        [transition:gap_0.15s,_color_0.15s]
+        [&:hover]:[color:#e1c9ff]
+        [&:hover]:[gap:9px]
+      `}
           href={`/components/${component.slug}`}
         >
           Inspect component <Icon name="arrow-right" size={15} />
@@ -359,23 +520,98 @@ function StatCard({
   return (
     <article
       aria-busy={loading}
-      className={tw(`stat-card${href ? " is-link" : ""}`)}
+      className={(`stat-card${href ? " is-link" : ""}`) + `
+        relative
+        min-w-0
+        [min-height:140px]
+        flex
+        items-start
+        [gap:12px]
+        overflow-hidden
+        [padding:17px_16px_56px]
+        [border:1px_solid_#302944]
+        [border-radius:12px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216_76%)]
+        [box-shadow:0_12px_30px_#0005]
+        [transition:border-color_0.18s,_transform_0.18s,_box-shadow_0.18s]
+        [&.is-link:hover]:[border-color:#7a4fb8]
+        [&.is-link:hover]:[transform:translateY(-2px)]
+        [&.is-link:hover]:[box-shadow:0_16px_36px_#0007,_0_0_18px_#9d5cff12]
+        [&::after]:[content:""]
+        [&::after]:absolute
+        [&::after]:[inset:0_0_auto]
+        [&::after]:[height:2px]
+        [&::after]:[opacity:0.78]
+        [&::after]:[background:linear-gradient(90deg,_transparent,_#9d5cff55,_transparent)]
+        [@media(max-width:580px)]:[min-height:120px]
+        [@media(max-width:580px)]:[gap:8px]
+        [@media(max-width:580px)]:[padding:13px_10px_49px]
+      `}
     >
       {href && (
         <Link
-          className={tw("stat-card__link")}
+          className={"stat-card__link absolute [inset:0] [z-index:1] [border-radius:inherit]"}
           href={href}
           aria-label={label}
         />
       )}
-      <div className={tw(`stat-icon stat-icon--${color}`)}>
+      <div className={(`stat-icon stat-icon--${color}`) + `
+        [width:46px]
+        [height:46px]
+        [flex:0_0_auto]
+        grid
+        [place-items:center]
+        [border-radius:12px]
+        [background:#8144cf17]
+        [&.stat-icon--purple]:[color:#ac68ff]
+        [&.stat-icon--purple]:[background:#8d4add19]
+        [&.stat-icon--cyan]:[color:#37d4ce]
+        [&.stat-icon--cyan]:[background:#23b9b11a]
+        [&.stat-icon--green]:[color:#6fe6b1]
+        [&.stat-icon--green]:[background:#45d99b16]
+        [&.stat-icon--blue]:[color:#68b7fc]
+        [&.stat-icon--blue]:[background:#468de918]
+        [@media(max-width:580px)]:[width:38px]
+        [@media(max-width:580px)]:[height:38px]
+      `}>
         <Icon name={icon} size={26} />
       </div>
-      <div className={tw("stat-card__copy")}>
+      <div className={`stat-card__copy
+        min-w-0
+        flex
+        flex-col
+        [gap:2px]
+        [padding-top:1px]
+        [&_span]:[order:0]
+        [&_span]:[color:#9a9bad]
+        [&_span]:[font-size:12px]
+        [&_strong]:[font-size:clamp(25px,_2.2vw,_32px)]
+        [&_strong]:[line-height:1.2]
+        [&_strong]:[letter-spacing:-0.045em]
+        [&_strong]:[font-weight:690]
+        [&_small]:overflow-hidden
+        [&_small]:[color:#747588]
+        [&_small]:[font-size:9px]
+        [&_small]:[text-overflow:ellipsis]
+        [&_small]:[white-space:nowrap]
+        [@media(max-width:580px)]:[&_strong]:[font-size:22px]
+        [@media(max-width:580px)]:[&_span]:[font-size:10px]
+      `}>
         {loading ? (
           <span
             aria-hidden="true"
-            className={tw("dashboard-skeleton dashboard-skeleton--stat-value")}
+            className={`dashboard-skeleton
+        dashboard-skeleton--stat-value
+        block
+        [border-radius:6px]
+        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
+        [background-size:200%_100%]
+        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        [width:68px]
+        [height:31px]
+        [margin:1px_0_2px]
+        [border-radius:7px]
+      `}
           />
         ) : (
           <strong>{value}</strong>
@@ -385,36 +621,94 @@ function StatCard({
       {loading ? (
         <span
           aria-hidden="true"
-          className={tw("dashboard-skeleton dashboard-skeleton--stat-chart")}
+          className={`dashboard-skeleton
+        dashboard-skeleton--stat-chart
+        block
+        [border-radius:6px]
+        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
+        [background-size:200%_100%]
+        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        absolute
+        [right:13px]
+        [bottom:8px]
+        [left:13px]
+        [height:43px]
+        [border-radius:5px]
+      `}
         />
       ) : visual ? (
         <div
           aria-hidden="true"
-          className={tw(
-            `stat-card-preview stat-card-preview--${visualType ?? "component"}`,
-          )}
+          className={(`stat-card-preview stat-card-preview--${visualType ?? "component"}`) + `
+        absolute
+        [right:13px]
+        [bottom:8px]
+        [left:13px]
+        [height:43px]
+        flex
+        items-center
+        justify-center
+        overflow-hidden
+        [border-top:1px_solid_#ffffff10]
+        [pointer-events:none]
+        [&_.wk-mascot-host]:flex
+        [&_.wk-mascot-host]:items-center
+        [&_.wk-mascot-host]:justify-center
+        [@media(max-width:580px)]:[right:9px]
+        [@media(max-width:580px)]:[bottom:7px]
+        [@media(max-width:580px)]:[left:9px]
+        [@media(max-width:580px)]:[height:36px]
+        [background:radial-gradient(ellipse_at_center,_#bd80ff12,_transparent_70%)]
+        [&_.badge-preview]:[transform:scale(0.88)]
+        [background:radial-gradient(ellipse_at_center,_#38d9d218,_transparent_70%)]
+      `}
         >
           {visual}
         </div>
       ) : (
         <svg
-          className={tw(
-            `stat-sparkline stat-sparkline--${color}${points.length ? "" : " is-empty"}`,
-          )}
+          className={(`stat-sparkline stat-sparkline--${color}${points.length ? "" : " is-empty"}`) + `
+        absolute
+        [right:13px]
+        [bottom:9px]
+        [width:calc(100%_-_26px)]
+        [height:43px]
+        [overflow:visible]
+        [&.stat-sparkline--purple]:[color:#bd80ff]
+        [&.stat-sparkline--purple_.stat-sparkline-line]:[stroke:#bd80ff]
+        [&.stat-sparkline--purple_.stat-sparkline-area]:[fill:#bd80ff]
+        [&.stat-sparkline--purple_.stat-sparkline-point]:[fill:#d3a7ff]
+        [&.stat-sparkline--cyan]:[color:#38d9d2]
+        [&.stat-sparkline--cyan_.stat-sparkline-line]:[stroke:#38d9d2]
+        [&.stat-sparkline--cyan_.stat-sparkline-area]:[fill:#38d9d2]
+        [&.stat-sparkline--cyan_.stat-sparkline-point]:[fill:#84fff8]
+        [&.stat-sparkline--green]:[color:#66e4ad]
+        [&.stat-sparkline--green_.stat-sparkline-line]:[stroke:#66e4ad]
+        [&.stat-sparkline--green_.stat-sparkline-area]:[fill:#66e4ad]
+        [&.stat-sparkline--green_.stat-sparkline-point]:[fill:#a5ffd0]
+        [&.stat-sparkline--blue]:[color:#66b7ff]
+        [&.stat-sparkline--blue_.stat-sparkline-line]:[stroke:#66b7ff]
+        [&.stat-sparkline--blue_.stat-sparkline-area]:[fill:#66b7ff]
+        [&.stat-sparkline--blue_.stat-sparkline-point]:[fill:#a2d5ff]
+        [@media(max-width:580px)]:[right:9px]
+        [@media(max-width:580px)]:[bottom:7px]
+        [@media(max-width:580px)]:[width:calc(100%_-_18px)]
+        [@media(max-width:580px)]:[height:36px]
+      `}
           role="img"
           aria-label={chartLabel}
           viewBox="0 0 140 44"
           preserveAspectRatio="none"
         >
           <line
-            className={tw("stat-sparkline-baseline")}
+            className={"stat-sparkline-baseline [stroke:#ffffff10] [stroke-width:1]"}
             x1="0"
             x2="140"
             y1="40"
             y2="40"
           />
           {chartType === "line" && areaPath && (
-            <path className={tw("stat-sparkline-area")} d={areaPath} />
+            <path className={"stat-sparkline-area [opacity:0.13] [transform-box:fill-box] [transform-origin:center_bottom]"} d={areaPath} />
           )}
           {chartType === "bars" && maxBarValue > 0
             ? chartValues.map((value, index) => {
@@ -437,14 +731,22 @@ function StatCard({
             : null}
           {chartType === "line" && points.length > 1 && (
             <polyline
-              className={tw("stat-sparkline-line")}
+              className={`stat-sparkline-line
+        [fill:none]
+        [stroke-width:2.2]
+        [stroke-linecap:round]
+        [stroke-linejoin:round]
+        [stroke-dasharray:1]
+        [stroke-dashoffset:1]
+        [filter:drop-shadow(0_0_4px_currentColor)]
+      `}
               pathLength={1}
               points={points.join(" ")}
             />
           )}
           {chartType === "line" && points.length === 1 && (
             <circle
-              className={tw("stat-sparkline-point")}
+              className={"stat-sparkline-point [stroke:#111219] [stroke-width:2] [transform-box:fill-box] [transform-origin:center]"}
               cx={points[0].split(",")[0]}
               cy={points[0].split(",")[1]}
               r="4.5"
@@ -454,7 +756,7 @@ function StatCard({
           )}
           {!points.length && (
             <text
-              className={tw("stat-sparkline-empty-label")}
+              className={"stat-sparkline-empty-label [fill:#6f7081] [font:8px_ui-sans-serif,_system-ui,_sans-serif]"}
               x="134"
               y="30"
               textAnchor="end"
@@ -484,7 +786,19 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
     .filter((point): point is string => point !== null)
     .join(" ");
   return (
-    <div className={tw("history-chart")}>
+    <div className={`history-chart
+        [margin-top:10px]
+        [&_svg]:block
+        [&_svg]:[width:100%]
+        [&_svg]:[height:133px]
+        [&_svg]:[overflow:visible]
+        [&_svg_line]:[stroke:#30313d]
+        [&_svg_line]:[stroke-width:0.7]
+        [&_svg_text]:[fill:#77798b]
+        [&_svg_text]:[font:8px_ui-sans-serif,_system-ui,_sans-serif]
+        [&_svg_.history-run-label]:[fill:#898b9c]
+        [&_svg_.history-run-label]:[font-size:8px]
+      `}>
       <svg
         role="img"
         aria-label={`Test pass rate across ${runs.length} recent individual runs`}
@@ -501,7 +815,17 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
         ))}
         {passingPoints && (
           <polyline
-            className={tw("history-line history-line--passing")}
+            className={`history-line
+        history-line--passing
+        [fill:none]
+        [stroke-width:2.3]
+        [stroke-linecap:round]
+        [stroke-linejoin:round]
+        [stroke-dasharray:1]
+        [stroke-dashoffset:1]
+        [&.history-line--passing]:[stroke:#9d5cff]
+        [&.history-line--coverage]:[stroke:#a45af5]
+      `}
             pathLength={1}
             points={passingPoints}
           />
@@ -510,7 +834,15 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
           <g key={`${item.itemType}-${item.itemSlug}-${item.completedAt}`}>
             {item.passedPercentage !== null && (
               <circle
-                className={tw("history-point history-point--passing")}
+                className={`history-point
+        history-point--passing
+        [stroke:#14151c]
+        [stroke-width:2]
+        [transform-box:fill-box]
+        [transform-origin:center]
+        [&.history-point--passing]:[fill:#9d5cff]
+        [&.history-point--coverage]:[fill:#a45af5]
+      `}
                 style={{ animationDelay: `${index * 75}ms` }}
                 cx={x(index)}
                 cy={y(item.passedPercentage)}
@@ -520,7 +852,7 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
               </circle>
             )}
             <text
-              className={tw("history-run-label")}
+              className={"history-run-label"}
               x={x(index)}
               y="142"
               textAnchor="middle"
@@ -530,7 +862,7 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
           </g>
         ))}
       </svg>
-      <div className={tw("history-chart-caption")}>
+      <div className={"history-chart-caption flex justify-between [margin:-2px_0_0_27px] [color:#737586] [font-size:8px]"}>
         <span>Older</span>
         <span>Recent runs</span>
         <span>Latest</span>
@@ -582,12 +914,79 @@ export function OverviewPage() {
       item.passedPercentage === null ? [] : [item.passedPercentage],
     );
   return (
-    <div className={tw("page-stack overview-page")}>
-      <section className={tw("overview-hero")}>
-        <div className={tw("hero-panel")}>
-          <div className={tw("hero-glow")} aria-hidden="true" />
-          <div className={tw("hero-copy")}>
-            <span className={tw("hero-kicker")}>
+    <div className={`page-stack
+        overview-page
+        flex
+        flex-col
+        [gap:28px]
+        [@media(max-width:580px)]:[gap:20px]
+        [&_.section-title-row_h2]:[font-size:16.5px]
+        [&_.text-link]:[gap:7px]
+        [&_.text-link]:[font-size:12px]
+      `}>
+      <section className={`overview-hero
+        relative
+        [--hero-height:348px]
+        [&::after]:[content:""]
+        [&::after]:absolute
+        [&::after]:[z-index:2]
+        [&::after]:[inset:calc(var(--hero-height)_-_150px)_0_0]
+        [&::after]:[background:linear-gradient(_180deg,_transparent_0,_color-mix(in_srgb,_var(--background)_76%,_transparent)_80px,_var(--background)_145px_)]
+        [&::after]:[pointer-events:none]
+        [@media(max-width:820px)]:[--hero-height:310px]
+        [@media(max-width:580px)]:[--hero-height:305px]
+      `}>
+        <div className={`hero-panel
+        relative
+        [min-height:348px]
+        flex
+        items-center
+        overflow-hidden
+        [border:1px_solid_#282538]
+        [border-bottom:0]
+        [border-radius:15px]
+        [background:radial-gradient(_ellipse_at_82%_45%,_#1b1c20_0,_#111216_35%,_#111216_70%_)]
+        [&::before]:[content:""]
+        [&::before]:absolute
+        [&::before]:[inset:0]
+        [&::before]:[opacity:0.35]
+        [&::before]:[background:radial-gradient(ellipse_at_88%_35%,_#1d7c7a2d,_transparent_34%),_linear-gradient(115deg,_transparent_58%,_#542b9c14)]
+        [&::before]:[pointer-events:none]
+        [@media(max-width:820px)]:[min-height:310px]
+        [@media(max-width:580px)]:[min-height:305px]
+        [@media(max-width:580px)]:items-start
+      `}>
+          <div className={"hero-glow absolute [right:25%] [bottom:-115px] [width:360px] [height:200px] [border-radius:50%] [background:#5425a344] [filter:blur(75px)]"} aria-hidden="true" />
+          <div className={`hero-copy
+        relative
+        [z-index:4]
+        [width:62%]
+        [padding:27px_12px_85px_30px]
+        [&_h1]:[max-width:635px]
+        [&_h1]:[margin:2px_0_8px]
+        [&_h1]:[font-size:clamp(28px,_3vw,_39px)]
+        [&_h1]:[line-height:1.13]
+        [&_h1]:[letter-spacing:-0.055em]
+        [&_h1]:[font-weight:690]
+        [&_h1_span]:[color:#b16cff]
+        [&_h1_span]:[text-shadow:0_0_26px_#974aff45]
+        [&>p]:[max-width:580px]
+        [&>p]:[margin:0]
+        [&>p]:[color:#a5a5b8]
+        [&>p]:[font-size:13px]
+        [&>p]:[line-height:1.7]
+        [@media(max-width:1120px)]:[width:66%]
+        [@media(max-width:820px)]:[width:70%]
+        [@media(max-width:820px)]:[padding-left:22px]
+        [@media(max-width:820px)]:[&_h1]:[font-size:30px]
+        [@media(max-width:580px)]:[width:100%]
+        [@media(max-width:580px)]:[padding:22px_17px]
+        [@media(max-width:580px)]:[&_h1]:[max-width:300px]
+        [@media(max-width:580px)]:[&_h1]:[font-size:28px]
+        [@media(max-width:580px)]:[&>p]:[max-width:300px]
+        [@media(max-width:580px)]:[&>p]:[font-size:11px]
+      `}>
+            <span className={"hero-kicker inline-flex items-center [gap:7px] [color:#c49aff] [font-size:12px] [font-weight:740] [letter-spacing:0.11em]"}>
               <Icon name="sparkles" size={15} /> WELCOME BACK!
             </span>
             <h1>
@@ -598,7 +997,33 @@ export function OverviewPage() {
               utilities.
             </p>
           </div>
-          <div className={tw("hero-art")}>
+          <div className={`hero-art
+        absolute
+        [inset:0_0_0_auto]
+        [width:48%]
+        [height:100%]
+        [&_img]:absolute
+        [&_img]:[width:100%]
+        [&_img]:[height:143%]
+        [&_img]:[right:-2%]
+        [&_img]:[top:-20%]
+        [&_img]:[object-fit:contain]
+        [&_img]:[object-position:center]
+        [&_img]:[mix-blend-mode:screen]
+        [&_img]:[opacity:0.9]
+        [@media(max-width:1120px)]:[width:43%]
+        [@media(max-width:1120px)]:[opacity:0.82]
+        [@media(max-width:820px)]:[width:47%]
+        [@media(max-width:820px)]:[right:-6%]
+        [@media(max-width:820px)]:[opacity:0.72]
+        [@media(max-width:580px)]:[width:60%]
+        [@media(max-width:580px)]:[height:54%]
+        [@media(max-width:580px)]:[inset:auto_0_0_auto]
+        [@media(max-width:580px)]:[opacity:0.67]
+        [@media(max-width:580px)]:[&_img]:[height:140%]
+        [@media(max-width:580px)]:[&_img]:[top:-12%]
+        [@media(max-width:580px)]:[&_img]:[right:-15%]
+      `}>
             <Image
               src="/assets/img/neon_robot_banner.png"
               alt="Neon robot mascot holding a code panel"
@@ -610,7 +1035,18 @@ export function OverviewPage() {
           </div>
         </div>
 
-        <section aria-label="Library summary" className={tw("stats-grid")}>
+        <section aria-label="Library summary" className={`stats-grid
+        relative
+        [z-index:3]
+        grid
+        [grid-template-columns:repeat(4,_minmax(0,_1fr))]
+        [gap:14px]
+        [margin:-126px_22px_0]
+        [@media(max-width:820px)]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]
+        [@media(max-width:820px)]:[margin-top:-108px]
+        [@media(max-width:580px)]:[gap:8px]
+        [@media(max-width:580px)]:[margin:-82px_8px_0]
+      `}>
           <StatCard
             label="Components"
             value={String(components.length)}
@@ -637,7 +1073,8 @@ export function OverviewPage() {
                 : `${latestTestRun.passedPercentage}%`
             }
             icon="tests"
-            color="green"
+            color="purple"
+            href="/tests"
             loading={loading}
             chartValues={testChartValues}
             chartLabel={
@@ -656,7 +1093,8 @@ export function OverviewPage() {
                   : `${Math.round(averageItemDurationMs)} ms`
             }
             icon="clock"
-            color="blue"
+            color="purple"
+            href="/tests"
             loading={loading}
             chartValues={itemDurationHistory}
             chartType="bars"
@@ -670,22 +1108,75 @@ export function OverviewPage() {
         </section>
       </section>
 
-      <div className={tw("dashboard-grid dashboard-grid--primary")}>
+      <div className={`dashboard-grid
+        dashboard-grid--primary
+        grid
+        [gap:18px]
+        [&.dashboard-grid--primary]:[grid-template-columns:minmax(0,_1.15fr)_minmax(340px,_0.85fr)]
+        [&.dashboard-grid--secondary]:[grid-template-columns:minmax(0,_1.25fr)_minmax(300px,_0.75fr)]
+        [&_.panel]:[padding:20px]
+        [&_.activity-panel]:[padding:20px_24px]
+        [@media(max-width:1120px)]:[&.dashboard-grid--primary]:[grid-template-columns:minmax(0,_1.2fr)_minmax(280px,_0.8fr)]
+        [@media(max-width:1120px)]:[&.dashboard-grid--secondary]:[grid-template-columns:1.15fr_0.85fr]
+        [@media(max-width:1120px)]:[&_.activity-panel]:[padding:18px]
+        [@media(max-width:820px)]:[&.dashboard-grid--primary]:[grid-template-columns:1fr]
+        [@media(max-width:820px)]:[&.dashboard-grid--secondary]:[grid-template-columns:1fr]
+        [@media(max-width:580px)]:[gap:12px]
+        [@media(max-width:580px)]:[&_.panel]:[padding:16px]
+        [@media(max-width:580px)]:[&_.activity-panel]:[padding:16px]
+      `}>
         <section
           aria-busy={loading}
-          className={tw("panel test-performance-panel")}
+          className={`panel
+        test-performance-panel
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [box-shadow:0_8px_24px_#0004]
+      `}
         >
           <SectionTitle title="Test performance" href="/tests" icon="tests" />
           {loading ? (
-            <div aria-hidden="true" className={tw("chart-loading-skeleton")}>
+            <div aria-hidden="true" className={"chart-loading-skeleton [min-height:150px] flex items-center [padding-top:8px]"}>
               <span
-                className={tw("dashboard-skeleton dashboard-skeleton--chart")}
+                className={`dashboard-skeleton
+        dashboard-skeleton--chart
+        block
+        [border-radius:6px]
+        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
+        [background-size:200%_100%]
+        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        [width:100%]
+        [height:132px]
+        [border-radius:8px]
+      `}
               />
             </div>
           ) : chartHistory.length > 1 ? (
-            <div className={tw("chart-legend")}>
+            <div className={`chart-legend
+        flex
+        items-center
+        justify-end
+        [gap:16px]
+        [margin-top:14px]
+        [color:#a5a6b8]
+        [font-size:12px]
+        [&>span]:inline-flex
+        [&>span]:items-center
+        [&>span]:[gap:7px]
+      `}>
               <span>
-                <i className={tw("legend-dot legend-dot--cyan")} /> Passing
+                <i className={`legend-dot
+        legend-dot--purple
+        [width:7px]
+        [height:7px]
+        [border-radius:50%]
+        [&.legend-dot--purple]:[background:#a458ff]
+        [&.legend-dot--purple]:[box-shadow:0_0_8px_#a458ff77]
+        [&.legend-dot--cyan]:[background:#31d9d2]
+        [&.legend-dot--cyan]:[box-shadow:0_0_8px_#31d9d277]
+      `} /> Passing
                 tests
               </span>
             </div>
@@ -694,17 +1185,39 @@ export function OverviewPage() {
             <TestHistoryGraph history={chartHistory} />
           ) : !loading && latestTestRun ? (
             <div
-              className={tw("result-chart")}
+              className={`result-chart
+        relative
+        [min-height:120px]
+        flex
+        flex-col
+        justify-center
+        [gap:12px]
+        [padding:18px_6px_10px]
+        [&>p]:[margin:0]
+        [&>p]:[color:#808295]
+        [&>p]:[font-size:12px]
+      `}
               aria-label={`${latestTestRun.passed} tests passed, ${latestTestRun.failed} failed, ${latestTestRun.pending} pending`}
             >
-              <div className={tw("result-chart__bar")}>
+              <div className={`result-chart__bar
+        [height:9px]
+        overflow-hidden
+        [border-radius:10px]
+        [background:#2a2b36]
+        [&_span]:block
+        [&_span]:[height:100%]
+        [&_span]:[border-radius:inherit]
+        [&_span]:[background:linear-gradient(90deg,_#944bfa,_#39d0c3)]
+        [&_span]:[transform:scaleX(0)]
+        [&_span]:[transform-origin:left_center]
+      `}>
                 <span
                   style={{
                     width: `${latestTestRun.total ? (latestTestRun.passed / latestTestRun.total) * 100 : 0}%`,
                   }}
                 />
               </div>
-              <div className={tw("chart-values")}>
+              <div className={"chart-values flex [gap:16px] [color:#a8a9bc] [font-size:12px] [&_strong]:[color:#69dcaa] [&_strong]:[font-weight:600]"}>
                 <strong>{latestTestRun.passed} passed</strong>
                 <span>{latestTestRun.failed} failed</span>
                 <span>{latestTestRun.pending} pending</span>
@@ -715,8 +1228,31 @@ export function OverviewPage() {
               </p>
             </div>
           ) : !loading ? (
-            <div className={tw("chart-empty")}>
-              <div className={tw("chart-placeholder")}>
+            <div className={`chart-empty
+        [min-height:130px]
+        flex
+        flex-col
+        justify-center
+        [&>p]:[margin:4px_0_0]
+        [&>p]:[color:#838497]
+        [&>p]:[text-align:center]
+        [&>p]:[font-size:12px]
+      `}>
+              <div className={`chart-placeholder
+        [min-height:110px]
+        flex
+        flex-col
+        items-center
+        justify-center
+        [gap:9px]
+        [border:1px_dashed_#30313f]
+        [border-radius:10px]
+        [color:#898a9d]
+        [background:repeating-linear-gradient(_to_bottom,_transparent_0,_transparent_24px,_#292a3618_25px,_transparent_26px_)]
+        [text-align:center]
+        [&_svg]:[color:#9a72c7]
+        [&_span]:[font-size:12px]
+      `}>
                 <Icon name="activity" size={20} />
                 <span>
                   Run an individual component or widget test to record quality
@@ -725,75 +1261,313 @@ export function OverviewPage() {
               </div>
             </div>
           ) : null}
-          <div className={tw("coverage-line")}>
+          <div className={`coverage-line
+        flex
+        justify-between
+        items-center
+        [margin-top:14px]
+        [padding-top:12px]
+        [border-top:1px_solid_#242531]
+        [color:#9293a5]
+        [font-size:12px]
+      `}>
             <span>Test durations</span>
             <Badge tone="muted">Individual runs only</Badge>
           </div>
         </section>
 
-        <section aria-busy={loading} className={tw("panel activity-panel")}>
-          <div className={tw("activity-heading")}>
-            <span className={tw("activity-heading-icon")}>
+        <section aria-busy={loading} className={`panel
+        activity-panel
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [box-shadow:0_8px_24px_#0004]
+      `}>
+          <div className={`activity-heading
+        flex
+        items-center
+        [gap:12px]
+        [margin-left:2px]
+        [&>div]:min-w-0
+        [&>div]:[flex:1]
+        [&_h2]:[margin:0]
+        [&_h2]:[font-size:17px]
+        [&_h2]:[line-height:1.2]
+        [&_h2]:[font-weight:650]
+        [@media(max-width:1120px)]:[gap:10px]
+        [@media(max-width:1120px)]:[&_h2]:[font-size:16px]
+        [@media(max-width:580px)]:[gap:8px]
+        [@media(max-width:580px)]:[&_h2]:[font-size:15px]
+      `}>
+            <span className={`activity-heading-icon
+        [width:40px]
+        [height:40px]
+        [flex:0_0_auto]
+        grid
+        [place-items:center]
+        [border:1px_solid_#75421e66]
+        [border-radius:11px]
+        [color:#ffb45f]
+        [background:linear-gradient(145deg,_#c76c241f,_#742d261b)]
+        [box-shadow:inset_0_0_15px_#ff9e2410]
+        [@media(max-width:1120px)]:[width:36px]
+        [@media(max-width:1120px)]:[height:36px]
+        [@media(max-width:1120px)]:[border-radius:10px]
+        [@media(max-width:1120px)]:[&_svg]:[width:20px]
+        [@media(max-width:1120px)]:[&_svg]:[height:20px]
+        [@media(max-width:580px)]:[width:34px]
+        [@media(max-width:580px)]:[height:34px]
+        [@media(max-width:580px)]:[border-radius:9px]
+        [@media(max-width:580px)]:[&_svg]:[width:19px]
+        [@media(max-width:580px)]:[&_svg]:[height:19px]
+      `}>
               <Icon name="activity" size={20} />
             </span>
             <div>
               <h2>Recent Activity</h2>
             </div>
-            <Link className={tw("text-link")} href="/tests">
+            <Link className={`text-link
+        inline-flex
+        items-center
+        [gap:6px]
+        [margin-top:1px]
+        [color:#c084fc]
+        [font-size:12px]
+        [font-weight:600]
+        [white-space:nowrap]
+        [&:hover]:[color:#d9b8ff]
+      `} href="/tests">
               View all <Icon name="arrow-right" size={14} />
             </Link>
           </div>
           {loading ? (
             <ol
               aria-hidden="true"
-              className={tw("activity-list activity-skeleton-list")}
+              className={`activity-list
+        activity-skeleton-list
+        relative
+        flex
+        flex-col
+        [gap:0]
+        [margin:24px_0_0_2px]
+        [padding:0]
+        [list-style:none]
+        [&::before]:[content:""]
+        [&::before]:absolute
+        [&::before]:[z-index:0]
+        [&::before]:[top:8px]
+        [&::before]:[bottom:8px]
+        [&::before]:[left:4px]
+        [&::before]:[width:1px]
+        [&::before]:[background:linear-gradient(#4acb9a77,_#9d5cff66,_#ff6f8277)]
+        [&_li]:relative
+        [&_li]:[min-height:66px]
+        [&_li]:grid
+        [&_li]:[grid-template-columns:8px_78px_34px_minmax(0,_1fr)]
+        [&_li]:items-center
+        [&_li]:[gap:14px]
+        [&_li]:[border-bottom:1px_solid_#22232d]
+        [&_li:last-child]:[border-bottom:0]
+        [&_time]:[color:#9293a5]
+        [&_time]:[font-size:12px]
+        [&_time]:[white-space:nowrap]
+        [&_li_div]:flex
+        [&_li_div]:flex-col
+        [&_li_div]:[gap:3px]
+        [&_li_strong]:overflow-hidden
+        [&_li_strong]:[font-size:13px]
+        [&_li_strong]:[font-weight:600]
+        [&_li_strong]:[text-overflow:ellipsis]
+        [&_li_strong]:[white-space:nowrap]
+        [&_li_div_span]:[color:#808295]
+        [&_li_div_span]:[font-size:11.5px]
+        [@media(max-width:1120px)]:[margin-top:20px]
+        [@media(max-width:1120px)]:[&_li]:[min-height:62px]
+        [@media(max-width:1120px)]:[&_li]:[grid-template-columns:8px_72px_32px_minmax(0,_1fr)]
+        [@media(max-width:1120px)]:[&_li]:[gap:12px]
+        [@media(max-width:580px)]:[margin-top:18px]
+        [@media(max-width:580px)]:[&_li]:[min-height:58px]
+        [@media(max-width:580px)]:[&_li]:[grid-template-columns:8px_56px_28px_minmax(0,_1fr)]
+        [@media(max-width:580px)]:[&_li]:[gap:9px]
+        [@media(max-width:580px)]:[&_time]:[font-size:10px]
+        [@media(max-width:580px)]:[&_li_strong]:[font-size:11.5px]
+        [@media(max-width:580px)]:[&_li_div_span]:[font-size:10px]
+      `}
             >
               {[0, 1, 2].map((item) => (
-                <li className={tw("activity-skeleton-row")} key={item}>
+                <li className={"activity-skeleton-row"} key={item}>
                   <span
-                    className={tw(
-                      "dashboard-skeleton dashboard-skeleton--timeline",
-                    )}
+                    className={`dashboard-skeleton
+        dashboard-skeleton--timeline
+        block
+        [border-radius:6px]
+        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
+        [background-size:200%_100%]
+        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        [width:8px]
+        [height:8px]
+        [border-radius:50%]
+      `}
                   />
                   <span
-                    className={tw(
-                      "dashboard-skeleton dashboard-skeleton--activity-time",
-                    )}
+                    className={`dashboard-skeleton
+        dashboard-skeleton--activity-time
+        block
+        [border-radius:6px]
+        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
+        [background-size:200%_100%]
+        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        [width:48px]
+        [height:9px]
+      `}
                   />
                   <span
-                    className={tw(
-                      "dashboard-skeleton dashboard-skeleton--activity-icon",
-                    )}
+                    className={`dashboard-skeleton
+        dashboard-skeleton--activity-icon
+        block
+        [border-radius:6px]
+        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
+        [background-size:200%_100%]
+        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        [width:34px]
+        [height:34px]
+        [border-radius:10px]
+      `}
                   />
-                  <span className={tw("activity-skeleton-copy")}>
+                  <span className={"activity-skeleton-copy min-w-0 flex flex-col [gap:7px]"}>
                     <span
-                      className={tw(
-                        "dashboard-skeleton dashboard-skeleton--activity-title",
-                      )}
+                      className={`dashboard-skeleton
+        dashboard-skeleton--activity-title
+        block
+        [border-radius:6px]
+        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
+        [background-size:200%_100%]
+        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        [width:78%]
+        [height:11px]
+      `}
                     />
                     <span
-                      className={tw(
-                        "dashboard-skeleton dashboard-skeleton--activity-meta",
-                      )}
+                      className={`dashboard-skeleton
+        dashboard-skeleton--activity-meta
+        block
+        [border-radius:6px]
+        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
+        [background-size:200%_100%]
+        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        [width:58%]
+        [height:9px]
+      `}
                     />
                   </span>
                 </li>
               ))}
             </ol>
           ) : activityItems.length ? (
-            <ol className={tw("activity-list")}>
+            <ol className={`activity-list
+        relative
+        flex
+        flex-col
+        [gap:0]
+        [margin:24px_0_0_2px]
+        [padding:0]
+        [list-style:none]
+        [&::before]:[content:""]
+        [&::before]:absolute
+        [&::before]:[z-index:0]
+        [&::before]:[top:8px]
+        [&::before]:[bottom:8px]
+        [&::before]:[left:4px]
+        [&::before]:[width:1px]
+        [&::before]:[background:linear-gradient(#4acb9a77,_#9d5cff66,_#ff6f8277)]
+        [&_li]:relative
+        [&_li]:[min-height:66px]
+        [&_li]:grid
+        [&_li]:[grid-template-columns:8px_78px_34px_minmax(0,_1fr)]
+        [&_li]:items-center
+        [&_li]:[gap:14px]
+        [&_li]:[border-bottom:1px_solid_#22232d]
+        [&_li:last-child]:[border-bottom:0]
+        [&_time]:[color:#9293a5]
+        [&_time]:[font-size:12px]
+        [&_time]:[white-space:nowrap]
+        [&_li_div]:flex
+        [&_li_div]:flex-col
+        [&_li_div]:[gap:3px]
+        [&_li_strong]:overflow-hidden
+        [&_li_strong]:[font-size:13px]
+        [&_li_strong]:[font-weight:600]
+        [&_li_strong]:[text-overflow:ellipsis]
+        [&_li_strong]:[white-space:nowrap]
+        [&_li_div_span]:[color:#808295]
+        [&_li_div_span]:[font-size:11.5px]
+        [@media(max-width:1120px)]:[margin-top:20px]
+        [@media(max-width:1120px)]:[&_li]:[min-height:62px]
+        [@media(max-width:1120px)]:[&_li]:[grid-template-columns:8px_72px_32px_minmax(0,_1fr)]
+        [@media(max-width:1120px)]:[&_li]:[gap:12px]
+        [@media(max-width:580px)]:[margin-top:18px]
+        [@media(max-width:580px)]:[&_li]:[min-height:58px]
+        [@media(max-width:580px)]:[&_li]:[grid-template-columns:8px_56px_28px_minmax(0,_1fr)]
+        [@media(max-width:580px)]:[&_li]:[gap:9px]
+        [@media(max-width:580px)]:[&_time]:[font-size:10px]
+        [@media(max-width:580px)]:[&_li_strong]:[font-size:11.5px]
+        [@media(max-width:580px)]:[&_li_div_span]:[font-size:10px]
+      `}>
               {activityItems.map((item) => (
                 <li
-                  className={tw(
-                    `activity-item activity-item--${item.itemType}${item.failed ? " has-failures" : ""}`,
-                  )}
+                  className={(`activity-item activity-item--${item.itemType}${item.failed ? " has-failures" : ""}`) + `
+        [&.activity-item--component_.activity-timeline-dot]:[border-color:#d4b2ff]
+        [&.activity-item--component_.activity-timeline-dot]:[background:#9e63ee]
+        [&.activity-item--component_.activity-timeline-dot]:[box-shadow:0_0_9px_#a15bff99]
+        [&.activity-item--widget_.activity-timeline-dot]:[border-color:#a7efff]
+        [&.activity-item--widget_.activity-timeline-dot]:[background:#45c7e8]
+        [&.activity-item--widget_.activity-timeline-dot]:[box-shadow:0_0_9px_#45c7e899]
+        [&.has-failures_.activity-timeline-dot]:[border-color:#ffc0c7]
+        [&.has-failures_.activity-timeline-dot]:[background:#ed6176]
+        [&.has-failures_.activity-timeline-dot]:[box-shadow:0_0_9px_#ed617699]
+        [&.activity-item--component_.activity-marker]:[border-color:#7248a655]
+        [&.activity-item--component_.activity-marker]:[color:#c195ff]
+        [&.activity-item--component_.activity-marker]:[background:linear-gradient(145deg,_#a45af52c,_#7136c21c)]
+        [&.activity-item--widget_.activity-marker]:[border-color:#45c7e855]
+        [&.activity-item--widget_.activity-marker]:[color:#83e7fb]
+        [&.activity-item--widget_.activity-marker]:[background:linear-gradient(145deg,_#45c7e82c,_#2284a51c)]
+        [&.has-failures_.activity-marker]:[border-color:#9c405055]
+        [&.has-failures_.activity-marker]:[color:#ff899a]
+        [&.has-failures_.activity-marker]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
+      `}
                   key={item.key}
                 >
-                  <span className={tw("activity-timeline-dot")} />
+                  <span className={`activity-timeline-dot
+        relative
+        [z-index:1]
+        [width:8px]
+        [height:8px]
+        [border:1px_solid_#a6ffd4]
+        [border-radius:50%]
+        [background:#3dc990]
+        [box-shadow:0_0_9px_#37d99599]
+      `} />
                   <time dateTime={item.completedAt}>
                     {activityTime(item.completedAt)}
                   </time>
-                  <span className={tw("activity-marker")}>
+                  <span className={`activity-marker
+        [width:34px]
+        [height:34px]
+        grid
+        [place-items:center]
+        [border:1px_solid_#31845e55]
+        [border-radius:10px]
+        [color:#65e2ad]
+        [background:linear-gradient(145deg,_#49d89c29,_#2483581c)]
+        [&.activity-marker--failed]:[border-color:#9c405055]
+        [&.activity-marker--failed]:[color:#ff899a]
+        [&.activity-marker--failed]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
+        [@media(max-width:1120px)]:[width:30px]
+        [@media(max-width:1120px)]:[height:30px]
+        [@media(max-width:580px)]:[width:28px]
+        [@media(max-width:580px)]:[height:28px]
+      `}>
                     <Icon
                       name={
                         item.failed
@@ -819,17 +1593,85 @@ export function OverviewPage() {
               ))}
             </ol>
           ) : (
-            <div className={tw("activity-empty")}>
-              <div className={tw("activity-empty-icons")}>
-                <span className={tw("activity-marker activity-marker--passed")}>
+            <div className={`activity-empty
+        [min-height:200px]
+        flex
+        flex-col
+        items-center
+        justify-center
+        [padding:20px]
+        [text-align:center]
+        [&_.activity-marker]:[width:36px]
+        [&_.activity-marker]:[height:36px]
+        [&>strong]:[font-size:13px]
+        [&>strong]:[font-weight:640]
+        [&>p]:[max-width:280px]
+        [&>p]:[margin:6px_0_0]
+        [&>p]:[color:#8e90a2]
+        [&>p]:[font-size:12px]
+        [&>p]:[line-height:1.55]
+      `}>
+              <div className={"activity-empty-icons flex [gap:10px] [margin-bottom:14px]"}>
+                <span className={`activity-marker
+        activity-marker--passed
+        [width:34px]
+        [height:34px]
+        grid
+        [place-items:center]
+        [border:1px_solid_#31845e55]
+        [border-radius:10px]
+        [color:#65e2ad]
+        [background:linear-gradient(145deg,_#49d89c29,_#2483581c)]
+        [&.activity-marker--failed]:[border-color:#9c405055]
+        [&.activity-marker--failed]:[color:#ff899a]
+        [&.activity-marker--failed]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
+        [@media(max-width:1120px)]:[width:30px]
+        [@media(max-width:1120px)]:[height:30px]
+        [@media(max-width:580px)]:[width:28px]
+        [@media(max-width:580px)]:[height:28px]
+      `}>
                   <Icon name="check" size={14} />
                 </span>
                 <span
-                  className={tw("activity-marker activity-marker--component")}
+                  className={`activity-marker
+        activity-marker--component
+        [width:34px]
+        [height:34px]
+        grid
+        [place-items:center]
+        [border:1px_solid_#31845e55]
+        [border-radius:10px]
+        [color:#65e2ad]
+        [background:linear-gradient(145deg,_#49d89c29,_#2483581c)]
+        [&.activity-marker--failed]:[border-color:#9c405055]
+        [&.activity-marker--failed]:[color:#ff899a]
+        [&.activity-marker--failed]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
+        [@media(max-width:1120px)]:[width:30px]
+        [@media(max-width:1120px)]:[height:30px]
+        [@media(max-width:580px)]:[width:28px]
+        [@media(max-width:580px)]:[height:28px]
+      `}
                 >
                   <Icon name="components" size={14} />
                 </span>
-                <span className={tw("activity-marker activity-marker--failed")}>
+                <span className={`activity-marker
+        activity-marker--failed
+        [width:34px]
+        [height:34px]
+        grid
+        [place-items:center]
+        [border:1px_solid_#31845e55]
+        [border-radius:10px]
+        [color:#65e2ad]
+        [background:linear-gradient(145deg,_#49d89c29,_#2483581c)]
+        [&.activity-marker--failed]:[border-color:#9c405055]
+        [&.activity-marker--failed]:[color:#ff899a]
+        [&.activity-marker--failed]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
+        [@media(max-width:1120px)]:[width:30px]
+        [@media(max-width:1120px)]:[height:30px]
+        [@media(max-width:580px)]:[width:28px]
+        [@media(max-width:580px)]:[height:28px]
+      `}>
                   <Icon name="activity" size={14} />
                 </span>
               </div>
@@ -872,19 +1714,70 @@ export function ComponentsPage() {
   );
 
   return (
-    <div className={tw("page-stack")}>
+    <div className={"component-library-page page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
       <PageTitle
         eyebrow="LIBRARY / COMPONENTS"
         title="Components"
         description="Reusable interface building blocks, organized for quick inspection and experimentation."
         action={
-          <Link className={tw("button button-primary")} href="/playground">
+          <Link className={`button
+        button-primary
+        [min-height:38px]
+        inline-flex
+        items-center
+        justify-center
+        [gap:8px]
+        [padding:0_16px]
+        [border:1px_solid_transparent]
+        [border-radius:9px]
+        [font-size:12.5px]
+        [font-weight:600]
+        [line-height:1]
+        [white-space:nowrap]
+        [cursor:pointer]
+        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
+        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
+        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
+        [&:disabled]:[cursor:not-allowed]
+        [&:disabled]:[opacity:0.52]
+        [&.button-primary]:[border-color:#8747d8]
+        [&.button-primary]:[color:white]
+        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
+        [&.button-quiet]:[border-color:#30313f]
+        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:[background:#171821cc]
+        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:[background:#20202e]
+      `} href="/playground">
             <Icon name="play" size={15} /> Open playground
           </Link>
         }
       />
-      <div className={tw("catalog-toolbar")}>
-        <label className={tw("catalog-search")}>
+      <div className={"catalog-toolbar flex items-center [gap:12px] [@media(max-width:580px)]:flex-wrap"}>
+        <label className={`catalog-search
+        [height:42px]
+        flex
+        items-center
+        [gap:10px]
+        [padding:0_14px]
+        [border:1px_solid_#292a38]
+        [border-radius:10px]
+        [color:#9da0b5]
+        [background:#111219]
+        [width:min(440px,_55%)]
+        [transition:border-color_0.15s,_box-shadow_0.15s]
+        [&_input]:[width:100%]
+        [&_input]:[border:0]
+        [&_input]:[outline:0]
+        [&_input]:[color:var(--foreground)]
+        [&_input]:[background:transparent]
+        [&_input]:[font-size:12.5px]
+        [&_input::placeholder]:[color:#7b7d90]
+        [&:focus-within]:[border-color:#8e56de]
+        [&:focus-within]:[box-shadow:0_0_0_3px_#9d5cff15]
+        [@media(max-width:580px)]:[width:100%]
+      `}>
           <Icon name="search" size={18} />
           <input
             value={query}
@@ -894,7 +1787,27 @@ export function ComponentsPage() {
           />
           <kbd>⌘ K</kbd>
         </label>
-        <div className={tw("category-select")}>
+        <div className={`category-select
+        [height:42px]
+        flex
+        items-center
+        [gap:8px]
+        [padding:0_10px]
+        [border:1px_solid_#2f303f]
+        [border-radius:10px]
+        [color:#9fa0b4]
+        [background:#12131b]
+        [min-width:190px]
+        [&>svg]:[flex:0_0_auto]
+        [&_.dropdown]:[flex:1]
+        [&_.dropdown]:[width:auto]
+        [&_.dropdown-trigger]:[min-height:38px]
+        [&_.dropdown-trigger]:[padding-inline:4px]
+        [&_.dropdown-trigger]:[border:0]
+        [&_.dropdown-trigger]:[background:transparent]
+        [@media(max-width:580px)]:min-w-0
+        [@media(max-width:580px)]:[flex:1]
+      `}>
           <Icon name="filter" size={17} />
           <Dropdown
             label="Filter by category"
@@ -903,18 +1816,43 @@ export function ComponentsPage() {
             options={categories.map((item) => ({ label: item, value: item }))}
           />
         </div>
-        <span className={tw("catalog-count")}>
+        <span className={"catalog-count [margin-left:auto] [color:#9293a5] [font-size:12px] [font-weight:550] [@media(max-width:580px)]:[margin-left:auto]"}>
           {filtered.length} {filtered.length === 1 ? "component" : "components"}
         </span>
       </div>
       {Object.keys(grouped).length ? (
         Object.entries(grouped).map(([group, items]) => (
-          <section className={tw("catalog-group")} key={group}>
-            <div className={tw("catalog-group-heading")}>
+          <section className={"catalog-group flex flex-col [gap:16px]"} key={group}>
+            <div className={`catalog-group-heading
+        flex
+        items-center
+        [gap:10px]
+        [padding-bottom:12px]
+        [border-bottom:1px_solid_#232431]
+        [&_h2]:[margin:0]
+        [&_h2]:[font-size:16px]
+        [&_h2]:[font-weight:650]
+        [&_h2]:[letter-spacing:-0.01em]
+        [&_span]:inline-flex
+        [&_span]:items-center
+        [&_span]:[padding:2px_8px]
+        [&_span]:[border-radius:6px]
+        [&_span]:[background:#181924]
+        [&_span]:[border:1px_solid_#262736]
+        [&_span]:[color:#a5a6b8]
+        [&_span]:[font:11px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+        [&_span]:[font-weight:600]
+      `}>
               <h2>{group}</h2>
               <span>{String(items.length).padStart(2, "0")}</span>
             </div>
-            <div className={tw("component-grid")}>
+            <div className={`component-grid
+        grid
+        [grid-template-columns:repeat(auto-fill,_minmax(360px,_1fr))]
+        [gap:20px]
+        [@media(max-width:1120px)]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]
+        [@media(max-width:580px)]:[grid-template-columns:1fr]
+      `}>
               {items.map((component) => (
                 <ComponentCard component={component} key={component.slug} />
               ))}
@@ -922,14 +1860,49 @@ export function ComponentsPage() {
           </section>
         ))
       ) : (
-        <section className={tw("panel")}>
+        <section className={`panel
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#151620,_#101117)]
+        [box-shadow:0_8px_24px_#0004]
+      `}>
           <EmptyState
             icon="widgets"
             title="No matching components"
             description="Try a different name or category."
             action={
               <button
-                className={tw("button button-quiet")}
+                className={`button
+        button-quiet
+        [min-height:38px]
+        inline-flex
+        items-center
+        justify-center
+        [gap:8px]
+        [padding:0_16px]
+        [border:1px_solid_transparent]
+        [border-radius:9px]
+        [font-size:12.5px]
+        [font-weight:600]
+        [line-height:1]
+        [white-space:nowrap]
+        [cursor:pointer]
+        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
+        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
+        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
+        [&:disabled]:[cursor:not-allowed]
+        [&:disabled]:[opacity:0.52]
+        [&.button-primary]:[border-color:#8747d8]
+        [&.button-primary]:[color:white]
+        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
+        [&.button-quiet]:[border-color:#30313f]
+        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:[background:#171821cc]
+        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:[background:#20202e]
+      `}
                 type="button"
                 onClick={() => {
                   setQuery("");
@@ -946,459 +1919,134 @@ export function ComponentsPage() {
   );
 }
 
-function DetailPreview({
-  slug,
-  onMeasure,
-}: {
-  slug: string;
-  onMeasure: (durationMs: number) => void;
-}) {
-  const { recordRenderTime } = useQuality();
-  const [badgeTone, setBadgeTone] = useState<BadgeTone>("green");
-  const [dot, setDot] = useState(true);
-  const [duration, setDuration] = useState<number | null>(null);
-  const [viewport, setViewport] = useState("Desktop");
-  const hasMeasured = useRef(false);
-  const hasReported = useRef(false);
-
-  useEffect(() => {
-    if (duration !== null && !hasReported.current) {
-      hasReported.current = true;
-      recordRenderTime(duration);
-      onMeasure(duration);
-    }
-  }, [duration, onMeasure, recordRenderTime]);
-
-  return (
-    <div className={tw("detail-preview-area")}>
-      <div className={tw("preview-toolbar")}>
-        <span>
-          <span className={tw("preview-live-dot")} /> Interactive preview
-        </span>
-        <div>
-          {(["Desktop", "Tablet", "Mobile"] as const).map((item) => (
-            <button
-              type="button"
-              aria-pressed={viewport === item}
-              className={tw(viewport === item ? "is-selected" : "")}
-              title={`${item} viewport`}
-              key={item}
-              onClick={() => setViewport(item)}
-            >
-              <Icon
-                name={
-                  item === "Desktop"
-                    ? "monitor"
-                    : item === "Tablet"
-                      ? "tablet"
-                      : "phone"
-                }
-                size={15}
-              />
-            </button>
-          ))}
-        </div>
-      </div>
-      <div
-        className={tw(
-          `component-stage component-stage--${viewport.toLowerCase()}`,
-        )}
-      >
-        <div className={tw("component-stage__canvas")}>
-          <Profiler
-            id={`component-${slug}`}
-            onRender={(_id, _phase, actualDuration) => {
-              if (!hasMeasured.current) {
-                hasMeasured.current = true;
-                setDuration(actualDuration);
-              }
-            }}
-          >
-            <div className={tw("component-stage__center")}>
-            <ComponentPreview slug={slug} tone={badgeTone} dot={dot} />
-            </div>
-          </Profiler>
-        </div>
-      </div>
-      {slug === "toast" ? (
-        <div className={tw("preview-properties")}>
-          <span className={tw("render-measure")}>
-            <Icon name="sparkles" size={14} /> Notification preview
-          </span>
-          <span className={tw("render-measure")}>
-            <Icon name="clock" size={14} />{" "}
-            {duration === null ? "Measuring render…" : `${duration.toFixed(2)} ms actual render`}
-          </span>
-        </div>
-      ) : (
-      <div className={tw("preview-properties")}>
-        <div className={tw("property-control")}>
-          <span>Color tone</span>
-          <Dropdown
-            label="Color tone"
-            value={badgeTone}
-            onChange={(value) => setBadgeTone(value as BadgeTone)}
-            options={badgeTones}
-          />
-        </div>
-        <div className={tw("property-control property-switch")}>
-          <span>Status dot</span>
-          <DashboardToggle
-            checked={dot}
-            onChange={setDot}
-            label="Show status dot"
-          />
-        </div>
-        <span className={tw("render-measure")}>
-          <Icon name="clock" size={14} />{" "}
-          {duration === null
-            ? "Measuring render…"
-            : `${duration.toFixed(2)} ms actual render`}
-        </span>
-      </div>
-      )}
-    </div>
-  );
-}
-
 export function ComponentDetailPage({ slug }: { slug: string }) {
-  const component = getComponent(slug);
-  const componentSlug = component?.slug;
-  const { snapshot, runningItemKey, runItemTests } = useQuality();
-  const componentTest = snapshot.itemTests?.[itemTestKey("component", slug)];
-  const [tab, setTab] = useState("Preview");
-  const [copied, setCopied] = useState(false);
-  const [componentRenderTimeMs, setComponentRenderTimeMs] = useState<
-    number | null
-  >(null);
-  const [sourceFiles, setSourceFiles] = useState<{
-    source: string;
-    testSource: string;
-  } | null>(null);
-  const [sourceStatus, setSourceStatus] = useState<
-    "idle" | "loading" | "ready" | "error"
-  >("idle");
-
-  useEffect(() => {
-    if (tab !== "Source" || !componentSlug) return;
-    const controller = new AbortController();
-    const timer = window.setTimeout(() => {
-      setSourceStatus("loading");
-      void fetch(`/api/components/${componentSlug}/source`, {
-        signal: controller.signal,
-      })
-        .then(async (response) => {
-          if (!response.ok) throw new Error("Source files are unavailable.");
-          return (await response.json()) as {
-            source: string;
-            testSource: string;
-          };
-        })
-        .then((files) => {
-          setSourceFiles(files);
-          setSourceStatus("ready");
-        })
-        .catch(() => {
-          if (!controller.signal.aborted) setSourceStatus("error");
-        });
-    }, 0);
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [componentSlug, tab]);
-
-  if (!component) return <NotFoundPage />;
-  const usage = component?.slug === "toast"
-    ? '<Toast variant="success" title="Changes saved" description="Your update is ready." />'
-    : '<Badge tone="green" dot>Ready</Badge>';
-  const componentTestRunning =
-    runningItemKey === itemTestKey("component", slug);
-
-  async function copyUsage() {
-    await navigator.clipboard.writeText(usage);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1600);
-  }
-
+  if (!getComponent(slug)) return <NotFoundPage />;
   return (
-    <div className={tw("page-stack")}>
-      <div className={tw("breadcrumb")}>
-        <Link href="/components">Components</Link>
-        <span>/</span>
-        <span>{component.name}</span>
-      </div>
-      <PageTitle
-        eyebrow={`COMPONENT / ${component.category.toUpperCase()}`}
-        title={component.name}
-        description={component.description}
-        action={
-          <div className={tw("component-detail-actions")}>
-            <TestStatus slug={slug} />
-            <button
-              className={tw("button button-primary")}
-              type="button"
-              disabled={runningItemKey !== null || !component.test}
-              onClick={() => void runItemTests("component", slug)}
-            >
-              <Icon name="play" size={14} />
-              {componentTestRunning
-                ? "Running tests…"
-                : `Run ${component.name} tests`}
-            </button>
-          </div>
-        }
-      />
-      <div className={tw("detail-meta")}>
-        <span>
-          <Icon name="code" size={15} /> {component.source}
-        </span>
-        <Badge tone="cyan">{component.category}</Badge>
-      </div>
-      <div
-        className={tw("detail-tabs")}
-        role="tablist"
-        aria-label="Component sections"
-      >
-        {["Preview", "Variants", "Tests", "Performance", "Source"].map(
-          (item) => (
-            <button
-              role="tab"
-              aria-selected={tab === item}
-              className={tw(tab === item ? "is-selected" : "")}
-              key={item}
-              onClick={() => setTab(item)}
-            >
-              {item}
-            </button>
-          ),
-        )}
-      </div>
-      {tab === "Preview" && (
-        <section className={tw("panel detail-preview-panel")}>
-          <DetailPreview
-            slug={component.slug}
-            onMeasure={setComponentRenderTimeMs}
-          />
-        </section>
-      )}
-      {tab === "Variants" && (
-        <section className={tw("panel variants-panel")}>
-          <SectionTitle
-            title="Available variants"
-            detail="Rendered with the library component itself"
-          />
-          <div className={tw("variant-samples")}>
-            {component.slug === "toast" ? (
-              <>
-                {(["loading", "success", "warning", "error"] as const).map((variant) => (
-                  <div key={variant}>
-                    <ToastPreview variant={variant} />
-                    <span>{variant}</span>
-                  </div>
-                ))}
-                <div>
-                  <ToastPreview mode="steps" />
-                  <span>Steps</span>
-                </div>
-              </>
-            ) : (
-              <>
-                {badgeTones.map(({ label, value }) => (
-                  <div key={value}>
-                    <ComponentPreview tone={value as BadgeTone} />
-                    <span>{label}</span>
-                  </div>
-                ))}
-                <div>
-                  <ComponentPreview dot={false} />
-                  <span>Without status dot</span>
-                </div>
-              </>
-            )}
-          </div>
-        </section>
-      )}
-      {tab === "Tests" && (
-        <section className={tw("panel quality-detail-panel")}>
-          <SectionTitle
-            title="Test results"
-            detail="Latest individual test run for this component"
-          />
-          {componentTest && componentTest.total > 0 ? (
-            <>
-              <div className={tw("quality-kpis")}>
-                <div>
-                  <strong>{componentTest.total}</strong>
-                  <span>Test cases</span>
-                </div>
-                <div>
-                  <strong className={tw("positive-text")}>
-                    {componentTest.passed}
-                  </strong>
-                  <span>Passed</span>
-                </div>
-                <div>
-                  <strong className={tw("negative-text")}>
-                    {componentTest.failed}
-                  </strong>
-                  <span>Failed</span>
-                </div>
-                <div>
-                  <strong>{componentTest.pending}</strong>
-                  <span>Pending</span>
-                </div>
-              </div>
-              <div className={tw("component-test-result-meta")}>
-                Latest individual component run
-                {componentTest.completedAt
-                  ? ` · ${new Date(componentTest.completedAt).toLocaleString()}`
-                  : ""}
-              </div>
-              <TestCaseList assertions={componentTest.assertions} />
-              <div className={tw("detail-test-source")}>
-                <Icon name="code" size={14} /> {component.test ?? "No individual test registered"}
-                <span>
-                  Duration: {(componentTest.durationMs / 1000).toFixed(2)}s
-                </span>
-              </div>
-            </>
-          ) : (
-            <EmptyState
-              icon="tests"
-              title="No test results yet"
-              description={component.test
-                ? `Run this component's individual test to collect results for ${component.test}.`
-                : "This component is cataloged for preview, but does not have an individual test file registered yet."}
-            />
-          )}
-        </section>
-      )}
-      {tab === "Performance" && (
-        <section className={tw("panel quality-detail-panel")}>
-          <SectionTitle
-            title="Render performance"
-            detail="Measured in this browser session"
-          />
-          {componentRenderTimeMs == null ? (
-            <EmptyState
-              icon="activity"
-              title="No render measurement yet"
-              description="Open the Preview tab to collect an actual React Profiler duration for this component."
-            />
-          ) : (
-            <>
-              <div className={tw("quality-kpis")}>
-                <div>
-                  <strong>{componentRenderTimeMs.toFixed(2)} ms</strong>
-                  <span>Initial render duration</span>
-                </div>
-                <div>
-                  <strong>1</strong>
-                  <span>Profiler sample</span>
-                </div>
-              </div>
-              {/* <p className={tw("performance-observation")}>
-                This is a single React Profiler measurement for the current
-                preview. Re-render counts, unnecessary-render analysis, and
-                benchmark comparisons need a dedicated benchmark run.
-              </p> */}
-            </>
-          )}
-        </section>
-      )}
-      {tab === "Source" && (
-        <section className={tw("panel source-panel")}>
-          <div className={tw("source-heading")}>
-            <div>
-              <SectionTitle
-                title="Usage example"
-                detail="Live example for the selected component"
-              />
-            </div>
-            <button
-              type="button"
-              className={tw("copy-button")}
-              onClick={() => void copyUsage()}
-            >
-              <Icon name="copy" size={15} /> {copied ? "Copied" : "Copy"}
-            </button>
-          </div>
-          <pre>
-            <code>{usage}</code>
-          </pre>
-          <div className={tw("source-files")}>
-            <section>
-              <div className={tw("source-file-heading")}>
-                <span>Implementation</span>
-                <code>{component.source}</code>
-              </div>
-              <pre>
-                <code>
-                  {sourceStatus === "error"
-                    ? "Source file unavailable."
-                    : sourceStatus === "ready"
-                      ? sourceFiles?.source
-                      : "Loading implementation…"}
-                </code>
-              </pre>
-            </section>
-            <section>
-              <div className={tw("source-file-heading")}>
-                <span>Tests</span>
-                <code>{component.test ?? "No individual test registered"}</code>
-              </div>
-              <pre>
-                <code>
-                  {sourceStatus === "error"
-                    ? "Test file unavailable."
-                    : sourceStatus === "ready"
-                      ? sourceFiles?.testSource
-                      : "Loading tests…"}
-                </code>
-              </pre>
-            </section>
-          </div>
-        </section>
-      )}
-      {snapshot.error && (
-        <p className={tw("inline-error")} role="status">
-          {snapshot.error}
-        </p>
-      )}
-    </div>
+    <WidgetKitStudio
+      key={slug}
+      initialItem={slug}
+      initialMode="preview"
+    />
   );
 }
 
 export function WidgetsPage() {
   return (
-    <div className={tw("page-stack")}>
+    <div className={"widget-library-page page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
       <PageTitle
         eyebrow="LIBRARY / WIDGETS"
         title="Widgets"
         description="Larger, composed experiences built from the component library."
         action={
-          <Link className={tw("button button-quiet")} href="/notes">
+          <Link className={`button
+        button-quiet
+        [min-height:38px]
+        inline-flex
+        items-center
+        justify-center
+        [gap:8px]
+        [padding:0_16px]
+        [border:1px_solid_transparent]
+        [border-radius:9px]
+        [font-size:12.5px]
+        [font-weight:600]
+        [line-height:1]
+        [white-space:nowrap]
+        [cursor:pointer]
+        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
+        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
+        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
+        [&:disabled]:[cursor:not-allowed]
+        [&:disabled]:[opacity:0.52]
+        [&.button-primary]:[border-color:#8747d8]
+        [&.button-primary]:[color:white]
+        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
+        [&.button-quiet]:[border-color:#30313f]
+        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:[background:#171821cc]
+        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:[background:#20202e]
+      `} href="/notes">
             <Icon name="plus" size={16} /> Propose a widget
           </Link>
         }
       />
       {widgets.length ? (
-        <div className={tw("widget-catalog-grid")}>
+        <div className={`widget-catalog-grid
+        grid
+        [grid-template-columns:repeat(auto-fill,_minmax(440px,_1fr))]
+        [gap:24px]
+        [@media(max-width:580px)]:[grid-template-columns:1fr]
+      `}>
           {widgets.map((widget) => (
             <Link
-              className={tw("panel widget-card")}
+              className={`panel
+        widget-card
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#151620,_#101117)]
+        [box-shadow:0_8px_24px_#0004]
+        overflow-hidden
+        [border:1px_solid_#2b283b]
+        [background:linear-gradient(160deg,_#161722,_#101117_80%)]
+        [box-shadow:0_12px_30px_#0004]
+        [transition:all_0.2s_cubic-bezier(0.2,_0.8,_0.2,_1)]
+        [&:hover]:[transform:translateY(-3px)]
+        [&:hover]:[border-color:#8b55d8]
+        [&:hover]:[box-shadow:0_18px_40px_#0006,_0_0_24px_#9d5cff18]
+      `}
               href={`/playground?item=${widget.slug}`}
               key={widget.slug}
             >
-              <div className={tw("widget-card__preview")}>
+              <div className={`widget-card__preview
+        [min-height:260px]
+        grid
+        [place-items:center]
+        [padding:24px]
+        [border-bottom:1px_solid_#232431]
+        [color:#c084fc]
+        [background:radial-gradient(ellipse_at_center,_#6b35b822,_transparent_65%),_repeating-linear-gradient(0deg,_transparent_0,_transparent_27px,_#ffffff05_28px),_repeating-linear-gradient(90deg,_transparent_0,_transparent_27px,_#ffffff05_28px),_#111218]
+      `}>
                 {widget.slug === "mascot" ? (
                   <WidgetMascotPreview />
                 ) : (
                   <Icon name="widgets" size={25} />
                 )}
               </div>
-              <div className={tw("widget-card__body")}>
+              <div className={`widget-card__body
+        [padding:22px_24px_24px]
+        [&>div]:flex
+        [&>div]:items-center
+        [&>div]:justify-between
+        [&>div]:[gap:10px]
+        [&_h2]:[margin:0]
+        [&_h2]:[font-size:18px]
+        [&_h2]:[font-weight:700]
+        [&_h2]:[letter-spacing:-0.015em]
+        [&>span]:block
+        [&>span]:[margin-top:4px]
+        [&>span]:[color:#9293a5]
+        [&>span]:[font-size:11px]
+        [&>span]:[font-weight:600]
+        [&>span]:[text-transform:uppercase]
+        [&>span]:[letter-spacing:0.08em]
+        [&_p]:[min-height:44px]
+        [&_p]:[margin:12px_0_18px]
+        [&_p]:[color:#9da0b3]
+        [&_p]:[font-size:13.5px]
+        [&_p]:[line-height:1.6]
+        [&_code]:inline-flex
+        [&_code]:items-center
+        [&_code]:[gap:6px]
+        [&_code]:[padding:5px_10px]
+        [&_code]:[border-radius:7px]
+        [&_code]:[background:#0c0d13]
+        [&_code]:[border:1px_solid_#242533]
+        [&_code]:[color:#c49aff]
+        [&_code]:[font:11px/1.4_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+      `}>
                 <div>
                   <h2>{widget.name}</h2>
                   <Badge
@@ -1416,8 +2064,53 @@ export function WidgetsPage() {
           ))}
         </div>
       ) : (
-        <section className={tw("panel widget-empty-panel")}>
-          <div className={tw("widget-orbit")} aria-hidden="true">
+        <section className={`panel
+        widget-empty-panel
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#151620,_#101117)]
+        [box-shadow:0_8px_24px_#0004]
+        relative
+        [min-height:360px]
+        grid
+        [place-items:center]
+        overflow-hidden
+        [&_.empty-state]:relative
+        [&_.empty-state]:[z-index:1]
+        [&_.empty-state>p]:[max-width:440px]
+        [@media(max-width:580px)]:[min-height:300px]
+      `}>
+          <div className={`widget-orbit
+        absolute
+        [inset:0]
+        grid
+        [place-items:center]
+        [color:#8142d2]
+        [opacity:0.14]
+        [&::before]:[content:""]
+        [&::before]:absolute
+        [&::before]:[width:250px]
+        [&::before]:[height:120px]
+        [&::before]:[border:1px_solid_#934df9]
+        [&::before]:[border-radius:50%]
+        [&::before]:[transform:rotate(-25deg)]
+        [&::after]:[content:""]
+        [&::after]:absolute
+        [&::after]:[width:340px]
+        [&::after]:[height:175px]
+        [&::after]:[border:1px_solid_#934df9]
+        [&::after]:[border-radius:50%]
+        [&::after]:[transform:rotate(32deg)]
+        [&>span]:absolute
+        [&>span]:[width:6px]
+        [&>span]:[height:6px]
+        [&>span]:[border-radius:50%]
+        [&>span]:[background:#38d7d0]
+        [&>span]:[box-shadow:0_0_12px_#38d7d0]
+        [&>span:first-child]:[transform:translate(135px,_-48px)]
+        [&>span:nth-child(2)]:[transform:translate(-105px,_64px)]
+      `} aria-hidden="true">
             <span />
             <span />
             <Icon name="widgets" size={28} />
@@ -1427,14 +2120,67 @@ export function WidgetsPage() {
             title="No widgets registered"
             description="Widgets are kept separate from UI primitives. Add a composed widget when one is ready to document and test."
             action={
-              <Link href="/notes" className={tw("button button-primary")}>
+              <Link href="/notes" className={`button
+        button-primary
+        [min-height:38px]
+        inline-flex
+        items-center
+        justify-center
+        [gap:8px]
+        [padding:0_16px]
+        [border:1px_solid_transparent]
+        [border-radius:9px]
+        [font-size:12.5px]
+        [font-weight:600]
+        [line-height:1]
+        [white-space:nowrap]
+        [cursor:pointer]
+        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
+        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
+        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
+        [&:disabled]:[cursor:not-allowed]
+        [&:disabled]:[opacity:0.52]
+        [&.button-primary]:[border-color:#8747d8]
+        [&.button-primary]:[color:white]
+        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
+        [&.button-quiet]:[border-color:#30313f]
+        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:[background:#171821cc]
+        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:[background:#20202e]
+      `}>
                 Capture an idea <Icon name="arrow-right" size={15} />
               </Link>
             }
           />
         </section>
       )}
-      <div className={tw("widget-notes")}>
+      <div className={`widget-notes
+        flex
+        items-center
+        [gap:14px]
+        [padding:18px_22px]
+        [border:1px_solid_#262736]
+        [border-radius:12px]
+        [background:linear-gradient(145deg,_#14151e,_#111217)]
+        [&>span]:[width:38px]
+        [&>span]:[height:38px]
+        [&>span]:[flex:0_0_auto]
+        [&>span]:grid
+        [&>span]:[place-items:center]
+        [&>span]:[border-radius:10px]
+        [&>span]:[background:#9d5cff18]
+        [&>span]:[border:1px_solid_#7545a944]
+        [&>span]:[color:#c084fc]
+        [&_p]:[margin:0]
+        [&_p]:[color:#9da0b3]
+        [&_p]:[font-size:13px]
+        [&_p]:[line-height:1.6]
+        [&_strong]:[color:#edeaf5]
+        [&_strong]:[font-weight:600]
+        [&_strong]:[margin-right:4px]
+      `}>
         <span>
           <Icon name="sparkles" size={16} />
         </span>
@@ -1449,419 +2195,22 @@ export function WidgetsPage() {
 
 export function PlaygroundPage({
   initialItem,
+  initialMode = "playground",
 }: {
   initialItem?: string;
+  initialMode?: "preview" | "playground";
 } = {}) {
-  const playgroundItems = [
-    ...components.map((component) => ({
-      label: `${component.name} · component`,
-      value: component.slug,
-    })),
-    ...widgets.map((widget) => ({
-      label: `${widget.name} · widget`,
-      value: widget.slug,
-    })),
-  ];
-  const defaultItem = playgroundItems.some((item) => item.value === initialItem)
-    ? initialItem!
-    : (components[0]?.slug ?? "badge");
-  const [slug, setSlug] = useState(defaultItem);
-  const [badgeTone, setBadgeTone] = useState<BadgeTone>("green");
-  const [dot, setDot] = useState(true);
-  const [viewport, setViewport] = useState("Desktop");
-  const [toastVariant, setToastVariant] = useState<"loading" | "success" | "warning" | "error">("loading");
-  const [toastMode, setToastMode] = useState<"normal" | "steps">("normal");
-  const mascotPlayground = useMascotPlayground();
-  const selectedComponent = getComponent(slug);
-  const selectedWidget = getWidget(slug);
-  const isMascot = slug === "mascot";
-  const isToast = slug === "toast";
-  const snippet = isMascot
-    ? mascotPlayground.snippet
-    : isToast
-      ? `<Toast variant="${toastVariant}" mode="${toastMode}" title="Saving changes" />`
-      : `<Badge tone="${badgeTone}"${dot ? " dot" : ""}>Ready</Badge>`;
-  const detailsHref = selectedComponent
-    ? `/components/${selectedComponent.slug}`
-    : selectedWidget
-      ? "/widgets"
-      : "/components";
-
   return (
-    <div className={tw("page-stack")}>
-      <PageTitle
-        eyebrow="EXPERIMENT / PLAYGROUND"
-        title="Playground"
-        description="Explore component props and states in a safe, live preview."
-      />
-      <div className={tw("playground-layout")}>
-        <aside className={tw("panel playground-controls")}>
-          <div className={tw("control-heading")}>
-            <span className={tw("control-heading-icon")}>
-              <Icon name="filter" size={17} />
-            </span>
-            <div>
-              <strong>Controls</strong>
-              <small>Changes stay in this session</small>
-            </div>
-          </div>
-          <div className={tw("control-label")}>
-            <span>Item</span>
-            <Dropdown
-              label="Playground item"
-              value={slug}
-              onChange={setSlug}
-              options={playgroundItems}
-            />
-          </div>
-          {isMascot ? (
-            <MascotPlaygroundControls playground={mascotPlayground} />
-          ) : isToast ? (
-            <>
-              <div className={tw("control-label")}>
-                <span>Toast variant</span>
-                <Dropdown
-                  label="Toast variant"
-                  value={toastVariant}
-                  onChange={(value) => setToastVariant(value as typeof toastVariant)}
-                  options={["loading", "success", "warning", "error"].map((value) => ({ label: value, value }))}
-                />
-              </div>
-              <div className={tw("control-label")}>
-                <span>Display</span>
-                <Dropdown
-                  label="Toast display"
-                  value={toastMode}
-                  onChange={(value) => setToastMode(value as typeof toastMode)}
-                  options={["normal", "steps"].map((value) => ({ label: value, value }))}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              <div className={tw("control-label")}>
-                <span>Color tone</span>
-                <Dropdown
-                  label="Color tone"
-                  value={badgeTone}
-                  onChange={(value) => setBadgeTone(value as BadgeTone)}
-                  options={badgeTones}
-                />
-              </div>
-              <div className={tw("control-toggle")}>
-                <span>
-                  <strong>Status dot</strong>
-                  <small>Show the badge indicator</small>
-                </span>
-                <DashboardToggle
-                  checked={dot}
-                  onChange={setDot}
-                  label="Show status dot"
-                />
-              </div>
-            </>
-          )}
-          <div className={tw("control-divider")} />
-          <div className={tw("viewport-picker")}>
-            <strong>Viewport</strong>
-            <div>
-              {(["Desktop", "Tablet", "Mobile"] as const).map((item) => (
-                <button
-                  aria-pressed={viewport === item}
-                  className={tw(viewport === item ? "is-selected" : "")}
-                  key={item}
-                  onClick={() => setViewport(item)}
-                  title={item}
-                >
-                  <Icon
-                    name={
-                      item === "Desktop"
-                        ? "monitor"
-                        : item === "Tablet"
-                          ? "tablet"
-                          : "phone"
-                    }
-                    size={16}
-                  />
-                  <span>{item}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <Link className={tw("control-detail-link")} href={detailsHref}>
-            {selectedWidget ? "Open widget catalog" : "Open component details"}{" "}
-            <Icon name="arrow-right" size={14} />
-          </Link>
-        </aside>
-
-        <section className={tw("panel playground-preview-panel")}>
-          <div className={tw("playground-panel-heading")}>
-            <div>
-              <strong>Live preview</strong>
-              <span>Changes update instantly</span>
-            </div>
-            <Badge tone="green" dot>
-              Local
-            </Badge>
-          </div>
-          <div
-            className={tw(
-              `playground-stage playground-stage--${viewport.toLowerCase()}`,
-            )}
-          >
-            <div
-              className={tw(
-                `playground-canvas${isMascot ? " playground-canvas--mascot" : ""}`,
-              )}
-            >
-              {isMascot ? (
-                <MascotPlaygroundStage playground={mascotPlayground} />
-              ) : isToast ? (
-                <ToastPreview variant={toastVariant} mode={toastMode} />
-              ) : (
-                <ComponentPreview slug={slug} tone={badgeTone} dot={dot} />
-              )}
-            </div>
-          </div>
-          <div className={tw("code-preview-heading")}>
-            <span>
-              <Icon name="code" size={15} /> Example
-            </span>
-            <Link href={detailsHref}>
-              View source <Icon name="arrow-right" size={14} />
-            </Link>
-          </div>
-          <pre className={tw("code-preview")}>
-            <code>{snippet}</code>
-          </pre>
-        </section>
-      </div>
-    </div>
+    <WidgetKitStudio
+      key={initialItem ?? "default"}
+      initialItem={initialItem}
+      initialMode={initialMode}
+    />
   );
 }
 
 export function TestsPage() {
-  const { snapshot, runningItemKey, loading, runItemTests, refresh } =
-    useQuality();
-  const runHistory = snapshot.history ?? [];
-  const run = runHistory[0] ?? null;
-  const testsBusy = runningItemKey !== null;
-  const targets: Array<{
-    itemType: TestTargetType;
-    slug: string;
-    name: string;
-    test?: string;
-  }> = [
-    ...components.map((item) => ({
-      itemType: "component" as const,
-      slug: item.slug,
-      name: item.name,
-      test: item.test,
-    })),
-    ...widgets.map((item) => ({
-      itemType: "widget" as const,
-      slug: item.slug,
-      name: item.name,
-      test: item.test,
-    })),
-  ];
-  return (
-    <div className={tw("page-stack")}>
-      <PageTitle
-        eyebrow="QUALITY / VITEST"
-        title="Tests & Performance"
-        description="Run tests for one component or widget at a time and review each saved result."
-      />
-      {snapshot.error && (
-        <div className={tw("error-banner")} role="alert">
-          <Icon name="activity" size={17} />
-          <span>{snapshot.error}</span>
-          <button onClick={() => void refresh()}>Retry</button>
-        </div>
-      )}
-      <div className={tw("quality-kpis quality-kpis--wide")}>
-        <div>
-          <span>
-            {run ? `${run.itemName} ${run.itemType} tests` : "Latest test run"}
-          </span>
-          <strong>{loading ? "…" : (run?.total ?? "—")}</strong>
-          <small>
-            {run
-              ? `Individual run · ${new Date(run.completedAt).toLocaleString()}`
-              : "No test results yet"}
-          </small>
-        </div>
-        <div>
-          <span>Passed</span>
-          <strong className={tw("positive-text")}>
-            {loading ? "…" : (run?.passed ?? "—")}
-          </strong>
-          <small>
-            {run
-              ? `${run.passedPercentage ?? "—"}% pass rate`
-              : "Run an individual test to collect results"}
-          </small>
-        </div>
-        <div>
-          <span>Failed</span>
-          <strong className={tw(run?.failed ? "negative-text" : "")}>
-            {loading ? "…" : (run?.failed ?? "—")}
-          </strong>
-          <small>{run ? "Reported by Vitest" : "No test results yet"}</small>
-        </div>
-        <div>
-          <span>Pending</span>
-          <strong>{loading ? "…" : (run?.pending ?? "—")}</strong>
-          <small>{run ? "Reported by Vitest" : "No test results yet"}</small>
-        </div>
-      </div>
-      <section className={tw("panel component-test-overview")}>
-        <SectionTitle
-          title="Individual test targets"
-          detail="Choose a component or widget to run only its registered Vitest path"
-        />
-        <div className={tw("component-test-groups")}>
-          {targets.map((target) => {
-            const key = itemTestKey(target.itemType, target.slug);
-            const result = snapshot.itemTests?.[key];
-            const isRunning = runningItemKey === key;
-            return (
-              <div className={tw("component-test-group")} key={key}>
-                <details>
-                  <summary>
-                    <span className={tw("component-test-group-name")}>
-                      {target.name} <small>{target.itemType}</small>
-                    </span>
-                    <Badge
-                      tone={
-                        result?.failed
-                          ? "amber"
-                          : result?.total
-                            ? "green"
-                            : "muted"
-                      }
-                    >
-                      {result
-                        ? `${result.passed}/${result.total} passed`
-                        : "Not tested"}
-                    </Badge>
-                    <Icon name="chevron-down" size={15} />
-                  </summary>
-                  {result?.completedAt && (
-                    <div className={tw("component-test-result-meta")}>
-                      Latest individual run ·{" "}
-                      {new Date(result.completedAt).toLocaleString()} ·{" "}
-                      {(result.durationMs / 1000).toFixed(2)}s
-                    </div>
-                  )}
-                  {result?.assertions.length ? (
-                    <TestCaseList assertions={result.assertions} />
-                  ) : (
-                    <p className={tw("component-test-unavailable")}>
-                      {result
-                        ? "No test cases were returned by this run."
-                        : target.test
-                          ? `No individual result yet. Test path: ${target.test}`
-                          : "No individual test file registered for this target."}
-                    </p>
-                  )}
-                </details>
-                <button
-                  className={tw("button button-quiet component-test-run")}
-                  type="button"
-                  onClick={() =>
-                    void runItemTests(target.itemType, target.slug)
-                  }
-                  disabled={testsBusy || !target.test}
-                >
-                  <Icon name="play" size={13} />
-                  {isRunning ? "Running tests…" : `Run ${target.name} tests`}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-      <div className={tw("dashboard-grid dashboard-grid--primary")}>
-        <section className={tw("panel quality-panel")}>
-          <SectionTitle
-            title="Individual test activity"
-            detail="Recent runs, each scoped to one component or widget"
-          />
-          {runHistory.length ? (
-            <ol className={tw("run-history")}>
-              {runHistory.map((item) => (
-                <li
-                  className={tw("run-row")}
-                  key={`${item.itemType}-${item.itemSlug}-${item.completedAt}`}
-                >
-                  <span
-                    className={tw(
-                      item.failed
-                        ? "run-status run-status--failed"
-                        : "run-status",
-                    )}
-                  >
-                    <Icon name={item.failed ? "activity" : "check"} size={15} />
-                  </span>
-                  <div>
-                    <strong>
-                      {item.itemName} {item.itemType} tests
-                    </strong>
-                    <small>
-                      {item.total} tests · {item.passed} passed · {item.failed}{" "}
-                      failed · {item.pending} pending
-                    </small>
-                  </div>
-                  <span className={tw("run-duration")}>
-                    {(item.durationMs / 1000).toFixed(1)}s
-                  </span>
-                  <span className={tw("run-time")}>
-                    {new Date(item.completedAt).toLocaleTimeString()}
-                  </span>
-                </li>
-              ))}
-            </ol>
-          ) : (
-            <EmptyState
-              icon="tests"
-              title="No test runs yet"
-              description="Choose an individual test target above to record pass, fail, pending counts, and duration."
-            />
-          )}
-        </section>
-      </div>
-      <section className={tw("panel performance-panel")}>
-        <SectionTitle
-          title="Performance"
-          detail="Only actual browser measurements are shown"
-        />
-        <div className={tw("performance-empty-row")}>
-          <span className={tw("performance-icon")}>
-            <Icon name="clock" size={19} />
-          </span>
-          <div>
-            <strong>
-              {snapshot.averageRenderTimeMs == null
-                ? "No aggregate render measurements"
-                : `${snapshot.averageRenderTimeMs.toFixed(2)} ms average`}
-            </strong>
-            <p>
-              Component previews can report actual render duration. There is no
-              benchmark history or cross run comparison yet.
-            </p>
-          </div>
-          <Badge tone="muted">
-            {snapshot.averageRenderTimeMs == null ? "Not measured" : "Measured"}
-          </Badge>
-        </div>
-      </section>
-      <p className={tw("quality-footnote")}>
-        <Icon name="sparkles" size={15} /> Counts, test cases, and durations
-        come from each target&apos;s individual Vitest run.
-      </p>
-    </div>
-  );
+  return <TestsStudioPage />;
 }
 
 type Note = { id: string; text: string; createdAt: string; kind: string };
@@ -1908,16 +2257,55 @@ export function NotesPage() {
   }
 
   return (
-    <div className={tw("page-stack")}>
+    <div className={"page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
       <PageTitle
         eyebrow="WORKSPACE / NOTES"
         title="Notes"
         description="A lightweight local scratchpad for implementation decisions, known issues, and ideas."
       />
-      <div className={tw("notes-layout")}>
-        <form className={tw("panel note-editor")} onSubmit={addNote}>
-          <div className={tw("note-editor-heading")}>
-            <span className={tw("note-editor-icon")}>
+      <div className={`notes-layout
+        grid
+        [grid-template-columns:minmax(340px,_400px)_minmax(0,_1fr)]
+        [align-items:start]
+        [gap:24px]
+        [@media(max-width:820px)]:[grid-template-columns:1fr]
+      `}>
+        <form className={`panel
+        note-editor
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [box-shadow:0_8px_24px_#0004]
+        [padding:22px_24px]
+        [border:1px_solid_#272837]
+        [background:linear-gradient(150deg,_#1b1c20,_#111216)]
+      `} onSubmit={addNote}>
+          <div className={`note-editor-heading
+        flex
+        items-center
+        [gap:12px]
+        [padding-bottom:16px]
+        [border-bottom:1px_solid_#262736]
+        [margin-bottom:8px]
+        [&>div]:flex
+        [&>div]:flex-col
+        [&>div]:[gap:2px]
+        [&_strong]:[font-size:14px]
+        [&_strong]:[font-weight:650]
+        [&_small]:[color:#8a8b9e]
+        [&_small]:[font-size:11.5px]
+      `}>
+            <span className={`note-editor-icon
+        [width:36px]
+        [height:36px]
+        grid
+        [place-items:center]
+        [border:1px_solid_#6f42a6]
+        [border-radius:9px]
+        [color:#c084fc]
+        [background:#8e4bd520]
+      `}>
               <Icon name="notes" size={17} />
             </span>
             <div>
@@ -1925,7 +2313,29 @@ export function NotesPage() {
               <small>Stored in this browser only</small>
             </div>
           </div>
-          <div className={tw("control-label")}>
+          <div className={`control-label
+        flex
+        flex-col
+        [gap:8px]
+        [margin-top:16px]
+        [color:#cfd0de]
+        [font-size:12px]
+        [font-weight:600]
+        [&_.dropdown]:[width:100%]
+        [&_textarea]:[resize:vertical]
+        [&_textarea]:[min-height:120px]
+        [&_textarea]:[max-height:240px]
+        [&_textarea]:[overflow-y:auto]
+        [&_textarea]:[padding:12px]
+        [&_textarea]:[border:1px_solid_#343544]
+        [&_textarea]:[border-radius:8px]
+        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:[background:#111219]
+        [&_textarea]:[font-size:12.5px]
+        [&_textarea]:[line-height:1.6]
+        [&_textarea:focus-visible]:[border-color:#9865d2]
+        [&_textarea::placeholder]:[color:#7b7d90]
+      `}>
             <span>Type</span>
             <Dropdown
               label="Type"
@@ -1939,7 +2349,29 @@ export function NotesPage() {
               ].map((item) => ({ label: item, value: item }))}
             />
           </div>
-          <label className={tw("control-label")}>
+          <label className={`control-label
+        flex
+        flex-col
+        [gap:8px]
+        [margin-top:16px]
+        [color:#cfd0de]
+        [font-size:12px]
+        [font-weight:600]
+        [&_.dropdown]:[width:100%]
+        [&_textarea]:[resize:vertical]
+        [&_textarea]:[min-height:120px]
+        [&_textarea]:[max-height:240px]
+        [&_textarea]:[overflow-y:auto]
+        [&_textarea]:[padding:12px]
+        [&_textarea]:[border:1px_solid_#343544]
+        [&_textarea]:[border-radius:8px]
+        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:[background:#111219]
+        [&_textarea]:[font-size:12.5px]
+        [&_textarea]:[line-height:1.6]
+        [&_textarea:focus-visible]:[border-color:#9865d2]
+        [&_textarea::placeholder]:[color:#7b7d90]
+      `}>
             Note
             <textarea
               aria-label="Note text"
@@ -1949,10 +2381,39 @@ export function NotesPage() {
               onChange={(event) => setText(event.target.value)}
             />
           </label>
-          <div className={tw("note-submit-row")}>
+          <div className={"note-submit-row flex items-center justify-between [gap:10px] [margin-top:18px] [&>span]:[color:#8e90a2] [&>span]:[font-size:12px]"}>
             <span>{notes.length} saved locally</span>
             <button
-              className={tw("button button-primary")}
+              className={`button
+        button-primary
+        [min-height:38px]
+        inline-flex
+        items-center
+        justify-center
+        [gap:8px]
+        [padding:0_16px]
+        [border:1px_solid_transparent]
+        [border-radius:9px]
+        [font-size:12.5px]
+        [font-weight:600]
+        [line-height:1]
+        [white-space:nowrap]
+        [cursor:pointer]
+        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
+        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
+        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
+        [&:disabled]:[cursor:not-allowed]
+        [&:disabled]:[opacity:0.52]
+        [&.button-primary]:[border-color:#8747d8]
+        [&.button-primary]:[color:white]
+        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
+        [&.button-quiet]:[border-color:#30313f]
+        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:[background:#171821cc]
+        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:[background:#20202e]
+      `}
               type="submit"
               disabled={!text.trim()}
             >
@@ -1960,15 +2421,53 @@ export function NotesPage() {
             </button>
           </div>
         </form>
-        <section className={tw("panel notes-list-panel")}>
-          <div className={tw("notes-list-heading")}>
+        <section className={`panel
+        notes-list-panel
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [box-shadow:0_8px_24px_#0004]
+        [padding:22px]
+        [border:1px_solid_#272837]
+        [background:linear-gradient(150deg,_#1b1c20,_#111216)]
+      `}>
+          <div className={"notes-list-heading [margin-bottom:0]"}>
             <SectionTitle
               title="Your notes"
               detail="Saved in local browser storage"
             />
           </div>
           {notes.length ? (
-            <ul className={tw("notes-list")}>
+            <ul className={`notes-list
+        flex
+        flex-col
+        [gap:14px]
+        [margin:16px_0_0]
+        [padding:0]
+        [list-style:none]
+        [&_li]:relative
+        [&_li]:[padding:16px_46px_16px_18px]
+        [&_li]:[border:1px_solid_#272837]
+        [&_li]:[border-radius:12px]
+        [&_li]:[background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [&_li]:[box-shadow:0_6px_18px_#0003]
+        [&_li]:[transition:border-color_0.16s,_transform_0.16s]
+        [&_li:hover]:[border-color:#6d42a8]
+        [&_li:hover]:[transform:translateY(-2px)]
+        [&_li>div]:flex
+        [&_li>div]:items-center
+        [&_li>div]:justify-between
+        [&_li>div]:[gap:10px]
+        [&_time]:[color:#808295]
+        [&_time]:[font-size:11.5px]
+        [&_p]:[margin:10px_0_0]
+        [&_p]:[color:#edeaf5]
+        [&_p]:[font-size:13.5px]
+        [&_p]:[line-height:1.65]
+        [&_p]:[white-space:pre-wrap]
+        [&_p]:[overflow-wrap:anywhere]
+      `}>
               {notes.map((note) => (
                 <li key={note.id}>
                   <div>
@@ -1988,7 +2487,24 @@ export function NotesPage() {
                   <p>{note.text}</p>
                   <button
                     type="button"
-                    className={tw("note-delete")}
+                    className={`note-delete
+        absolute
+        [top:12px]
+        [right:12px]
+        [width:28px]
+        [height:28px]
+        grid
+        [place-items:center]
+        [border:1px_solid_transparent]
+        [border-radius:7px]
+        [color:#8e90a2]
+        [background:transparent]
+        [cursor:pointer]
+        [transition:all_0.15s]
+        [&:hover]:[border-color:#713647]
+        [&:hover]:[color:#ff8192]
+        [&:hover]:[background:#551c2c]
+      `}
                     onClick={() =>
                       setNotes((current) =>
                         current.filter((item) => item.id !== note.id),
@@ -2016,15 +2532,47 @@ export function NotesPage() {
 
 export function DocumentationPage() {
   return (
-    <div className={tw("page-stack")}>
+    <div className={"page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
       <PageTitle
         eyebrow="LIBRARY / DOCUMENTATION"
         title="Library docs"
         description="How this workspace organizes, previews, and measures reusable UI pieces."
       />
-      <div className={tw("docs-grid")}>
-        <section className={tw("panel docs-panel")}>
-          <span className={tw("docs-icon")}>
+      <div className={"docs-grid grid [grid-template-columns:repeat(3,_minmax(0,_1fr))] [gap:16px] [@media(max-width:820px)]:[grid-template-columns:1fr]"}>
+        <section className={`panel
+        docs-panel
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [box-shadow:0_8px_24px_#0004]
+        [min-height:190px]
+        [padding:20px]
+        [&_h2]:[margin:14px_0_6px]
+        [&_h2]:[font-size:15px]
+        [&>p]:[min-height:48px]
+        [&>p]:[margin:0_0_12px]
+        [&>p]:[color:#9da0b3]
+        [&>p]:[font-size:12.5px]
+        [&>p]:[line-height:1.6]
+        [&_code]:[color:#d3b2ff]
+        [&_code]:[font:11.5px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+        [@media(max-width:580px)]:[min-height:0]
+        [@media(max-width:580px)]:[&>p]:[min-height:0]
+      `}>
+          <span className={`docs-icon
+        [width:36px]
+        [height:36px]
+        grid
+        [place-items:center]
+        [border-radius:10px]
+        [color:#b883fb]
+        [background:#8748d51e]
+        [&.docs-icon--cyan]:[color:#47d8d0]
+        [&.docs-icon--cyan]:[background:#27b8b01a]
+        [&.docs-icon--green]:[color:#62dda6]
+        [&.docs-icon--green]:[background:#33b9781a]
+      `}>
             <Icon name="components" size={18} />
           </span>
           <h2>Component library</h2>
@@ -2033,12 +2581,55 @@ export function DocumentationPage() {
             Dashboard-only layout and catalogs live separately under{" "}
             <code>packages/components/dashboard</code>.
           </p>
-          <Link className={tw("text-link")} href="/components">
+          <Link className={`text-link
+        inline-flex
+        items-center
+        [gap:6px]
+        [margin-top:1px]
+        [color:#c084fc]
+        [font-size:12px]
+        [font-weight:600]
+        [white-space:nowrap]
+        [&:hover]:[color:#d9b8ff]
+      `} href="/components">
             Browse components <Icon name="arrow-right" size={14} />
           </Link>
         </section>
-        <section className={tw("panel docs-panel")}>
-          <span className={tw("docs-icon docs-icon--cyan")}>
+        <section className={`panel
+        docs-panel
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [box-shadow:0_8px_24px_#0004]
+        [min-height:190px]
+        [padding:20px]
+        [&_h2]:[margin:14px_0_6px]
+        [&_h2]:[font-size:15px]
+        [&>p]:[min-height:48px]
+        [&>p]:[margin:0_0_12px]
+        [&>p]:[color:#9da0b3]
+        [&>p]:[font-size:12.5px]
+        [&>p]:[line-height:1.6]
+        [&_code]:[color:#d3b2ff]
+        [&_code]:[font:11.5px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+        [@media(max-width:580px)]:[min-height:0]
+        [@media(max-width:580px)]:[&>p]:[min-height:0]
+      `}>
+          <span className={`docs-icon
+        docs-icon--cyan
+        [width:36px]
+        [height:36px]
+        grid
+        [place-items:center]
+        [border-radius:10px]
+        [color:#b883fb]
+        [background:#8748d51e]
+        [&.docs-icon--cyan]:[color:#47d8d0]
+        [&.docs-icon--cyan]:[background:#27b8b01a]
+        [&.docs-icon--green]:[color:#62dda6]
+        [&.docs-icon--green]:[background:#33b9781a]
+      `}>
             <Icon name="play" size={18} />
           </span>
           <h2>Experiment safely</h2>
@@ -2046,12 +2637,55 @@ export function DocumentationPage() {
             The playground changes only local view state. It does not edit
             component source files or persist prop changes.
           </p>
-          <Link className={tw("text-link")} href="/playground">
+          <Link className={`text-link
+        inline-flex
+        items-center
+        [gap:6px]
+        [margin-top:1px]
+        [color:#c084fc]
+        [font-size:12px]
+        [font-weight:600]
+        [white-space:nowrap]
+        [&:hover]:[color:#d9b8ff]
+      `} href="/playground">
             Open playground <Icon name="arrow-right" size={14} />
           </Link>
         </section>
-        <section className={tw("panel docs-panel")}>
-          <span className={tw("docs-icon docs-icon--green")}>
+        <section className={`panel
+        docs-panel
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [box-shadow:0_8px_24px_#0004]
+        [min-height:190px]
+        [padding:20px]
+        [&_h2]:[margin:14px_0_6px]
+        [&_h2]:[font-size:15px]
+        [&>p]:[min-height:48px]
+        [&>p]:[margin:0_0_12px]
+        [&>p]:[color:#9da0b3]
+        [&>p]:[font-size:12.5px]
+        [&>p]:[line-height:1.6]
+        [&_code]:[color:#d3b2ff]
+        [&_code]:[font:11.5px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+        [@media(max-width:580px)]:[min-height:0]
+        [@media(max-width:580px)]:[&>p]:[min-height:0]
+      `}>
+          <span className={`docs-icon
+        docs-icon--green
+        [width:36px]
+        [height:36px]
+        grid
+        [place-items:center]
+        [border-radius:10px]
+        [color:#b883fb]
+        [background:#8748d51e]
+        [&.docs-icon--cyan]:[color:#47d8d0]
+        [&.docs-icon--cyan]:[background:#27b8b01a]
+        [&.docs-icon--green]:[color:#62dda6]
+        [&.docs-icon--green]:[background:#33b9781a]
+      `}>
             <Icon name="tests" size={18} />
           </span>
           <h2>Quality reports</h2>
@@ -2059,17 +2693,60 @@ export function DocumentationPage() {
             Run a component or widget test individually. Saved results include
             its cases and duration, and feed the Home activity and average.
           </p>
-          <Link className={tw("text-link")} href="/tests">
+          <Link className={`text-link
+        inline-flex
+        items-center
+        [gap:6px]
+        [margin-top:1px]
+        [color:#c084fc]
+        [font-size:12px]
+        [font-weight:600]
+        [white-space:nowrap]
+        [&:hover]:[color:#d9b8ff]
+      `} href="/tests">
             View quality <Icon name="arrow-right" size={14} />
           </Link>
         </section>
       </div>
-      <section className={tw("panel docs-components")}>
+      <section className={`panel
+        docs-components
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [box-shadow:0_8px_24px_#0004]
+        [padding:20px]
+      `}>
         <SectionTitle
           title="Registered components"
           detail="The catalog is defined in packages/lib/catalog.ts"
         />
-        <div className={tw("docs-component-list")}>
+        <div className={`docs-component-list
+        flex
+        flex-col
+        [margin-top:12px]
+        [&>a]:[min-height:56px]
+        [&>a]:flex
+        [&>a]:items-center
+        [&>a]:[gap:14px]
+        [&>a]:[padding:10px_6px]
+        [&>a]:[border-bottom:1px_solid_#252632]
+        [&>a:last-child]:[border-bottom:0]
+        [&>a>span]:min-w-0
+        [&>a>span]:[flex:1]
+        [&>a>span]:flex
+        [&>a>span]:flex-col
+        [&>a>span]:[gap:4px]
+        [&_strong]:[font-size:13px]
+        [&_small]:overflow-hidden
+        [&_small]:[color:#8e90a2]
+        [&_small]:[font-size:11.5px]
+        [&_small]:[text-overflow:ellipsis]
+        [&_small]:[white-space:nowrap]
+        [&_code]:[color:#c49aff]
+        [&_code]:[font:11px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+        [&>a>svg]:[color:#9293a5]
+      `}>
           {components.map((component) => (
             <Link key={component.slug} href={`/components/${component.slug}`}>
               <span>
@@ -2082,7 +2759,23 @@ export function DocumentationPage() {
           ))}
         </div>
       </section>
-      <section className={tw("panel docs-usage")}>
+      <section className={`panel
+        docs-usage
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [box-shadow:0_8px_24px_#0004]
+        [padding:20px]
+        [&_pre]:[overflow-x:auto]
+        [&_pre]:[margin:14px_0_0]
+        [&_pre]:[padding:16px]
+        [&_pre]:[border:1px_solid_#2a2b38]
+        [&_pre]:[border-radius:10px]
+        [&_pre]:[color:#ceabff]
+        [&_pre]:[background:#0b0c11]
+        [&_pre]:[font:12px/1.7_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+      `}>
         <SectionTitle
           title="Import and use"
           detail="Public exports from the UI package entry point"
@@ -2101,19 +2794,54 @@ export function DocumentationPage() {
 
 export function NotFoundPage() {
   return (
-    <div className={tw("page-stack")}>
+    <div className={"page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
       <PageTitle
         eyebrow="LIBRARY / NOT FOUND"
         title="Nothing here yet"
         description="This item is not registered in the current component catalog."
       />
-      <section className={tw("panel")}>
+      <section className={`panel
+        min-w-0
+        [border:1px_solid_#262735]
+        [border-radius:14px]
+        [background:linear-gradient(145deg,_#151620,_#101117)]
+        [box-shadow:0_8px_24px_#0004]
+      `}>
         <EmptyState
           icon="widgets"
           title="No matching library item"
           description="Browse the registered components or return to the overview."
           action={
-            <Link className={tw("button button-primary")} href="/components">
+            <Link className={`button
+        button-primary
+        [min-height:38px]
+        inline-flex
+        items-center
+        justify-center
+        [gap:8px]
+        [padding:0_16px]
+        [border:1px_solid_transparent]
+        [border-radius:9px]
+        [font-size:12.5px]
+        [font-weight:600]
+        [line-height:1]
+        [white-space:nowrap]
+        [cursor:pointer]
+        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
+        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
+        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
+        [&:disabled]:[cursor:not-allowed]
+        [&:disabled]:[opacity:0.52]
+        [&.button-primary]:[border-color:#8747d8]
+        [&.button-primary]:[color:white]
+        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
+        [&.button-quiet]:[border-color:#30313f]
+        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:[background:#171821cc]
+        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:[background:#20202e]
+      `} href="/components">
               Browse components
             </Link>
           }

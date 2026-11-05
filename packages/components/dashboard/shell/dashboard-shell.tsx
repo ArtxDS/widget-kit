@@ -1,15 +1,15 @@
 "use client";
 
-import { tw } from "@/lib/tailwind";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Blocks } from "lucide-react";
 import { components, widgets } from "@/lib/catalog";
 import type { IconName } from "../shared/icon";
 import { Icon } from "../shared/icon";
 import { QualityProvider } from "../quality/quality-provider";
 import { TestRunToast } from "../quality/test-run-toast";
+import { CatalogSidebar } from "../studio/catalog-sidebar";
 
 const navItems: { href: string; label: string; icon: IconName }[] = [
   { href: "/", label: "Overview", icon: "overview" },
@@ -20,11 +20,22 @@ const navItems: { href: string; label: string; icon: IconName }[] = [
   { href: "/notes", label: "Notes", icon: "notes" },
 ];
 
+const headerLinks = [
+  { href: "/components", label: "Components" },
+  { href: "/widgets", label: "Widgets" },
+  { href: "/tests", label: "Tests" },
+  { href: "/docs", label: "Docs" },
+  { href: "/notes", label: "Notes" },
+];
+
 export function DashboardShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const isOverview = pathname === "/";
+  const isStudio = pathname === "/playground" || pathname.startsWith("/components/");
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
   function closeSearch() {
     setQuery("");
     setSearchOpen(false);
@@ -38,11 +49,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         setSearchOpen(true);
         inputRef.current?.focus();
       }
-      if (event.key === "Escape" && searchOpen) {
-        setQuery("");
-        setSearchOpen(false);
-        inputRef.current?.blur();
-      }
+      if (event.key === "Escape" && searchOpen) closeSearch();
     }
     window.addEventListener("keydown", onShortcut);
     return () => window.removeEventListener("keydown", onShortcut);
@@ -54,7 +61,8 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
   const results = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    const pages = [...navItems, { href: "/docs", label: "Documentation", icon: "book" as const }].map((item) => ({ ...item, kind: "Page", key: item.href }));
+    const pages = [...navItems, { href: "/docs", label: "Documentation", icon: "book" as const }]
+      .map((item) => ({ ...item, kind: "Page", key: item.href }));
     const catalogItems = components.map((component) => ({
       href: `/components/${component.slug}`,
       label: component.name,
@@ -77,90 +85,87 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
   return (
     <QualityProvider>
-      <div className={tw("dashboard-frame")}>
-        <aside className={tw("sidebar")}>
-          <Link className={tw("brand")} href="/" aria-label="widget-kit overview">
-            <span className={tw("brand-mark")} aria-hidden="true">
-              <Blocks size={28} strokeWidth={2.3} />
-            </span>
-            <span className={tw("brand-copy")}>
-              <strong>widget-kit</strong>
-              <span>v0.1.0</span>
-            </span>
+      <div className="dashboard-frame">
+        <header className="global-header">
+          <Link className="global-brand" href="/" aria-label="widget-kit overview">
+            <span className="global-brand-mark" aria-hidden="true"><Blocks size={27} strokeWidth={1.9} /></span>
+            <strong>widget-kit</strong>
+            <small>v0.1.0</small>
           </Link>
 
-          <nav aria-label="Main navigation" className={tw("side-nav")}>
-            <span className={tw("nav-caption")}>WORKSPACE</span>
-            {navItems.map((item) => {
-              const active = item.href === "/"
-                ? pathname === "/"
-                : pathname === item.href || pathname.startsWith(`${item.href}/`);
-              return (
-                <Link
-                  aria-current={active ? "page" : undefined}
-                  className={tw(`nav-link${active ? " is-active" : ""}`)}
-                  href={item.href}
-                  aria-label={item.label}
-                  key={item.href}
-                  title={item.label}
-                >
-                  <Icon name={item.icon} size={19} />
+          <div
+            className="search-control relative min-w-0"
+            onBlur={(event) => {
+              const next = event.relatedTarget as Node | null;
+              if (!next || !event.currentTarget.contains(next)) setSearchOpen(false);
+            }}
+          >
+            <div className="search-field">
+              <Icon name="search" size={17} />
+              <input
+                aria-controls="topbar-search-results"
+                aria-label="Search pages and components"
+                onChange={(event) => setQuery(event.target.value)}
+                onFocus={() => setSearchOpen(true)}
+                placeholder="Search components, props, or documentation..."
+                ref={inputRef}
+                value={query}
+              />
+              {query ? (
+                <button className="search-clear" type="button" aria-label="Clear search" onClick={() => setQuery("")}><Icon name="close" size={14} /></button>
+              ) : <kbd>⌘ K</kbd>}
+            </div>
+            <div className="search-dropdown" id="topbar-search-results" role="region" aria-label="Search suggestions" hidden={!searchOpen}>
+              <span className="nav-caption">{query ? "RESULTS" : "JUMP TO"}</span>
+              {visibleResults.length ? visibleResults.map((item) => (
+                <Link className="search-option" href={item.href} key={`${item.kind}-${item.key}`} onClick={closeSearch}>
+                  <Icon name={item.icon} size={17} />
                   <span>{item.label}</span>
+                  <small>{item.kind}</small>
+                  <Icon className="search-option-arrow" name="arrow-right" size={15} />
                 </Link>
-              );
-            })}
-          </nav>
-
-          <div className={tw("sidebar-bottom")}>
-            <div className={tw("dev-status")}>
-              <span className={tw("status-light")} />
-              <div><strong>Development Mode</strong><span>Local workspace</span></div>
-              <Icon className={tw("dev-wave")} name="activity" size={22} />
+              )) : <p className="search-empty">No matching pages or components.</p>}
             </div>
-            <p className={tw("sidebar-motto")}><Icon name="sparkles" size={15} /> Build once. Reuse everywhere.</p>
           </div>
-        </aside>
 
-        <div className={tw("main-column")}>
-          <header className={tw(`topbar${pathname === "/" ? " topbar--overview" : ""}`)}>
-            <div
-              className={tw("search-control")}
-              onBlur={(event) => {
-                const next = event.relatedTarget as Node | null;
-                if (!next || !event.currentTarget.contains(next)) setSearchOpen(false);
-              }}
-            >
-              <div className={tw("search-field")}>
-                <Icon name="search" size={18} />
-                <input
-                  aria-controls="topbar-search-results"
-                  aria-label="Search pages and components"
-                  onChange={(event) => setQuery(event.target.value)}
-                  onFocus={() => setSearchOpen(true)}
-                  placeholder="Search pages and components..."
-                  ref={inputRef}
-                  value={query}
-                />
-                {query ? <button className={tw("search-clear")} type="button" aria-label="Clear search" onClick={() => setQuery("")}><Icon name="close" size={14} /></button> : <kbd>⌘ K</kbd>}
-              </div>
-              <div className={tw("search-dropdown")} id="topbar-search-results" role="region" aria-label="Search suggestions" hidden={!searchOpen}>
-                <span className={tw("nav-caption")}>{query ? "RESULTS" : "JUMP TO"}</span>
-                {visibleResults.length ? visibleResults.map((item) => (
-                  <Link className={tw("search-option")} href={item.href} key={`${item.kind}-${item.key}`} onClick={closeSearch}>
-                    <Icon name={item.icon} size={17} />
-                    <span>{item.label}</span>
-                    <small>{item.kind}</small>
-                    <Icon className={tw("search-option-arrow")} name="arrow-right" size={15} />
-                  </Link>
-                )) : <p className={tw("search-empty")}>No matching pages or components.</p>}
-              </div>
-            </div>
-          </header>
+          <nav aria-label="Catalog navigation" className="global-nav">
+            {headerLinks.map((item) => (
+              <Link
+                aria-current={pathname === item.href || pathname.startsWith(`${item.href}/`) ? "page" : undefined}
+                href={item.href}
+                key={item.href}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+          <span aria-hidden="true" className="global-profile">WK</span>
+        </header>
 
-          <main className={tw(`main-content${pathname === "/" ? " main-content--overview" : ""}`)}>{children}</main>
+        <div className="dashboard-body">
+          <Suspense fallback={<CatalogSidebarFallback pathname={pathname} />}>
+            <CatalogSidebar pathname={pathname} />
+          </Suspense>
+          {isStudio ? (
+            <div className="main-content main-content--studio">{children}</div>
+          ) : (
+            <main className={`main-content${isOverview ? " main-content--overview" : ""}`}>
+              {children}
+            </main>
+          )}
         </div>
       </div>
       <TestRunToast />
     </QualityProvider>
+  );
+}
+
+function CatalogSidebarFallback({ pathname }: { pathname: string }) {
+  const hideCatalogHeader = pathname === "/" || pathname === "/widgets" || pathname === "/notes";
+  return (
+    <aside aria-hidden="true" className={`studio-catalog studio-catalog--global${hideCatalogHeader ? " studio-catalog--compact-header" : ""}`}>
+      {!hideCatalogHeader && <div className="studio-catalog-heading"><h2>Components</h2></div>}
+      {!hideCatalogHeader && <div className="studio-sidebar-skeleton" />}
+    </aside>
   );
 }
