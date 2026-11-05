@@ -31,7 +31,8 @@
   "files": [
     "dist",
     "packages/styles",
-    "README.md"
+    "README.md",
+    "!dist/**/*.tsbuildinfo"
   ],
   "publishConfig": {
     "access": "public"
