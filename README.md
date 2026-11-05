@@ -1,12 +1,10 @@
+# widget-kit
 
+A personal collection of reusable React components, widgets, and design tokens,
+built to accelerate development. A space to build, experiment, test, and
+organize reusable UI solutions.
 
-A personal collection of reusable React components, widgets, and design tokens, built to accelerate development.
-
-A space to build, experiment, test, and organize reusable UI solutions.
-
-## Installation
-
-Add `widget-kit` to your project and import the components you need.
+**Stack:** Next.js · React · TypeScript · Prisma + Supabase · Vitest
 
 ## Quick Start
 
@@ -18,23 +16,26 @@ export function Status() {
 }
 ```
 
+## Development
+
+```bash
+npm install
+cp .env.example .env.local   # fill in the database URLs (see below)
+npm run dev                  # dashboard at http://localhost:3000
+npm test                     # run the test suite
+```
+
 ## Architecture
 
-- **`packages/`** — Reusable components, widgets, hooks, and utilities.
-- **`app/`** — Dashboard, component showcase, and playground.
+- **`packages/`**: components, widgets, hooks, and utilities.
+- **`app/`**: dashboard, component showcase, and playground.
+- **`tests/`**: shared setup, fixtures, MSW mocks, and per-page dashboard tests.
 
-## Supabase quality history
+## Quality history
 
-The dashboard stores test runs and component test results in Supabase Postgres
-through Prisma. Copy `.env.example` to `.env.local` and replace the placeholders
-with the database URLs from your Supabase project. Use the transaction pooler
-URL for `DATABASE_URL` and the direct connection or session pooler URL for
-`DIRECT_URL`.
-
-Run `npm run db:migrate` in development to create/update the tables, or
-`npm run db:deploy` to apply committed migrations in a deployment. The Home
-charts and Recent Activity use the saved quality history returned by
-`/api/quality`.
-
----
+The dashboard saves test runs and per-component results in Supabase Postgres
+through Prisma, and shows them on the Home charts via `/api/quality`.
+Set `DATABASE_URL` (transaction pooler) and `DIRECT_URL` (direct or session
+pooler) in `.env.local`, then run `npm run db:migrate` in development or
+`npm run db:deploy` in a deployment.
 
