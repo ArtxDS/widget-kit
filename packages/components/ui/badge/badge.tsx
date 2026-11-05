@@ -19,7 +19,7 @@ export function Badge({
       className={`wk-badge wk-badge--${tone} ${className}`.trim()}
       {...props}
     >
-      {dot && <span className={"wk-badge__dot [width:6px] [height:6px] [border-radius:50%] [background:currentColor]"} aria-hidden="true" />}
+      {dot && <span className={"wk-badge__dot size-[6px]  rounded-[50%] [background:currentColor]"} aria-hidden="true" />}
       {children}
     </span>
   );

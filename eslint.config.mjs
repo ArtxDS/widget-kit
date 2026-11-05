@@ -1,6 +1,7 @@
-import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import betterTailwind from "eslint-plugin-better-tailwindcss";
+import { defineConfig, globalIgnores } from "eslint/config";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -13,6 +14,18 @@ const eslintConfig = defineConfig([
     "dist/**",
     "next-env.d.ts",
   ]),
+  {
+    files: ["app/**/*.{ts,tsx}", "packages/**/*.{ts,tsx}"],
+    plugins: { "better-tailwindcss": betterTailwind },
+    rules: {
+      "better-tailwindcss/enforce-canonical-classes": "warn",
+    },
+    settings: {
+      "better-tailwindcss": {
+        entryPoint: "app/globals.css",
+      },
+    },
+  },
   {
     files: [
       "packages/components/ui/**",

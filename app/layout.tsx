@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="pt-BR" className={`app-html
-        [color-scheme:dark]
+        scheme-dark
         [--background:#090a0e]
         [--surface:#101117]
         [--surface-raised:#14151d]
@@ -29,21 +29,21 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         [--green:#57e0ac]
         [--amber:#f5c66d]
         [--red:#ff788a]
-        [min-height:100%]
+        min-h-full
       `}>
       <body className={`app-body
-        [&_*]:[box-sizing:border-box]
-        [min-height:100%]
-        [&_*]:[scrollbar-width:none]
-        [&_*::-webkit-scrollbar]:[display:none]
-        [&_*::-webkit-scrollbar]:[width:0]
-        [&_*::-webkit-scrollbar]:[height:0]
-        [margin:0]
+        **:box-border
+        min-h-full
+        **:scrollbar-none
+        [&_*::-webkit-scrollbar]:hidden
+        [&_*::-webkit-scrollbar]:size-0
+        
+        m-0
         [background:var(--background)]
-        [color:var(--foreground)]
-        [font-family:Inter,_ui-sans-serif,_system-ui,_-apple-system,_BlinkMacSystemFont,_"Segoe_UI",_sans-serif]
-        [font-size:14px]
-        [line-height:1.5]
+        text-(--foreground)
+        font-[Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe_UI",sans-serif]
+        text-[14px]
+        leading-normal
         [-webkit-font-smoothing:antialiased]
         [&_button]:[font:inherit]
         [&_input]:[font:inherit]
@@ -52,30 +52,30 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         [&_button]:[-webkit-tap-highlight-color:transparent]
         [&_a]:[-webkit-tap-highlight-color:transparent]
         [&_select]:[-webkit-tap-highlight-color:transparent]
-        [&_button]:[color:inherit]
-        [&_a]:[color:inherit]
+        [&_button]:text-inherit
+        [&_a]:text-inherit
         [&_a]:[text-decoration:none]
         [&_button:focus-visible]:[outline:2px_solid_var(--purple-bright)]
-        [&_button:focus-visible]:[outline-offset:3px]
+        [&_button:focus-visible]:outline-offset-[3px]
         [&_a:focus-visible]:[outline:2px_solid_var(--purple-bright)]
-        [&_a:focus-visible]:[outline-offset:3px]
+        [&_a:focus-visible]:outline-offset-[3px]
         [&_input:focus-visible]:[outline:none]
-        [&_input:focus-visible]:[border-color:#9865d2]
+        [&_input:focus-visible]:border-[#9865d2]
         [&_input:focus-visible]:[box-shadow:none]
         [&_select:focus-visible]:[outline:none]
-        [&_select:focus-visible]:[border-color:#9865d2]
+        [&_select:focus-visible]:border-[#9865d2]
         [&_select:focus-visible]:[box-shadow:none]
         [&_textarea:focus-visible]:[outline:none]
-        [&_textarea:focus-visible]:[border-color:#9865d2]
+        [&_textarea:focus-visible]:border-[#9865d2]
         [&_textarea:focus-visible]:[box-shadow:none]
-        [&::selection]:[color:white]
+        [&::selection]:text-[white]
         [&::selection]:[background:#753ad1]
-        [&_kbd]:[padding:2px_7px]
+        [&_kbd]:p-[2px_7px]
         [&_kbd]:[border:1px_solid_#30313e]
-        [&_kbd]:[border-radius:5px]
-        [&_kbd]:[color:#a3a4b5]
+        [&_kbd]:rounded-[5px]
+        [&_kbd]:text-[#a3a4b5]
         [&_kbd]:[background:#181923]
-        [&_kbd]:[font:11px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+        [&_kbd]:[font:11px_ui-monospace,SFMono-Regular,Menlo,monospace]
       `}>
         <DashboardShell>{children}</DashboardShell>
       </body>

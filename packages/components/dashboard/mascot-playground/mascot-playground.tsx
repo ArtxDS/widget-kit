@@ -73,7 +73,10 @@ const accentBPresets = [
 function normalizeHexColor(value: string) {
   const digits = value.trim().replace(/^#/, "");
   if (/^[\da-f]{3}$/i.test(digits)) {
-    return `#${digits.split("").map((digit) => `${digit}${digit}`).join("")}`.toUpperCase();
+    return `#${digits
+      .split("")
+      .map((digit) => `${digit}${digit}`)
+      .join("")}`.toUpperCase();
   }
   return /^[\da-f]{6}$/i.test(digits) ? `#${digits}`.toUpperCase() : null;
 }
@@ -124,7 +127,11 @@ function hslToRgb(hue: number, saturation: number, lightness: number) {
   else if (segment < 5) rgb = [secondary, 0, chroma];
   else rgb = [chroma, 0, secondary];
 
-  return rgb.map((channel) => Math.round((channel + match) * 255)) as [number, number, number];
+  return rgb.map((channel) => Math.round((channel + match) * 255)) as [
+    number,
+    number,
+    number,
+  ];
 }
 
 function rgbToHex([red, green, blue]: [number, number, number]) {
@@ -136,7 +143,11 @@ function rgbToHex([red, green, blue]: [number, number, number]) {
 function colorFromWheel(hue: number, intensity: number) {
   const base = hslToRgb(hue, 1, 0.5);
   return rgbToHex(
-    base.map((channel) => 255 + (channel - 255) * intensity) as [number, number, number],
+    base.map((channel) => 255 + (channel - 255) * intensity) as [
+      number,
+      number,
+      number,
+    ],
   );
 }
 
@@ -162,15 +173,20 @@ function AccentColorControl({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [hexDraft, setHexDraft] = useState(value.toUpperCase());
+  const [previousValue, setPreviousValue] = useState(value);
   const rootRef = useRef<HTMLDivElement>(null);
   const hexColor = normalizeHexColor(value) ?? "#9945FF";
   const wheelPoint = wheelPositionFromColor(hexColor);
   const wheelAngle = ((wheelPoint.hue - 90) * Math.PI) / 180;
   const wheelLeft = 50 + Math.cos(wheelAngle) * wheelPoint.intensity * 42;
   const wheelTop = 50 + Math.sin(wheelAngle) * wheelPoint.intensity * 42;
-  const pickerId = label === "Accent A" ? "accent-a-color-picker" : "accent-b-color-picker";
+  const pickerId =
+    label === "Accent A" ? "accent-a-color-picker" : "accent-b-color-picker";
 
-  useEffect(() => setHexDraft(value.toUpperCase()), [value]);
+  if (value !== previousValue) {
+    setPreviousValue(value);
+    setHexDraft(value.toUpperCase());
+  }
 
   useEffect(() => {
     if (!isOpen) return;
@@ -195,9 +211,12 @@ function AccentColorControl({
     const bounds = event.currentTarget.getBoundingClientRect();
     const deltaX = event.clientX - (bounds.left + bounds.width / 2);
     const deltaY = event.clientY - (bounds.top + bounds.height / 2);
-    const maxRadius = Math.max(1, Math.min(bounds.width, bounds.height) / 2 - 7);
+    const maxRadius = Math.max(
+      1,
+      Math.min(bounds.width, bounds.height) / 2 - 7,
+    );
     const intensity = Math.min(Math.hypot(deltaX, deltaY) / maxRadius, 1);
-    const hue = (Math.atan2(deltaY, deltaX) * 180 / Math.PI + 90 + 360) % 360;
+    const hue = ((Math.atan2(deltaY, deltaX) * 180) / Math.PI + 90 + 360) % 360;
     onChange(colorFromWheel(hue, intensity));
   }
 
@@ -212,19 +231,27 @@ function AccentColorControl({
     if (!change) return;
     event.preventDefault();
     const nextHue = (wheelPoint.hue + change[0] + 360) % 360;
-    const nextIntensity = Math.min(1, Math.max(0, wheelPoint.intensity + change[1]));
+    const nextIntensity = Math.min(
+      1,
+      Math.max(0, wheelPoint.intensity + change[1]),
+    );
     onChange(colorFromWheel(nextHue, nextIntensity));
   }
 
   return (
     <div
-      className={`mascot-token-row accent-color-control flex items-center justify-between [gap:10px] [margin-top:12px] [font-size:11.5px] [color:#9596a7]${isOpen ? " has-open-picker" : ""}`}
+      className={`mascot-token-row accent-color-control flex items-center justify-between gap-2.5 mt-3 text-[11.5px] text-[#9596a7]${isOpen ? " has-open-picker" : ""}`}
       ref={rootRef}
     >
       <span>{label}</span>
-      <div className="accent-color-swatches" role="group" aria-label={`${label} color presets`}>
+      <div
+        className="accent-color-swatches"
+        role="group"
+        aria-label={`${label} color presets`}
+      >
         {presets.map((preset) => {
-          const selected = hexColor.toLowerCase() === preset.color.toLowerCase();
+          const selected =
+            hexColor.toLowerCase() === preset.color.toLowerCase();
           return (
             <button
               aria-label={`${label}: ${preset.label} (${preset.color})`}
@@ -332,24 +359,26 @@ function PlayToggle({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <div className={`control-toggle
+    <div
+      className={`control-toggle
         flex
         items-center
         justify-between
-        [gap:12px]
-        [margin-top:16px]
-        [padding:12px_14px]
+        gap-3
+        mt-4
+        p-[12px_14px]
         [border:1px_solid_#262736]
-        [border-radius:10px]
+        rounded-[10px]
         [background:#151620]
         [&>span]:flex
         [&>span]:flex-col
-        [&>span]:[gap:2px]
-        [&_strong]:[font-size:12.5px]
-        [&_strong]:[font-weight:600]
-        [&_small]:[color:#8a8b9e]
-        [&_small]:[font-size:11px]
-      `}>
+        [&>span]:gap-0.5
+        [&_strong]:text-[12.5px]
+        [&_strong]:font-semibold
+        [&_small]:text-[#8a8b9e]
+        [&_small]:text-[11px]
+      `}
+    >
       <span>
         <strong>{label}</strong>
         <small>{detail}</small>
@@ -357,28 +386,31 @@ function PlayToggle({
       <button
         aria-checked={checked}
         aria-label={label}
-        className={(`dashboard-toggle${checked ? " is-checked" : ""}`) + `
+        className={
+          `dashboard-toggle${checked ? " is-checked" : ""}` +
+          `
         relative
-        [width:38px]
-        [height:23px]
-        [flex:0_0_auto]
-        [padding:3px]
+        w-9.5
+        h-5.75
+        flex-[0_0_auto]
+        p-0.75
         [border:1px_solid_#4a4b5a]
-        [border-radius:12px]
+        rounded-xl
         [background:#242532]
-        [cursor:pointer]
-        [transition:background_0.16s,_border-color_0.16s]
+        cursor-pointer
+        [transition:background_0.16s,border-color_0.16s]
         [&>span]:block
-        [&>span]:[width:15px]
-        [&>span]:[height:15px]
-        [&>span]:[border-radius:50%]
+        [&>span]:size-3.75
+        
+        [&>span]:rounded-[50%]
         [&>span]:[background:#d9dae5]
-        [&>span]:[transition:transform_0.16s,_background_0.16s]
-        [&.is-checked]:[border-color:#9258e4]
+        [&>span]:[transition:transform_0.16s,background_0.16s]
+        [&.is-checked]:border-[#9258e4]
         [&.is-checked]:[background:#763bc2]
-        [&.is-checked>span]:[transform:translateX(15px)]
+        [&.is-checked>span]:transform-[translateX(15px)]
         [&.is-checked>span]:[background:white]
-      `}
+      `
+        }
         onClick={() => onChange(!checked)}
         role="switch"
         type="button"
@@ -400,7 +432,8 @@ export function useMascotPlayground() {
   const [chest, setChest] = useState(true);
   const [arms, setArms] = useState(true);
   const [base, setBase] = useState(true);
-  const [accessory, setAccessory] = useState<(typeof accessories)[number]>("none");
+  const [accessory, setAccessory] =
+    useState<(typeof accessories)[number]>("none");
   const [reduced, setReduced] = useState(false);
   const [follow, setFollow] = useState(true);
   const [autoBlink, setAutoBlink] = useState(true);
@@ -651,29 +684,31 @@ export function MascotPlaygroundControls({
 
   return (
     <>
-      <div className={`control-label
+      <div
+        className={`control-label
         flex
         flex-col
-        [gap:8px]
-        [margin-top:16px]
-        [color:#cfd0de]
-        [font-size:12px]
-        [font-weight:600]
-        [&_.dropdown]:[width:100%]
-        [&_textarea]:[resize:vertical]
-        [&_textarea]:[min-height:120px]
-        [&_textarea]:[max-height:240px]
-        [&_textarea]:[overflow-y:auto]
-        [&_textarea]:[padding:12px]
+        gap-2
+        mt-4
+        text-[#cfd0de]
+        text-[12px]
+        font-semibold
+        [&_.dropdown]:w-full
+        [&_textarea]:resize-y
+        [&_textarea]:min-h-30
+        [&_textarea]:max-h-60
+        [&_textarea]:overflow-y-auto
+        [&_textarea]:p-3
         [&_textarea]:[border:1px_solid_#343544]
-        [&_textarea]:[border-radius:8px]
-        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:rounded-lg
+        [&_textarea]:text-[#f2f1f8]
         [&_textarea]:[background:#111219]
-        [&_textarea]:[font-size:12.5px]
-        [&_textarea]:[line-height:1.6]
-        [&_textarea:focus-visible]:[border-color:#9865d2]
-        [&_textarea::placeholder]:[color:#7b7d90]
-      `}>
+        [&_textarea]:text-[12.5px]
+        [&_textarea]:leading-[1.6]
+        [&_textarea:focus-visible]:border-[#9865d2]
+        [&_textarea::placeholder]:text-[#7b7d90]
+      `}
+      >
         <span>Theme preset</span>
         <Dropdown
           label="Theme preset"
@@ -697,20 +732,22 @@ export function MascotPlaygroundControls({
         presets={accentBPresets}
         value={accentB}
       />
-      <div className={`mascot-token-row
+      <div
+        className={`mascot-token-row
         flex
         items-center
         justify-between
-        [gap:10px]
-        [margin-top:12px]
-        [font-size:11.5px]
-        [color:#9596a7]
-        [&_input]:[width:32px]
-        [&_input]:[height:24px]
-        [&_input]:[padding:0]
+        gap-2.5
+        mt-3
+        text-[11.5px]
+        text-[#9596a7]
+        [&_input]:w-8
+        [&_input]:h-6
+        [&_input]:p-0
         [&_input]:[border:0]
         [&_input]:[background:transparent]
-      `}>
+      `}
+      >
         <span>Eye color</span>
         <input
           aria-label="Eye color"
@@ -719,29 +756,31 @@ export function MascotPlaygroundControls({
           onChange={(event) => setEyeFrom(event.target.value)}
         />
       </div>
-      <div className={`control-label
+      <div
+        className={`control-label
         flex
         flex-col
-        [gap:8px]
-        [margin-top:16px]
-        [color:#cfd0de]
-        [font-size:12px]
-        [font-weight:600]
-        [&_.dropdown]:[width:100%]
-        [&_textarea]:[resize:vertical]
-        [&_textarea]:[min-height:120px]
-        [&_textarea]:[max-height:240px]
-        [&_textarea]:[overflow-y:auto]
-        [&_textarea]:[padding:12px]
+        gap-2
+        mt-4
+        text-[#cfd0de]
+        text-[12px]
+        font-semibold
+        [&_.dropdown]:w-full
+        [&_textarea]:resize-y
+        [&_textarea]:min-h-30
+        [&_textarea]:max-h-60
+        [&_textarea]:overflow-y-auto
+        [&_textarea]:p-3
         [&_textarea]:[border:1px_solid_#343544]
-        [&_textarea]:[border-radius:8px]
-        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:rounded-lg
+        [&_textarea]:text-[#f2f1f8]
         [&_textarea]:[background:#111219]
-        [&_textarea]:[font-size:12.5px]
-        [&_textarea]:[line-height:1.6]
-        [&_textarea:focus-visible]:[border-color:#9865d2]
-        [&_textarea::placeholder]:[color:#7b7d90]
-      `}>
+        [&_textarea]:text-[12.5px]
+        [&_textarea]:leading-[1.6]
+        [&_textarea:focus-visible]:border-[#9865d2]
+        [&_textarea::placeholder]:text-[#7b7d90]
+      `}
+      >
         <span>Mood</span>
         <Dropdown
           label="Mood"
@@ -754,29 +793,31 @@ export function MascotPlaygroundControls({
           options={moods.map((value) => ({ label: value, value }))}
         />
       </div>
-      <div className={`control-label
+      <div
+        className={`control-label
         flex
         flex-col
-        [gap:8px]
-        [margin-top:16px]
-        [color:#cfd0de]
-        [font-size:12px]
-        [font-weight:600]
-        [&_.dropdown]:[width:100%]
-        [&_textarea]:[resize:vertical]
-        [&_textarea]:[min-height:120px]
-        [&_textarea]:[max-height:240px]
-        [&_textarea]:[overflow-y:auto]
-        [&_textarea]:[padding:12px]
+        gap-2
+        mt-4
+        text-[#cfd0de]
+        text-[12px]
+        font-semibold
+        [&_.dropdown]:w-full
+        [&_textarea]:resize-y
+        [&_textarea]:min-h-30
+        [&_textarea]:max-h-60
+        [&_textarea]:overflow-y-auto
+        [&_textarea]:p-3
         [&_textarea]:[border:1px_solid_#343544]
-        [&_textarea]:[border-radius:8px]
-        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:rounded-lg
+        [&_textarea]:text-[#f2f1f8]
         [&_textarea]:[background:#111219]
-        [&_textarea]:[font-size:12.5px]
-        [&_textarea]:[line-height:1.6]
-        [&_textarea:focus-visible]:[border-color:#9865d2]
-        [&_textarea::placeholder]:[color:#7b7d90]
-      `}>
+        [&_textarea]:text-[12.5px]
+        [&_textarea]:leading-[1.6]
+        [&_textarea:focus-visible]:border-[#9865d2]
+        [&_textarea::placeholder]:text-[#7b7d90]
+      `}
+      >
         <span>Accessory</span>
         <Dropdown
           label="Accessory"
@@ -787,29 +828,31 @@ export function MascotPlaygroundControls({
           options={accessories.map((value) => ({ label: value, value }))}
         />
       </div>
-      <div className={`control-label
+      <div
+        className={`control-label
         flex
         flex-col
-        [gap:8px]
-        [margin-top:16px]
-        [color:#cfd0de]
-        [font-size:12px]
-        [font-weight:600]
-        [&_.dropdown]:[width:100%]
-        [&_textarea]:[resize:vertical]
-        [&_textarea]:[min-height:120px]
-        [&_textarea]:[max-height:240px]
-        [&_textarea]:[overflow-y:auto]
-        [&_textarea]:[padding:12px]
+        gap-2
+        mt-4
+        text-[#cfd0de]
+        text-[12px]
+        font-semibold
+        [&_.dropdown]:w-full
+        [&_textarea]:resize-y
+        [&_textarea]:min-h-30
+        [&_textarea]:max-h-60
+        [&_textarea]:overflow-y-auto
+        [&_textarea]:p-3
         [&_textarea]:[border:1px_solid_#343544]
-        [&_textarea]:[border-radius:8px]
-        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:rounded-lg
+        [&_textarea]:text-[#f2f1f8]
         [&_textarea]:[background:#111219]
-        [&_textarea]:[font-size:12.5px]
-        [&_textarea]:[line-height:1.6]
-        [&_textarea:focus-visible]:[border-color:#9865d2]
-        [&_textarea::placeholder]:[color:#7b7d90]
-      `}>
+        [&_textarea]:text-[12.5px]
+        [&_textarea]:leading-[1.6]
+        [&_textarea:focus-visible]:border-[#9865d2]
+        [&_textarea::placeholder]:text-[#7b7d90]
+      `}
+      >
         <span>Bubble</span>
         <Dropdown
           label="Bubble"
@@ -820,29 +863,31 @@ export function MascotPlaygroundControls({
           options={bubblePositions.map((value) => ({ label: value, value }))}
         />
       </div>
-      <div className={`control-label
+      <div
+        className={`control-label
         flex
         flex-col
-        [gap:8px]
-        [margin-top:16px]
-        [color:#cfd0de]
-        [font-size:12px]
-        [font-weight:600]
-        [&_.dropdown]:[width:100%]
-        [&_textarea]:[resize:vertical]
-        [&_textarea]:[min-height:120px]
-        [&_textarea]:[max-height:240px]
-        [&_textarea]:[overflow-y:auto]
-        [&_textarea]:[padding:12px]
+        gap-2
+        mt-4
+        text-[#cfd0de]
+        text-[12px]
+        font-semibold
+        [&_.dropdown]:w-full
+        [&_textarea]:resize-y
+        [&_textarea]:min-h-30
+        [&_textarea]:max-h-60
+        [&_textarea]:overflow-y-auto
+        [&_textarea]:p-3
         [&_textarea]:[border:1px_solid_#343544]
-        [&_textarea]:[border-radius:8px]
-        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:rounded-lg
+        [&_textarea]:text-[#f2f1f8]
         [&_textarea]:[background:#111219]
-        [&_textarea]:[font-size:12.5px]
-        [&_textarea]:[line-height:1.6]
-        [&_textarea:focus-visible]:[border-color:#9865d2]
-        [&_textarea::placeholder]:[color:#7b7d90]
-      `}>
+        [&_textarea]:text-[12.5px]
+        [&_textarea]:leading-[1.6]
+        [&_textarea:focus-visible]:border-[#9865d2]
+        [&_textarea::placeholder]:text-[#7b7d90]
+      `}
+      >
         <span>Size ({size}px)</span>
         <input
           aria-label="Mascot size"
@@ -916,23 +961,25 @@ export function MascotPlaygroundControls({
           instanceRef.current?.mute(value);
         }}
       />
-      <div className={`mascot-play-actions
+      <div
+        className={`mascot-play-actions
         flex
         flex-wrap
-        [gap:8px]
-        [margin-top:10px]
-        [&_button]:[min-height:34px]
-        [&_button]:[padding:0_12px]
+        gap-2
+        mt-2.5
+        [&_button]:min-h-8.5
+        [&_button]:p-[0_12px]
         [&_button]:[border:1px_solid_#2c2d3a]
-        [&_button]:[border-radius:8px]
-        [&_button]:[color:#dad9e7]
+        [&_button]:rounded-lg
+        [&_button]:text-[#dad9e7]
         [&_button]:[background:#15161f]
-        [&_button]:[font-size:11.5px]
-        [&_button]:[font-weight:550]
-        [&_button]:[cursor:pointer]
-        [&_button:hover]:[border-color:#53436a]
+        [&_button]:text-[11.5px]
+        [&_button]:font-[550]
+        [&_button]:cursor-pointer
+        [&_button:hover]:border-[#53436a]
         [&_button:hover]:[background:#1c1d28]
-      `}>
+      `}
+      >
         {events.map((name) => (
           <button key={name} onClick={() => emit(name)} type="button">
             {name}
@@ -966,25 +1013,25 @@ export function MascotPlaygroundControls({
         >
           lookAt
         </button>
-        <button
-          onClick={() => instanceRef.current?.lookAt(null)}
-          type="button"
-        >
+        <button onClick={() => instanceRef.current?.lookAt(null)} type="button">
           look pointer
         </button>
       </div>
-      <ol aria-label="Mascot output events" className={`mascot-play-log
-        [max-height:160px]
+      <ol
+        aria-label="Mascot output events"
+        className={`mascot-play-log
+        max-h-40
         overflow-auto
-        [margin:10px_0_0]
-        [padding:12px]
+        m-[10px_0_0]
+        p-3
         [border:1px_solid_#292a37]
-        [border-radius:9px]
+        rounded-[9px]
         [background:#0b0c11]
-        [color:#c0c1d2]
-        [font:11.5px/1.6_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
-        [&_li]:[margin:0]
-      `}>
+        text-[#c0c1d2]
+        [font:11.5px/1.6_ui-monospace,SFMono-Regular,Menlo,monospace]
+        [&_li]:m-0
+      `}
+      >
         {log.length ? (
           log.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)
         ) : (
@@ -1003,14 +1050,23 @@ export function MascotPlaygroundStage({
   const { attach, bubblePosition, options, theme } = playground;
 
   return (
-    <div className={"mascot-play-stage flex flex-col items-center justify-center [padding:36px_16px_16px] [min-height:360px]"}>
+    <div
+      className={
+        "mascot-play-stage flex flex-col items-center justify-center p-[36px_16px_16px] min-h-90"
+      }
+    >
       <Mascot
         aria-label="Playground mascot"
         key={bubblePosition}
         onReady={attach}
         options={options}
       />
-      <div className={"mascot-play-avatars flex [gap:10px] justify-center [margin-top:12px]"} aria-label="Mascot avatars">
+      <div
+        className={
+          "mascot-play-avatars flex gap-2.5 justify-center mt-3"
+        }
+        aria-label="Mascot avatars"
+      >
         <MascotAvatar mood="happy" size={36} theme={theme} />
         <MascotAvatar mood="loading" size={36} theme={theme} />
         <MascotAvatar mood="error" size={36} theme={theme} />

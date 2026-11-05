@@ -49,30 +49,30 @@ function PageTitle({
         flex
         items-end
         justify-between
-        [gap:24px]
-        [&_h1]:[margin:0]
-        [&_h1]:[font-size:clamp(28px,_2.5vw,_36px)]
-        [&_h1]:[font-weight:700]
-        [&_h1]:[letter-spacing:-0.04em]
-        [&_h1]:[line-height:1.18]
+        gap-[24px]
+        [&_h1]:m-0
+        [&_h1]:text-[clamp(28px,2.5vw,36px)]
+        [&_h1]:font-bold
+        [&_h1]:tracking-[-0.04em]
+        [&_h1]:leading-[1.18]
         [@media(max-width:580px)]:items-start
         [@media(max-width:580px)]:flex-col
-        [@media(max-width:580px)]:[gap:12px]
-        [@media(max-width:580px)]:[&_h1]:[font-size:26px]
+        [@media(max-width:580px)]:gap-[12px]
+        [@media(max-width:580px)]:[&_h1]:text-[26px]
       `}>
       <div>
-        <p className={"eyebrow [margin:0_0_8px] [color:#c084fc] [font-size:11.5px] [font-weight:740] [letter-spacing:0.12em]"}>{eyebrow}</p>
+        <p className={"eyebrow m-[0_0_8px] text-[#c084fc] text-[11.5px] font-[740] tracking-[0.12em]"}>{eyebrow}</p>
         <h1>{title}</h1>
         <p className={`page-description
-        [max-width:760px]
-        [margin:8px_0_0]
-        [color:#9da0b3]
-        [font-size:13.5px]
-        [line-height:1.65]
-        [@media(max-width:580px)]:[font-size:12px]
+        max-w-[760px]
+        m-[8px_0_0]
+        text-[#9da0b3]
+        text-[13.5px]
+        leading-[1.65]
+        [@media(max-width:580px)]:text-[12px]
       `}>{description}</p>
       </div>
-      {action && <div className={"page-title-action [flex:0_0_auto] [@media(max-width:580px)]:[align-self:flex-start]"}>{action}</div>}
+      {action && <div className={"page-title-action flex-[0_0_auto] [@media(max-width:580px)]:self-start"}>{action}</div>}
     </div>
   );
 }
@@ -93,34 +93,34 @@ function SectionTitle({
         flex
         items-center
         justify-between
-        [gap:16px]
-        [&_h2]:[margin:0]
-        [&_h2]:[font-size:16.5px]
-        [&_h2]:[font-weight:650]
-        [&_h2]:[letter-spacing:-0.015em]
-        [&_p]:[margin:3px_0_0]
-        [&_p]:[color:#8d8f9f]
-        [&_p]:[font-size:12px]
+        gap-[16px]
+        [&_h2]:m-0
+        [&_h2]:text-[16.5px]
+        [&_h2]:font-[650]
+        [&_h2]:tracking-[-0.015em]
+        [&_p]:m-[3px_0_0]
+        [&_p]:text-[#8d8f9f]
+        [&_p]:text-[12px]
       `}>
-      <div className={(`section-title-copy${icon ? " has-icon" : ""}`) + " min-w-0 flex items-center [gap:14px]"}>
+      <div className={(`section-title-copy${icon ? " has-icon" : ""}`) + " min-w-0 flex items-center gap-[14px]"}>
         {icon && (
           <span
             className={(`section-title-icon section-title-icon--${icon}`) + `
-        [width:40px]
-        [height:40px]
-        [flex:0_0_auto]
+        size-[40px]
+        
+        flex-[0_0_auto]
         grid
-        [place-items:center]
+        place-items-center
         [border:1px_solid_#7545a955]
-        [border-radius:11px]
-        [color:#bb85ff]
-        [background:linear-gradient(145deg,_#9146df2b,_#46227124)]
-        [&.section-title-icon--tests]:[border-color:#3a8d8b66]
-        [&.section-title-icon--tests]:[color:#48d8d0]
-        [&.section-title-icon--tests]:[background:linear-gradient(145deg,_#23b9b126,_#17464324)]
-        [&.section-title-icon--play]:[border-color:#3b70a366]
-        [&.section-title-icon--play]:[color:#79baff]
-        [&.section-title-icon--play]:[background:linear-gradient(145deg,_#398ed526,_#263e6924)]
+        rounded-[11px]
+        text-[#bb85ff]
+        [background:linear-gradient(145deg,#9146df2b,#46227124)]
+        [&.section-title-icon--tests]:border-[#3a8d8b66]
+        [&.section-title-icon--tests]:text-[#48d8d0]
+        [&.section-title-icon--tests]:[background:linear-gradient(145deg,#23b9b126,#17464324)]
+        [&.section-title-icon--play]:border-[#3b70a366]
+        [&.section-title-icon--play]:text-[#79baff]
+        [&.section-title-icon--play]:[background:linear-gradient(145deg,#398ed526,#263e6924)]
       `}
           >
             <Icon name={icon} size={24} />
@@ -135,13 +135,13 @@ function SectionTitle({
         <Link className={`text-link
         inline-flex
         items-center
-        [gap:6px]
-        [margin-top:1px]
-        [color:#c084fc]
-        [font-size:12px]
-        [font-weight:600]
-        [white-space:nowrap]
-        [&:hover]:[color:#d9b8ff]
+        gap-[6px]
+        mt-px
+        text-[#c084fc]
+        text-[12px]
+        font-semibold
+        whitespace-nowrap
+        [&:hover]:text-[#d9b8ff]
       `} href={href}>
           View all <Icon name="arrow-right" size={17} />
         </Link>
@@ -163,32 +163,32 @@ function EmptyState({
 }) {
   return (
     <div className={`empty-state
-        [min-height:180px]
+        min-h-[180px]
         flex
         flex-col
         items-center
         justify-center
-        [padding:28px_20px]
-        [text-align:center]
-        [&>strong]:[font-size:14px]
-        [&>strong]:[font-weight:650]
-        [&>strong]:[color:#e6e5f2]
-        [&>p]:[max-width:380px]
-        [&>p]:[margin:6px_0_0]
-        [&>p]:[color:#8e90a2]
-        [&>p]:[font-size:12.5px]
-        [&>p]:[line-height:1.6]
-        [&>.button]:[margin-top:16px]
+        p-[28px_20px]
+        text-center
+        [&>strong]:text-[14px]
+        [&>strong]:font-[650]
+        [&>strong]:text-[#e6e5f2]
+        [&>p]:max-w-[380px]
+        [&>p]:m-[6px_0_0]
+        [&>p]:text-[#8e90a2]
+        [&>p]:text-[12.5px]
+        [&>p]:leading-[1.6]
+        [&>.button]:mt-[16px]
       `}>
       <span className={`empty-state-icon
-        [width:44px]
-        [height:44px]
+        size-[44px]
+        
         grid
-        [place-items:center]
-        [margin-bottom:12px]
+        place-items-center
+        mb-[12px]
         [border:1px_solid_#3b3648]
-        [border-radius:12px]
-        [color:#b57eff]
+        rounded-[12px]
+        text-[#b57eff]
         [background:#8c45dd1a]
       `}>
         <Icon name={icon} size={20} />
@@ -214,7 +214,7 @@ function ComponentPreview({
   }
 
   return (
-    <div className={"badge-preview flex flex-wrap justify-center items-center [gap:10px]"}>
+    <div className={"badge-preview flex flex-wrap justify-center items-center gap-[10px]"}>
       <Badge tone={tone} dot={dot}>
         Ready
       </Badge>
@@ -278,12 +278,12 @@ function TestStatus({
         dashboard-skeleton--test-status
         block
         [border-radius:6px]
-        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
-        [background-size:200%_100%]
-        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
-        [width:76px]
-        [height:21px]
-        [border-radius:99px]
+        [background:linear-gradient(90deg,#1a1b25_25%,#2a2b37_50%,#1a1b25_75%)]
+        bg-size-[200%_100%]
+        animate-[dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        w-[76px]
+        h-[21px]
+        rounded-[99px]
       `}
         role="status"
       />
@@ -316,34 +316,34 @@ function TestCaseList({ assertions }: { assertions: TestCase[] }) {
     <ul className={`component-test-cases
         flex
         flex-col
-        [gap:9px]
-        [margin:16px_0_0]
-        [padding:0]
+        gap-[9px]
+        m-[16px_0_0]
+        p-0
         [list-style:none]
-        [&>li]:[min-height:52px]
+        [&>li]:min-h-[52px]
         [&>li]:flex
         [&>li]:items-center
-        [&>li]:[gap:12px]
-        [&>li]:[padding:10px_14px]
+        [&>li]:gap-[12px]
+        [&>li]:p-[10px_14px]
         [&>li]:[border:1px_solid_#262734]
-        [&>li]:[border-radius:9px]
+        [&>li]:rounded-[9px]
         [&>li]:[background:#14151e]
       `}>
       {assertions.map((testCase, index) => (
         <li key={`${testCase.name}-${index}`}>
           <span
             className={(`test-case-icon test-case-icon--${testCase.status}`) + `
-        [width:28px]
-        [height:28px]
-        [flex:0_0_auto]
+        size-[28px]
+        
+        flex-[0_0_auto]
         grid
-        [place-items:center]
-        [border-radius:50%]
-        [color:#65dca9]
+        place-items-center
+        rounded-[50%]
+        text-[#65dca9]
         [background:#43ca901d]
-        [&.test-case-icon--failed]:[color:#ff8798]
+        [&.test-case-icon--failed]:text-[#ff8798]
         [&.test-case-icon--failed]:[background:#d64d691c]
-        [&.test-case-icon--pending]:[color:#a7a8b8]
+        [&.test-case-icon--pending]:text-[#a7a8b8]
         [&.test-case-icon--pending]:[background:#88889a1c]
       `}
           >
@@ -354,17 +354,17 @@ function TestCaseList({ assertions }: { assertions: TestCase[] }) {
           </span>
           <span className={`test-case-copy
         min-w-0
-        [flex:1]
+        flex-1
         flex
         flex-col
-        [gap:3px]
-        [&_strong]:[overflow-wrap:anywhere]
-        [&_strong]:[color:#dad9e5]
-        [&_strong]:[font-size:13px]
-        [&_strong]:[font-weight:570]
-        [&_small]:[color:#888a9c]
-        [&_small]:[font-size:11px]
-        [&_small]:[text-transform:capitalize]
+        gap-[3px]
+        [&_strong]:wrap-anywhere
+        [&_strong]:text-[#dad9e5]
+        [&_strong]:text-[13px]
+        [&_strong]:font-[570]
+        [&_small]:text-[#888a9c]
+        [&_small]:text-[11px]
+        [&_small]:capitalize
       `}>
             <strong>{testCase.name}</strong>
             <small>{testCase.status}</small>
@@ -391,23 +391,23 @@ function ComponentCard({ component }: { component: ComponentDefinition }) {
     <article className={`component-card
         overflow-hidden
         [border:1px_solid_#282938]
-        [border-radius:14px]
-        [background:linear-gradient(160deg,_#151620,_#101117_80%)]
+        rounded-[14px]
+        [background:linear-gradient(160deg,#151620,#101117_80%)]
         [box-shadow:0_10px_28px_#0004]
-        [transition:all_0.2s_cubic-bezier(0.2,_0.8,_0.2,_1)]
-        [&:hover]:[transform:translateY(-3px)]
-        [&:hover]:[border-color:#7848c4]
-        [&:hover]:[box-shadow:0_16px_36px_#0006,_0_0_20px_#9d5cff15]
+        [transition:all_0.2s_cubic-bezier(0.2,0.8,0.2,1)]
+        [&:hover]:transform-[translateY(-3px)]
+        [&:hover]:border-[#7848c4]
+        [&:hover]:[box-shadow:0_16px_36px_#0006,0_0_20px_#9d5cff15]
       `}>
       <Link
         className={`component-card__preview
-        [min-height:190px]
+        min-h-[190px]
         grid
-        [place-items:center]
-        [padding:24px]
+        place-items-center
+        p-[24px]
         [border-bottom:1px_solid_#232431]
-        [background:radial-gradient(ellipse_at_50%_120%,_#46287933,_transparent_65%),_repeating-linear-gradient(0deg,_transparent_0,_transparent_23px,_#ffffff05_24px),_repeating-linear-gradient(90deg,_transparent_0,_transparent_23px,_#ffffff05_24px),_#111218]
-        [@media(max-width:580px)]:[min-height:150px]
+        [background:radial-gradient(ellipse_at_50%_120%,#46287933,transparent_65%),repeating-linear-gradient(0deg,transparent_0,transparent_23px,#ffffff05_24px),repeating-linear-gradient(90deg,transparent_0,transparent_23px,#ffffff05_24px),#111218]
+        [@media(max-width:580px)]:min-h-[150px]
       `}
         href={`/components/${component.slug}`}
         aria-label={`Open ${component.name} details`}
@@ -415,29 +415,29 @@ function ComponentCard({ component }: { component: ComponentDefinition }) {
         <ComponentPreview slug={component.slug} />
       </Link>
       <div className={`component-card__body
-        [padding:18px_20px_20px]
-        [&>p]:[min-height:42px]
-        [&>p]:[margin:10px_0_16px]
-        [&>p]:[color:#9da0b3]
-        [&>p]:[font-size:13px]
-        [&>p]:[line-height:1.6]
+        p-[18px_20px_20px]
+        [&>p]:min-h-[42px]
+        [&>p]:m-[10px_0_16px]
+        [&>p]:text-[#9da0b3]
+        [&>p]:text-[13px]
+        [&>p]:leading-[1.6]
       `}>
         <div className={`component-card__heading
         flex
         justify-between
         items-start
-        [gap:8px]
-        [&_h3]:[margin:0]
-        [&_h3]:[font-size:16px]
-        [&_h3]:[font-weight:650]
-        [&_h3]:[letter-spacing:-0.01em]
+        gap-[8px]
+        [&_h3]:m-0
+        [&_h3]:text-[16px]
+        [&_h3]:font-[650]
+        [&_h3]:tracking-[-0.01em]
         [&>div>span]:block
-        [&>div>span]:[margin-top:3px]
-        [&>div>span]:[color:#8e90a2]
-        [&>div>span]:[font-size:11px]
-        [&>div>span]:[font-weight:600]
-        [&>div>span]:[text-transform:uppercase]
-        [&>div>span]:[letter-spacing:0.08em]
+        [&>div>span]:mt-[3px]
+        [&>div>span]:text-[#8e90a2]
+        [&>div>span]:text-[11px]
+        [&>div>span]:font-semibold
+        [&>div>span]:uppercase
+        [&>div>span]:tracking-[0.08em]
       `}>
           <div>
             <h3>{component.name}</h3>
@@ -450,13 +450,13 @@ function ComponentCard({ component }: { component: ComponentDefinition }) {
           className={`component-open
         inline-flex
         items-center
-        [gap:7px]
-        [color:#c084fc]
-        [font-size:12px]
-        [font-weight:600]
-        [transition:gap_0.15s,_color_0.15s]
-        [&:hover]:[color:#e1c9ff]
-        [&:hover]:[gap:9px]
+        gap-[7px]
+        text-[#c084fc]
+        text-[12px]
+        font-semibold
+        [transition:gap_0.15s,color_0.15s]
+        [&:hover]:text-[#e1c9ff]
+        [&:hover]:gap-[9px]
       `}
           href={`/components/${component.slug}`}
         >
@@ -523,56 +523,56 @@ function StatCard({
       className={(`stat-card${href ? " is-link" : ""}`) + `
         relative
         min-w-0
-        [min-height:140px]
+        min-h-[140px]
         flex
         items-start
-        [gap:12px]
+        gap-[12px]
         overflow-hidden
-        [padding:17px_16px_56px]
+        p-[17px_16px_56px]
         [border:1px_solid_#302944]
-        [border-radius:12px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216_76%)]
+        rounded-[12px]
+        [background:linear-gradient(145deg,#1b1c20,#111216_76%)]
         [box-shadow:0_12px_30px_#0005]
-        [transition:border-color_0.18s,_transform_0.18s,_box-shadow_0.18s]
-        [&.is-link:hover]:[border-color:#7a4fb8]
-        [&.is-link:hover]:[transform:translateY(-2px)]
-        [&.is-link:hover]:[box-shadow:0_16px_36px_#0007,_0_0_18px_#9d5cff12]
+        [transition:border-color_0.18s,transform_0.18s,box-shadow_0.18s]
+        [&.is-link:hover]:border-[#7a4fb8]
+        [&.is-link:hover]:transform-[translateY(-2px)]
+        [&.is-link:hover]:[box-shadow:0_16px_36px_#0007,0_0_18px_#9d5cff12]
         [&::after]:[content:""]
         [&::after]:absolute
-        [&::after]:[inset:0_0_auto]
-        [&::after]:[height:2px]
-        [&::after]:[opacity:0.78]
-        [&::after]:[background:linear-gradient(90deg,_transparent,_#9d5cff55,_transparent)]
-        [@media(max-width:580px)]:[min-height:120px]
-        [@media(max-width:580px)]:[gap:8px]
-        [@media(max-width:580px)]:[padding:13px_10px_49px]
+        [&::after]:inset-[0_0_auto]
+        [&::after]:h-[2px]
+        [&::after]:opacity-[0.78]
+        [&::after]:[background:linear-gradient(90deg,transparent,#9d5cff55,transparent)]
+        [@media(max-width:580px)]:min-h-[120px]
+        [@media(max-width:580px)]:gap-[8px]
+        [@media(max-width:580px)]:p-[13px_10px_49px]
       `}
     >
       {href && (
         <Link
-          className={"stat-card__link absolute [inset:0] [z-index:1] [border-radius:inherit]"}
+          className={"stat-card__link absolute inset-0 z-1 rounded-[inherit]"}
           href={href}
           aria-label={label}
         />
       )}
       <div className={(`stat-icon stat-icon--${color}`) + `
-        [width:46px]
-        [height:46px]
-        [flex:0_0_auto]
+        size-[46px]
+        
+        flex-[0_0_auto]
         grid
-        [place-items:center]
-        [border-radius:12px]
+        place-items-center
+        rounded-[12px]
         [background:#8144cf17]
-        [&.stat-icon--purple]:[color:#ac68ff]
+        [&.stat-icon--purple]:text-[#ac68ff]
         [&.stat-icon--purple]:[background:#8d4add19]
-        [&.stat-icon--cyan]:[color:#37d4ce]
+        [&.stat-icon--cyan]:text-[#37d4ce]
         [&.stat-icon--cyan]:[background:#23b9b11a]
-        [&.stat-icon--green]:[color:#6fe6b1]
+        [&.stat-icon--green]:text-[#6fe6b1]
         [&.stat-icon--green]:[background:#45d99b16]
-        [&.stat-icon--blue]:[color:#68b7fc]
+        [&.stat-icon--blue]:text-[#68b7fc]
         [&.stat-icon--blue]:[background:#468de918]
-        [@media(max-width:580px)]:[width:38px]
-        [@media(max-width:580px)]:[height:38px]
+        [@media(max-width:580px)]:size-[38px]
+        
       `}>
         <Icon name={icon} size={26} />
       </div>
@@ -580,22 +580,22 @@ function StatCard({
         min-w-0
         flex
         flex-col
-        [gap:2px]
-        [padding-top:1px]
-        [&_span]:[order:0]
-        [&_span]:[color:#9a9bad]
-        [&_span]:[font-size:12px]
-        [&_strong]:[font-size:clamp(25px,_2.2vw,_32px)]
-        [&_strong]:[line-height:1.2]
-        [&_strong]:[letter-spacing:-0.045em]
-        [&_strong]:[font-weight:690]
-        [&_small]:overflow-hidden
-        [&_small]:[color:#747588]
-        [&_small]:[font-size:9px]
-        [&_small]:[text-overflow:ellipsis]
-        [&_small]:[white-space:nowrap]
-        [@media(max-width:580px)]:[&_strong]:[font-size:22px]
-        [@media(max-width:580px)]:[&_span]:[font-size:10px]
+        gap-[2px]
+        pt-px
+        [&_span]:order-0
+        [&_span]:text-[#9a9bad]
+        [&_span]:text-[12px]
+        [&_strong]:text-[clamp(25px,2.2vw,32px)]
+        [&_strong]:leading-[1.2]
+        [&_strong]:tracking-[-0.045em]
+        [&_strong]:font-[690]
+        [&_small]:truncate
+        [&_small]:text-[#747588]
+        [&_small]:text-[9px]
+        
+        
+        [@media(max-width:580px)]:[&_strong]:text-[22px]
+        [@media(max-width:580px)]:[&_span]:text-[10px]
       `}>
         {loading ? (
           <span
@@ -604,13 +604,13 @@ function StatCard({
         dashboard-skeleton--stat-value
         block
         [border-radius:6px]
-        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
-        [background-size:200%_100%]
-        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
-        [width:68px]
-        [height:31px]
-        [margin:1px_0_2px]
-        [border-radius:7px]
+        [background:linear-gradient(90deg,#1a1b25_25%,#2a2b37_50%,#1a1b25_75%)]
+        bg-size-[200%_100%]
+        animate-[dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        w-[68px]
+        h-[31px]
+        m-[1px_0_2px]
+        rounded-[7px]
       `}
           />
         ) : (
@@ -624,15 +624,15 @@ function StatCard({
           className={`dashboard-skeleton
         dashboard-skeleton--stat-chart
         block
-        [border-radius:6px]
-        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
-        [background-size:200%_100%]
-        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        rounded-[6px]
+        [background:linear-gradient(90deg,#1a1b25_25%,#2a2b37_50%,#1a1b25_75%)]
+        bg-size-[200%_100%]
+        animate-[dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
         absolute
-        [right:13px]
-        [bottom:8px]
-        [left:13px]
-        [height:43px]
+        inset-x-[13px]
+        bottom-[8px]
+        
+        h-[43px]
         [border-radius:5px]
       `}
         />
@@ -641,25 +641,25 @@ function StatCard({
           aria-hidden="true"
           className={(`stat-card-preview stat-card-preview--${visualType ?? "component"}`) + `
         absolute
-        [right:13px]
-        [bottom:8px]
-        [left:13px]
-        [height:43px]
+        inset-x-[13px]
+        bottom-[8px]
+        
+        h-[43px]
         flex
         items-center
         justify-center
         overflow-hidden
         [border-top:1px_solid_#ffffff10]
-        [pointer-events:none]
+        pointer-events-none
         [&_.wk-mascot-host]:flex
         [&_.wk-mascot-host]:items-center
         [&_.wk-mascot-host]:justify-center
-        [@media(max-width:580px)]:[right:9px]
-        [@media(max-width:580px)]:[bottom:7px]
-        [@media(max-width:580px)]:[left:9px]
-        [@media(max-width:580px)]:[height:36px]
-        [background:radial-gradient(ellipse_at_center,_#bd80ff12,_transparent_70%)]
-        [&_.badge-preview]:[transform:scale(0.88)]
+        [@media(max-width:580px)]:inset-x-[9px]
+        [@media(max-width:580px)]:bottom-[7px]
+        
+        [@media(max-width:580px)]:h-[36px]
+        [background:radial-gradient(ellipse_at_center,#bd80ff12,transparent_70%)]
+        [&_.badge-preview]:transform-[scale(0.88)]
         [background:radial-gradient(ellipse_at_center,_#38d9d218,_transparent_70%)]
       `}
         >
@@ -669,31 +669,31 @@ function StatCard({
         <svg
           className={(`stat-sparkline stat-sparkline--${color}${points.length ? "" : " is-empty"}`) + `
         absolute
-        [right:13px]
-        [bottom:9px]
-        [width:calc(100%_-_26px)]
-        [height:43px]
-        [overflow:visible]
-        [&.stat-sparkline--purple]:[color:#bd80ff]
-        [&.stat-sparkline--purple_.stat-sparkline-line]:[stroke:#bd80ff]
-        [&.stat-sparkline--purple_.stat-sparkline-area]:[fill:#bd80ff]
-        [&.stat-sparkline--purple_.stat-sparkline-point]:[fill:#d3a7ff]
-        [&.stat-sparkline--cyan]:[color:#38d9d2]
-        [&.stat-sparkline--cyan_.stat-sparkline-line]:[stroke:#38d9d2]
-        [&.stat-sparkline--cyan_.stat-sparkline-area]:[fill:#38d9d2]
-        [&.stat-sparkline--cyan_.stat-sparkline-point]:[fill:#84fff8]
-        [&.stat-sparkline--green]:[color:#66e4ad]
-        [&.stat-sparkline--green_.stat-sparkline-line]:[stroke:#66e4ad]
-        [&.stat-sparkline--green_.stat-sparkline-area]:[fill:#66e4ad]
-        [&.stat-sparkline--green_.stat-sparkline-point]:[fill:#a5ffd0]
-        [&.stat-sparkline--blue]:[color:#66b7ff]
-        [&.stat-sparkline--blue_.stat-sparkline-line]:[stroke:#66b7ff]
-        [&.stat-sparkline--blue_.stat-sparkline-area]:[fill:#66b7ff]
-        [&.stat-sparkline--blue_.stat-sparkline-point]:[fill:#a2d5ff]
-        [@media(max-width:580px)]:[right:9px]
-        [@media(max-width:580px)]:[bottom:7px]
-        [@media(max-width:580px)]:[width:calc(100%_-_18px)]
-        [@media(max-width:580px)]:[height:36px]
+        right-[13px]
+        bottom-[9px]
+        w-[calc(100%-26px)]
+        h-[43px]
+        overflow-visible
+        [&.stat-sparkline--purple]:text-[#bd80ff]
+        [&.stat-sparkline--purple_.stat-sparkline-line]:stroke-[#bd80ff]
+        [&.stat-sparkline--purple_.stat-sparkline-area]:fill-[#bd80ff]
+        [&.stat-sparkline--purple_.stat-sparkline-point]:fill-[#d3a7ff]
+        [&.stat-sparkline--cyan]:text-[#38d9d2]
+        [&.stat-sparkline--cyan_.stat-sparkline-line]:stroke-[#38d9d2]
+        [&.stat-sparkline--cyan_.stat-sparkline-area]:fill-[#38d9d2]
+        [&.stat-sparkline--cyan_.stat-sparkline-point]:fill-[#84fff8]
+        [&.stat-sparkline--green]:text-[#66e4ad]
+        [&.stat-sparkline--green_.stat-sparkline-line]:stroke-[#66e4ad]
+        [&.stat-sparkline--green_.stat-sparkline-area]:fill-[#66e4ad]
+        [&.stat-sparkline--green_.stat-sparkline-point]:fill-[#a5ffd0]
+        [&.stat-sparkline--blue]:text-[#66b7ff]
+        [&.stat-sparkline--blue_.stat-sparkline-line]:stroke-[#66b7ff]
+        [&.stat-sparkline--blue_.stat-sparkline-area]:fill-[#66b7ff]
+        [&.stat-sparkline--blue_.stat-sparkline-point]:fill-[#a2d5ff]
+        [@media(max-width:580px)]:right-[9px]
+        [@media(max-width:580px)]:bottom-[7px]
+        [@media(max-width:580px)]:w-[calc(100%-18px)]
+        [@media(max-width:580px)]:h-[36px]
       `}
           role="img"
           aria-label={chartLabel}
@@ -701,14 +701,14 @@ function StatCard({
           preserveAspectRatio="none"
         >
           <line
-            className={"stat-sparkline-baseline [stroke:#ffffff10] [stroke-width:1]"}
+            className={"stat-sparkline-baseline stroke-[#ffffff10] stroke-1"}
             x1="0"
             x2="140"
             y1="40"
             y2="40"
           />
           {chartType === "line" && areaPath && (
-            <path className={"stat-sparkline-area [opacity:0.13] [transform-box:fill-box] [transform-origin:center_bottom]"} d={areaPath} />
+            <path className={"stat-sparkline-area opacity-[0.13] transform-fill origin-[center_bottom]"} d={areaPath} />
           )}
           {chartType === "bars" && maxBarValue > 0
             ? chartValues.map((value, index) => {
@@ -732,13 +732,13 @@ function StatCard({
           {chartType === "line" && points.length > 1 && (
             <polyline
               className={`stat-sparkline-line
-        [fill:none]
-        [stroke-width:2.2]
+        fill-none
+        stroke-[2.2]
         [stroke-linecap:round]
         [stroke-linejoin:round]
         [stroke-dasharray:1]
         [stroke-dashoffset:1]
-        [filter:drop-shadow(0_0_4px_currentColor)]
+        filter-[drop-shadow(0_0_4px_currentColor)]
       `}
               pathLength={1}
               points={points.join(" ")}
@@ -746,7 +746,7 @@ function StatCard({
           )}
           {chartType === "line" && points.length === 1 && (
             <circle
-              className={"stat-sparkline-point [stroke:#111219] [stroke-width:2] [transform-box:fill-box] [transform-origin:center]"}
+              className={"stat-sparkline-point stroke-[#111219] stroke-2 transform-fill origin-center"}
               cx={points[0].split(",")[0]}
               cy={points[0].split(",")[1]}
               r="4.5"
@@ -756,7 +756,7 @@ function StatCard({
           )}
           {!points.length && (
             <text
-              className={"stat-sparkline-empty-label [fill:#6f7081] [font:8px_ui-sans-serif,_system-ui,_sans-serif]"}
+              className={"stat-sparkline-empty-label fill-[#6f7081] [font:8px_ui-sans-serif,system-ui,sans-serif]"}
               x="134"
               y="30"
               textAnchor="end"
@@ -787,17 +787,17 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
     .join(" ");
   return (
     <div className={`history-chart
-        [margin-top:10px]
+        mt-[10px]
         [&_svg]:block
-        [&_svg]:[width:100%]
-        [&_svg]:[height:133px]
-        [&_svg]:[overflow:visible]
-        [&_svg_line]:[stroke:#30313d]
-        [&_svg_line]:[stroke-width:0.7]
-        [&_svg_text]:[fill:#77798b]
-        [&_svg_text]:[font:8px_ui-sans-serif,_system-ui,_sans-serif]
-        [&_svg_.history-run-label]:[fill:#898b9c]
-        [&_svg_.history-run-label]:[font-size:8px]
+        [&_svg]:w-full
+        [&_svg]:h-[133px]
+        [&_svg]:overflow-visible
+        [&_svg_line]:stroke-[#30313d]
+        [&_svg_line]:stroke-[0.7]
+        [&_svg_text]:fill-[#77798b]
+        [&_svg_text]:[font:8px_ui-sans-serif,system-ui,sans-serif]
+        [&_svg_.history-run-label]:fill-[#898b9c]
+        [&_svg_.history-run-label]:text-[8px]
       `}>
       <svg
         role="img"
@@ -817,14 +817,14 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
           <polyline
             className={`history-line
         history-line--passing
-        [fill:none]
-        [stroke-width:2.3]
+        fill-none
+        stroke-[2.3]
         [stroke-linecap:round]
         [stroke-linejoin:round]
         [stroke-dasharray:1]
         [stroke-dashoffset:1]
-        [&.history-line--passing]:[stroke:#9d5cff]
-        [&.history-line--coverage]:[stroke:#a45af5]
+        [&.history-line--passing]:stroke-[#9d5cff]
+        [&.history-line--coverage]:stroke-[#a45af5]
       `}
             pathLength={1}
             points={passingPoints}
@@ -836,12 +836,12 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
               <circle
                 className={`history-point
         history-point--passing
-        [stroke:#14151c]
-        [stroke-width:2]
-        [transform-box:fill-box]
-        [transform-origin:center]
-        [&.history-point--passing]:[fill:#9d5cff]
-        [&.history-point--coverage]:[fill:#a45af5]
+        stroke-[#14151c]
+        stroke-2
+        transform-fill
+        origin-center
+        [&.history-point--passing]:fill-[#9d5cff]
+        [&.history-point--coverage]:fill-[#a45af5]
       `}
                 style={{ animationDelay: `${index * 75}ms` }}
                 cx={x(index)}
@@ -862,7 +862,7 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
           </g>
         ))}
       </svg>
-      <div className={"history-chart-caption flex justify-between [margin:-2px_0_0_27px] [color:#737586] [font-size:8px]"}>
+      <div className={"history-chart-caption flex justify-between m-[-2px_0_0_27px] text-[#737586] text-[8px]"}>
         <span>Older</span>
         <span>Recent runs</span>
         <span>Latest</span>
@@ -918,75 +918,75 @@ export function OverviewPage() {
         overview-page
         flex
         flex-col
-        [gap:28px]
-        [@media(max-width:580px)]:[gap:20px]
-        [&_.section-title-row_h2]:[font-size:16.5px]
-        [&_.text-link]:[gap:7px]
-        [&_.text-link]:[font-size:12px]
+        gap-[28px]
+        [@media(max-width:580px)]:gap-[20px]
+        [&_.section-title-row_h2]:text-[16.5px]
+        [&_.text-link]:gap-[7px]
+        [&_.text-link]:text-[12px]
       `}>
       <section className={`overview-hero
         relative
         [--hero-height:348px]
         [&::after]:[content:""]
         [&::after]:absolute
-        [&::after]:[z-index:2]
-        [&::after]:[inset:calc(var(--hero-height)_-_150px)_0_0]
-        [&::after]:[background:linear-gradient(_180deg,_transparent_0,_color-mix(in_srgb,_var(--background)_76%,_transparent)_80px,_var(--background)_145px_)]
-        [&::after]:[pointer-events:none]
+        [&::after]:z-2
+        [&::after]:inset-[calc(var(--hero-height)-150px)_0_0]
+        [&::after]:[background:linear-gradient(180deg,transparent_0,color-mix(in_srgb,var(--background)_76%,transparent)_80px,var(--background)_145px)]
+        [&::after]:pointer-events-none
         [@media(max-width:820px)]:[--hero-height:310px]
         [@media(max-width:580px)]:[--hero-height:305px]
       `}>
         <div className={`hero-panel
         relative
-        [min-height:348px]
+        min-h-[348px]
         flex
         items-center
         overflow-hidden
         [border:1px_solid_#282538]
         [border-bottom:0]
-        [border-radius:15px]
-        [background:radial-gradient(_ellipse_at_82%_45%,_#1b1c20_0,_#111216_35%,_#111216_70%_)]
+        rounded-[15px]
+        [background:radial-gradient(ellipse_at_82%_45%,#1b1c20_0,#111216_35%,#111216_70%)]
         [&::before]:[content:""]
         [&::before]:absolute
-        [&::before]:[inset:0]
-        [&::before]:[opacity:0.35]
-        [&::before]:[background:radial-gradient(ellipse_at_88%_35%,_#1d7c7a2d,_transparent_34%),_linear-gradient(115deg,_transparent_58%,_#542b9c14)]
-        [&::before]:[pointer-events:none]
-        [@media(max-width:820px)]:[min-height:310px]
-        [@media(max-width:580px)]:[min-height:305px]
+        [&::before]:inset-0
+        [&::before]:opacity-[0.35]
+        [&::before]:[background:radial-gradient(ellipse_at_88%_35%,#1d7c7a2d,transparent_34%),linear-gradient(115deg,transparent_58%,#542b9c14)]
+        [&::before]:pointer-events-none
+        [@media(max-width:820px)]:min-h-[310px]
+        [@media(max-width:580px)]:min-h-[305px]
         [@media(max-width:580px)]:items-start
       `}>
-          <div className={"hero-glow absolute [right:25%] [bottom:-115px] [width:360px] [height:200px] [border-radius:50%] [background:#5425a344] [filter:blur(75px)]"} aria-hidden="true" />
+          <div className={"hero-glow absolute right-[25%] bottom-[-115px] w-[360px] h-[200px] rounded-[50%] [background:#5425a344] filter-[blur(75px)]"} aria-hidden="true" />
           <div className={`hero-copy
         relative
-        [z-index:4]
-        [width:62%]
-        [padding:27px_12px_85px_30px]
-        [&_h1]:[max-width:635px]
-        [&_h1]:[margin:2px_0_8px]
-        [&_h1]:[font-size:clamp(28px,_3vw,_39px)]
-        [&_h1]:[line-height:1.13]
-        [&_h1]:[letter-spacing:-0.055em]
-        [&_h1]:[font-weight:690]
-        [&_h1_span]:[color:#b16cff]
+        z-4
+        w-[62%]
+        p-[27px_12px_85px_30px]
+        [&_h1]:max-w-[635px]
+        [&_h1]:m-[2px_0_8px]
+        [&_h1]:text-[clamp(28px,3vw,39px)]
+        [&_h1]:leading-[1.13]
+        [&_h1]:tracking-[-0.055em]
+        [&_h1]:font-[690]
+        [&_h1_span]:text-[#b16cff]
         [&_h1_span]:[text-shadow:0_0_26px_#974aff45]
-        [&>p]:[max-width:580px]
-        [&>p]:[margin:0]
-        [&>p]:[color:#a5a5b8]
-        [&>p]:[font-size:13px]
-        [&>p]:[line-height:1.7]
-        [@media(max-width:1120px)]:[width:66%]
-        [@media(max-width:820px)]:[width:70%]
-        [@media(max-width:820px)]:[padding-left:22px]
-        [@media(max-width:820px)]:[&_h1]:[font-size:30px]
-        [@media(max-width:580px)]:[width:100%]
-        [@media(max-width:580px)]:[padding:22px_17px]
-        [@media(max-width:580px)]:[&_h1]:[max-width:300px]
-        [@media(max-width:580px)]:[&_h1]:[font-size:28px]
-        [@media(max-width:580px)]:[&>p]:[max-width:300px]
-        [@media(max-width:580px)]:[&>p]:[font-size:11px]
+        [&>p]:max-w-[580px]
+        [&>p]:m-0
+        [&>p]:text-[#a5a5b8]
+        [&>p]:text-[13px]
+        [&>p]:leading-[1.7]
+        [@media(max-width:1120px)]:w-[66%]
+        [@media(max-width:820px)]:w-[70%]
+        [@media(max-width:820px)]:pl-[22px]
+        [@media(max-width:820px)]:[&_h1]:text-[30px]
+        [@media(max-width:580px)]:w-full
+        [@media(max-width:580px)]:p-[22px_17px]
+        [@media(max-width:580px)]:[&_h1]:max-w-[300px]
+        [@media(max-width:580px)]:[&_h1]:text-[28px]
+        [@media(max-width:580px)]:[&>p]:max-w-[300px]
+        [@media(max-width:580px)]:[&>p]:text-[11px]
       `}>
-            <span className={"hero-kicker inline-flex items-center [gap:7px] [color:#c49aff] [font-size:12px] [font-weight:740] [letter-spacing:0.11em]"}>
+            <span className={"hero-kicker inline-flex items-center gap-[7px] text-[#c49aff] text-[12px] font-[740] tracking-[0.11em]"}>
               <Icon name="sparkles" size={15} /> WELCOME BACK!
             </span>
             <h1>
@@ -999,30 +999,30 @@ export function OverviewPage() {
           </div>
           <div className={`hero-art
         absolute
-        [inset:0_0_0_auto]
-        [width:48%]
-        [height:100%]
+        inset-[0_0_0_auto]
+        w-[48%]
+        h-full
         [&_img]:absolute
-        [&_img]:[width:100%]
-        [&_img]:[height:143%]
-        [&_img]:[right:-2%]
-        [&_img]:[top:-20%]
-        [&_img]:[object-fit:contain]
-        [&_img]:[object-position:center]
-        [&_img]:[mix-blend-mode:screen]
-        [&_img]:[opacity:0.9]
-        [@media(max-width:1120px)]:[width:43%]
-        [@media(max-width:1120px)]:[opacity:0.82]
-        [@media(max-width:820px)]:[width:47%]
-        [@media(max-width:820px)]:[right:-6%]
-        [@media(max-width:820px)]:[opacity:0.72]
-        [@media(max-width:580px)]:[width:60%]
-        [@media(max-width:580px)]:[height:54%]
-        [@media(max-width:580px)]:[inset:auto_0_0_auto]
-        [@media(max-width:580px)]:[opacity:0.67]
-        [@media(max-width:580px)]:[&_img]:[height:140%]
-        [@media(max-width:580px)]:[&_img]:[top:-12%]
-        [@media(max-width:580px)]:[&_img]:[right:-15%]
+        [&_img]:w-full
+        [&_img]:h-[143%]
+        [&_img]:right-[-2%]
+        [&_img]:top-[-20%]
+        [&_img]:object-contain
+        [&_img]:object-center
+        [&_img]:mix-blend-screen
+        [&_img]:opacity-[0.9]
+        [@media(max-width:1120px)]:w-[43%]
+        [@media(max-width:1120px)]:opacity-[0.82]
+        [@media(max-width:820px)]:w-[47%]
+        [@media(max-width:820px)]:right-[-6%]
+        [@media(max-width:820px)]:opacity-[0.72]
+        [@media(max-width:580px)]:w-[60%]
+        [@media(max-width:580px)]:h-[54%]
+        [@media(max-width:580px)]:inset-[auto_0_0_auto]
+        [@media(max-width:580px)]:opacity-[0.67]
+        [@media(max-width:580px)]:[&_img]:h-[140%]
+        [@media(max-width:580px)]:[&_img]:top-[-12%]
+        [@media(max-width:580px)]:[&_img]:right-[-15%]
       `}>
             <Image
               src="/assets/img/neon_robot_banner.png"
@@ -1037,15 +1037,15 @@ export function OverviewPage() {
 
         <section aria-label="Library summary" className={`stats-grid
         relative
-        [z-index:3]
+        z-3
         grid
-        [grid-template-columns:repeat(4,_minmax(0,_1fr))]
-        [gap:14px]
-        [margin:-126px_22px_0]
-        [@media(max-width:820px)]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]
-        [@media(max-width:820px)]:[margin-top:-108px]
-        [@media(max-width:580px)]:[gap:8px]
-        [@media(max-width:580px)]:[margin:-82px_8px_0]
+        grid-cols-4
+        gap-[14px]
+        m-[-126px_22px_0]
+        [@media(max-width:820px)]:grid-cols-2
+        [@media(max-width:820px)]:mt-[-108px]
+        [@media(max-width:580px)]:gap-[8px]
+        [@media(max-width:580px)]:m-[-82px_8px_0]
       `}>
           <StatCard
             label="Components"
@@ -1111,19 +1111,19 @@ export function OverviewPage() {
       <div className={`dashboard-grid
         dashboard-grid--primary
         grid
-        [gap:18px]
-        [&.dashboard-grid--primary]:[grid-template-columns:minmax(0,_1.15fr)_minmax(340px,_0.85fr)]
-        [&.dashboard-grid--secondary]:[grid-template-columns:minmax(0,_1.25fr)_minmax(300px,_0.75fr)]
-        [&_.panel]:[padding:20px]
-        [&_.activity-panel]:[padding:20px_24px]
-        [@media(max-width:1120px)]:[&.dashboard-grid--primary]:[grid-template-columns:minmax(0,_1.2fr)_minmax(280px,_0.8fr)]
-        [@media(max-width:1120px)]:[&.dashboard-grid--secondary]:[grid-template-columns:1.15fr_0.85fr]
-        [@media(max-width:1120px)]:[&_.activity-panel]:[padding:18px]
-        [@media(max-width:820px)]:[&.dashboard-grid--primary]:[grid-template-columns:1fr]
-        [@media(max-width:820px)]:[&.dashboard-grid--secondary]:[grid-template-columns:1fr]
-        [@media(max-width:580px)]:[gap:12px]
-        [@media(max-width:580px)]:[&_.panel]:[padding:16px]
-        [@media(max-width:580px)]:[&_.activity-panel]:[padding:16px]
+        gap-[18px]
+        [&.dashboard-grid--primary]:grid-cols-[minmax(0,1.15fr)_minmax(340px,0.85fr)]
+        [&.dashboard-grid--secondary]:grid-cols-[minmax(0,1.25fr)_minmax(300px,0.75fr)]
+        [&_.panel]:p-[20px]
+        [&_.activity-panel]:p-[20px_24px]
+        [@media(max-width:1120px)]:[&.dashboard-grid--primary]:grid-cols-[minmax(0,1.2fr)_minmax(280px,0.8fr)]
+        [@media(max-width:1120px)]:[&.dashboard-grid--secondary]:grid-cols-[1.15fr_0.85fr]
+        [@media(max-width:1120px)]:[&_.activity-panel]:p-[18px]
+        [@media(max-width:820px)]:[&.dashboard-grid--primary]:grid-cols-[1fr]
+        [@media(max-width:820px)]:[&.dashboard-grid--secondary]:grid-cols-[1fr]
+        [@media(max-width:580px)]:gap-[12px]
+        [@media(max-width:580px)]:[&_.panel]:p-[16px]
+        [@media(max-width:580px)]:[&_.activity-panel]:p-[16px]
       `}>
         <section
           aria-busy={loading}
@@ -1131,25 +1131,25 @@ export function OverviewPage() {
         test-performance-panel
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#1b1c20,#111216)]
         [box-shadow:0_8px_24px_#0004]
       `}
         >
           <SectionTitle title="Test performance" href="/tests" icon="tests" />
           {loading ? (
-            <div aria-hidden="true" className={"chart-loading-skeleton [min-height:150px] flex items-center [padding-top:8px]"}>
+            <div aria-hidden="true" className={"chart-loading-skeleton min-h-[150px] flex items-center pt-[8px]"}>
               <span
                 className={`dashboard-skeleton
         dashboard-skeleton--chart
         block
         [border-radius:6px]
-        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
-        [background-size:200%_100%]
-        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
-        [width:100%]
-        [height:132px]
-        [border-radius:8px]
+        [background:linear-gradient(90deg,#1a1b25_25%,#2a2b37_50%,#1a1b25_75%)]
+        bg-size-[200%_100%]
+        animate-[dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        w-full
+        h-[132px]
+        rounded-[8px]
       `}
               />
             </div>
@@ -1158,20 +1158,20 @@ export function OverviewPage() {
         flex
         items-center
         justify-end
-        [gap:16px]
-        [margin-top:14px]
-        [color:#a5a6b8]
-        [font-size:12px]
+        gap-[16px]
+        mt-[14px]
+        text-[#a5a6b8]
+        text-[12px]
         [&>span]:inline-flex
         [&>span]:items-center
-        [&>span]:[gap:7px]
+        [&>span]:gap-[7px]
       `}>
               <span>
                 <i className={`legend-dot
         legend-dot--purple
-        [width:7px]
-        [height:7px]
-        [border-radius:50%]
+        size-[7px]
+        
+        rounded-[50%]
         [&.legend-dot--purple]:[background:#a458ff]
         [&.legend-dot--purple]:[box-shadow:0_0_8px_#a458ff77]
         [&.legend-dot--cyan]:[background:#31d9d2]
@@ -1187,29 +1187,29 @@ export function OverviewPage() {
             <div
               className={`result-chart
         relative
-        [min-height:120px]
+        min-h-[120px]
         flex
         flex-col
         justify-center
-        [gap:12px]
-        [padding:18px_6px_10px]
-        [&>p]:[margin:0]
-        [&>p]:[color:#808295]
-        [&>p]:[font-size:12px]
+        gap-[12px]
+        p-[18px_6px_10px]
+        [&>p]:m-0
+        [&>p]:text-[#808295]
+        [&>p]:text-[12px]
       `}
               aria-label={`${latestTestRun.passed} tests passed, ${latestTestRun.failed} failed, ${latestTestRun.pending} pending`}
             >
               <div className={`result-chart__bar
-        [height:9px]
+        h-[9px]
         overflow-hidden
-        [border-radius:10px]
+        rounded-[10px]
         [background:#2a2b36]
         [&_span]:block
-        [&_span]:[height:100%]
-        [&_span]:[border-radius:inherit]
-        [&_span]:[background:linear-gradient(90deg,_#944bfa,_#39d0c3)]
-        [&_span]:[transform:scaleX(0)]
-        [&_span]:[transform-origin:left_center]
+        [&_span]:h-full
+        [&_span]:rounded-[inherit]
+        [&_span]:[background:linear-gradient(90deg,#944bfa,#39d0c3)]
+        [&_span]:transform-[scaleX(0)]
+        [&_span]:origin-[left_center]
       `}>
                 <span
                   style={{
@@ -1217,7 +1217,7 @@ export function OverviewPage() {
                   }}
                 />
               </div>
-              <div className={"chart-values flex [gap:16px] [color:#a8a9bc] [font-size:12px] [&_strong]:[color:#69dcaa] [&_strong]:[font-weight:600]"}>
+              <div className={"chart-values flex gap-[16px] text-[#a8a9bc] text-[12px] [&_strong]:text-[#69dcaa] [&_strong]:font-semibold"}>
                 <strong>{latestTestRun.passed} passed</strong>
                 <span>{latestTestRun.failed} failed</span>
                 <span>{latestTestRun.pending} pending</span>
@@ -1229,29 +1229,29 @@ export function OverviewPage() {
             </div>
           ) : !loading ? (
             <div className={`chart-empty
-        [min-height:130px]
+        min-h-[130px]
         flex
         flex-col
         justify-center
-        [&>p]:[margin:4px_0_0]
-        [&>p]:[color:#838497]
-        [&>p]:[text-align:center]
-        [&>p]:[font-size:12px]
+        [&>p]:m-[4px_0_0]
+        [&>p]:text-[#838497]
+        [&>p]:text-center
+        [&>p]:text-[12px]
       `}>
               <div className={`chart-placeholder
-        [min-height:110px]
+        min-h-[110px]
         flex
         flex-col
         items-center
         justify-center
-        [gap:9px]
+        gap-[9px]
         [border:1px_dashed_#30313f]
-        [border-radius:10px]
-        [color:#898a9d]
-        [background:repeating-linear-gradient(_to_bottom,_transparent_0,_transparent_24px,_#292a3618_25px,_transparent_26px_)]
-        [text-align:center]
-        [&_svg]:[color:#9a72c7]
-        [&_span]:[font-size:12px]
+        rounded-[10px]
+        text-[#898a9d]
+        [background:repeating-linear-gradient(to_bottom,transparent_0,transparent_24px,#292a3618_25px,transparent_26px)]
+        text-center
+        [&_svg]:text-[#9a72c7]
+        [&_span]:text-[12px]
       `}>
                 <Icon name="activity" size={20} />
                 <span>
@@ -1265,11 +1265,11 @@ export function OverviewPage() {
         flex
         justify-between
         items-center
-        [margin-top:14px]
-        [padding-top:12px]
+        mt-[14px]
+        pt-[12px]
         [border-top:1px_solid_#242531]
-        [color:#9293a5]
-        [font-size:12px]
+        text-[#9293a5]
+        text-[12px]
       `}>
             <span>Test durations</span>
             <Badge tone="muted">Individual runs only</Badge>
@@ -1280,47 +1280,47 @@ export function OverviewPage() {
         activity-panel
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#1b1c20,#111216)]
         [box-shadow:0_8px_24px_#0004]
       `}>
           <div className={`activity-heading
         flex
         items-center
-        [gap:12px]
-        [margin-left:2px]
+        gap-[12px]
+        ml-[2px]
         [&>div]:min-w-0
-        [&>div]:[flex:1]
-        [&_h2]:[margin:0]
-        [&_h2]:[font-size:17px]
-        [&_h2]:[line-height:1.2]
-        [&_h2]:[font-weight:650]
-        [@media(max-width:1120px)]:[gap:10px]
-        [@media(max-width:1120px)]:[&_h2]:[font-size:16px]
-        [@media(max-width:580px)]:[gap:8px]
-        [@media(max-width:580px)]:[&_h2]:[font-size:15px]
+        [&>div]:flex-1
+        [&_h2]:m-0
+        [&_h2]:text-[17px]
+        [&_h2]:leading-[1.2]
+        [&_h2]:font-[650]
+        [@media(max-width:1120px)]:gap-[10px]
+        [@media(max-width:1120px)]:[&_h2]:text-[16px]
+        [@media(max-width:580px)]:gap-[8px]
+        [@media(max-width:580px)]:[&_h2]:text-[15px]
       `}>
             <span className={`activity-heading-icon
-        [width:40px]
-        [height:40px]
-        [flex:0_0_auto]
+        size-[40px]
+        
+        flex-[0_0_auto]
         grid
-        [place-items:center]
+        place-items-center
         [border:1px_solid_#75421e66]
-        [border-radius:11px]
-        [color:#ffb45f]
-        [background:linear-gradient(145deg,_#c76c241f,_#742d261b)]
+        rounded-[11px]
+        text-[#ffb45f]
+        [background:linear-gradient(145deg,#c76c241f,#742d261b)]
         [box-shadow:inset_0_0_15px_#ff9e2410]
-        [@media(max-width:1120px)]:[width:36px]
-        [@media(max-width:1120px)]:[height:36px]
-        [@media(max-width:1120px)]:[border-radius:10px]
-        [@media(max-width:1120px)]:[&_svg]:[width:20px]
-        [@media(max-width:1120px)]:[&_svg]:[height:20px]
-        [@media(max-width:580px)]:[width:34px]
-        [@media(max-width:580px)]:[height:34px]
-        [@media(max-width:580px)]:[border-radius:9px]
-        [@media(max-width:580px)]:[&_svg]:[width:19px]
-        [@media(max-width:580px)]:[&_svg]:[height:19px]
+        [@media(max-width:1120px)]:size-[36px]
+        
+        [@media(max-width:1120px)]:rounded-[10px]
+        [@media(max-width:1120px)]:[&_svg]:size-[20px]
+        
+        [@media(max-width:580px)]:size-[34px]
+        
+        [@media(max-width:580px)]:rounded-[9px]
+        [@media(max-width:580px)]:[&_svg]:size-[19px]
+        
       `}>
               <Icon name="activity" size={20} />
             </span>
@@ -1330,13 +1330,13 @@ export function OverviewPage() {
             <Link className={`text-link
         inline-flex
         items-center
-        [gap:6px]
-        [margin-top:1px]
-        [color:#c084fc]
-        [font-size:12px]
-        [font-weight:600]
-        [white-space:nowrap]
-        [&:hover]:[color:#d9b8ff]
+        gap-[6px]
+        mt-px
+        text-[#c084fc]
+        text-[12px]
+        font-semibold
+        whitespace-nowrap
+        [&:hover]:text-[#d9b8ff]
       `} href="/tests">
               View all <Icon name="arrow-right" size={14} />
             </Link>
@@ -1349,50 +1349,50 @@ export function OverviewPage() {
         relative
         flex
         flex-col
-        [gap:0]
-        [margin:24px_0_0_2px]
-        [padding:0]
+        gap-0
+        m-[24px_0_0_2px]
+        p-0
         [list-style:none]
         [&::before]:[content:""]
         [&::before]:absolute
-        [&::before]:[z-index:0]
-        [&::before]:[top:8px]
-        [&::before]:[bottom:8px]
-        [&::before]:[left:4px]
-        [&::before]:[width:1px]
-        [&::before]:[background:linear-gradient(#4acb9a77,_#9d5cff66,_#ff6f8277)]
+        [&::before]:z-0
+        [&::before]:inset-y-[8px]
+        
+        [&::before]:left-[4px]
+        [&::before]:w-px
+        [&::before]:[background:linear-gradient(#4acb9a77,#9d5cff66,#ff6f8277)]
         [&_li]:relative
-        [&_li]:[min-height:66px]
+        [&_li]:min-h-[66px]
         [&_li]:grid
-        [&_li]:[grid-template-columns:8px_78px_34px_minmax(0,_1fr)]
+        [&_li]:grid-cols-[8px_78px_34px_minmax(0,1fr)]
         [&_li]:items-center
-        [&_li]:[gap:14px]
+        [&_li]:gap-[14px]
         [&_li]:[border-bottom:1px_solid_#22232d]
         [&_li:last-child]:[border-bottom:0]
-        [&_time]:[color:#9293a5]
-        [&_time]:[font-size:12px]
-        [&_time]:[white-space:nowrap]
+        [&_time]:text-[#9293a5]
+        [&_time]:text-[12px]
+        [&_time]:whitespace-nowrap
         [&_li_div]:flex
         [&_li_div]:flex-col
-        [&_li_div]:[gap:3px]
-        [&_li_strong]:overflow-hidden
-        [&_li_strong]:[font-size:13px]
-        [&_li_strong]:[font-weight:600]
-        [&_li_strong]:[text-overflow:ellipsis]
-        [&_li_strong]:[white-space:nowrap]
-        [&_li_div_span]:[color:#808295]
-        [&_li_div_span]:[font-size:11.5px]
-        [@media(max-width:1120px)]:[margin-top:20px]
-        [@media(max-width:1120px)]:[&_li]:[min-height:62px]
-        [@media(max-width:1120px)]:[&_li]:[grid-template-columns:8px_72px_32px_minmax(0,_1fr)]
-        [@media(max-width:1120px)]:[&_li]:[gap:12px]
-        [@media(max-width:580px)]:[margin-top:18px]
-        [@media(max-width:580px)]:[&_li]:[min-height:58px]
-        [@media(max-width:580px)]:[&_li]:[grid-template-columns:8px_56px_28px_minmax(0,_1fr)]
-        [@media(max-width:580px)]:[&_li]:[gap:9px]
-        [@media(max-width:580px)]:[&_time]:[font-size:10px]
-        [@media(max-width:580px)]:[&_li_strong]:[font-size:11.5px]
-        [@media(max-width:580px)]:[&_li_div_span]:[font-size:10px]
+        [&_li_div]:gap-[3px]
+        [&_li_strong]:truncate
+        [&_li_strong]:text-[13px]
+        [&_li_strong]:font-semibold
+        
+        
+        [&_li_div_span]:text-[#808295]
+        [&_li_div_span]:text-[11.5px]
+        [@media(max-width:1120px)]:mt-[20px]
+        [@media(max-width:1120px)]:[&_li]:min-h-[62px]
+        [@media(max-width:1120px)]:[&_li]:grid-cols-[8px_72px_32px_minmax(0,1fr)]
+        [@media(max-width:1120px)]:[&_li]:gap-[12px]
+        [@media(max-width:580px)]:mt-[18px]
+        [@media(max-width:580px)]:[&_li]:min-h-[58px]
+        [@media(max-width:580px)]:[&_li]:grid-cols-[8px_56px_28px_minmax(0,1fr)]
+        [@media(max-width:580px)]:[&_li]:gap-[9px]
+        [@media(max-width:580px)]:[&_time]:text-[10px]
+        [@media(max-width:580px)]:[&_li_strong]:text-[11.5px]
+        [@media(max-width:580px)]:[&_li_div_span]:text-[10px]
       `}
             >
               {[0, 1, 2].map((item) => (
@@ -1402,24 +1402,24 @@ export function OverviewPage() {
         dashboard-skeleton--timeline
         block
         [border-radius:6px]
-        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
-        [background-size:200%_100%]
-        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
-        [width:8px]
-        [height:8px]
-        [border-radius:50%]
+        [background:linear-gradient(90deg,#1a1b25_25%,#2a2b37_50%,#1a1b25_75%)]
+        bg-size-[200%_100%]
+        animate-[dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        size-[8px]
+        
+        rounded-[50%]
       `}
                   />
                   <span
                     className={`dashboard-skeleton
         dashboard-skeleton--activity-time
         block
-        [border-radius:6px]
-        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
-        [background-size:200%_100%]
-        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
-        [width:48px]
-        [height:9px]
+        rounded-[6px]
+        [background:linear-gradient(90deg,#1a1b25_25%,#2a2b37_50%,#1a1b25_75%)]
+        bg-size-[200%_100%]
+        animate-[dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        w-[48px]
+        h-[9px]
       `}
                   />
                   <span
@@ -1427,37 +1427,37 @@ export function OverviewPage() {
         dashboard-skeleton--activity-icon
         block
         [border-radius:6px]
-        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
-        [background-size:200%_100%]
-        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
-        [width:34px]
-        [height:34px]
-        [border-radius:10px]
+        [background:linear-gradient(90deg,#1a1b25_25%,#2a2b37_50%,#1a1b25_75%)]
+        bg-size-[200%_100%]
+        animate-[dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        size-[34px]
+        
+        rounded-[10px]
       `}
                   />
-                  <span className={"activity-skeleton-copy min-w-0 flex flex-col [gap:7px]"}>
+                  <span className={"activity-skeleton-copy min-w-0 flex flex-col gap-[7px]"}>
                     <span
                       className={`dashboard-skeleton
         dashboard-skeleton--activity-title
         block
-        [border-radius:6px]
-        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
-        [background-size:200%_100%]
-        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
-        [width:78%]
-        [height:11px]
+        rounded-[6px]
+        [background:linear-gradient(90deg,#1a1b25_25%,#2a2b37_50%,#1a1b25_75%)]
+        bg-size-[200%_100%]
+        animate-[dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        w-[78%]
+        h-[11px]
       `}
                     />
                     <span
                       className={`dashboard-skeleton
         dashboard-skeleton--activity-meta
         block
-        [border-radius:6px]
-        [background:linear-gradient(90deg,_#1a1b25_25%,_#2a2b37_50%,_#1a1b25_75%)]
-        [background-size:200%_100%]
-        [animation:dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
-        [width:58%]
-        [height:9px]
+        rounded-[6px]
+        [background:linear-gradient(90deg,#1a1b25_25%,#2a2b37_50%,#1a1b25_75%)]
+        bg-size-[200%_100%]
+        animate-[dashboard-skeleton-shimmer_1.35s_ease-in-out_infinite]
+        w-[58%]
+        h-[9px]
       `}
                     />
                   </span>
@@ -1469,82 +1469,82 @@ export function OverviewPage() {
         relative
         flex
         flex-col
-        [gap:0]
-        [margin:24px_0_0_2px]
-        [padding:0]
+        gap-0
+        m-[24px_0_0_2px]
+        p-0
         [list-style:none]
         [&::before]:[content:""]
         [&::before]:absolute
-        [&::before]:[z-index:0]
-        [&::before]:[top:8px]
-        [&::before]:[bottom:8px]
-        [&::before]:[left:4px]
-        [&::before]:[width:1px]
-        [&::before]:[background:linear-gradient(#4acb9a77,_#9d5cff66,_#ff6f8277)]
+        [&::before]:z-0
+        [&::before]:inset-y-[8px]
+        
+        [&::before]:left-[4px]
+        [&::before]:w-px
+        [&::before]:[background:linear-gradient(#4acb9a77,#9d5cff66,#ff6f8277)]
         [&_li]:relative
-        [&_li]:[min-height:66px]
+        [&_li]:min-h-[66px]
         [&_li]:grid
-        [&_li]:[grid-template-columns:8px_78px_34px_minmax(0,_1fr)]
+        [&_li]:grid-cols-[8px_78px_34px_minmax(0,1fr)]
         [&_li]:items-center
-        [&_li]:[gap:14px]
+        [&_li]:gap-[14px]
         [&_li]:[border-bottom:1px_solid_#22232d]
         [&_li:last-child]:[border-bottom:0]
-        [&_time]:[color:#9293a5]
-        [&_time]:[font-size:12px]
-        [&_time]:[white-space:nowrap]
+        [&_time]:text-[#9293a5]
+        [&_time]:text-[12px]
+        [&_time]:whitespace-nowrap
         [&_li_div]:flex
         [&_li_div]:flex-col
-        [&_li_div]:[gap:3px]
-        [&_li_strong]:overflow-hidden
-        [&_li_strong]:[font-size:13px]
-        [&_li_strong]:[font-weight:600]
-        [&_li_strong]:[text-overflow:ellipsis]
-        [&_li_strong]:[white-space:nowrap]
-        [&_li_div_span]:[color:#808295]
-        [&_li_div_span]:[font-size:11.5px]
-        [@media(max-width:1120px)]:[margin-top:20px]
-        [@media(max-width:1120px)]:[&_li]:[min-height:62px]
-        [@media(max-width:1120px)]:[&_li]:[grid-template-columns:8px_72px_32px_minmax(0,_1fr)]
-        [@media(max-width:1120px)]:[&_li]:[gap:12px]
-        [@media(max-width:580px)]:[margin-top:18px]
-        [@media(max-width:580px)]:[&_li]:[min-height:58px]
-        [@media(max-width:580px)]:[&_li]:[grid-template-columns:8px_56px_28px_minmax(0,_1fr)]
-        [@media(max-width:580px)]:[&_li]:[gap:9px]
-        [@media(max-width:580px)]:[&_time]:[font-size:10px]
-        [@media(max-width:580px)]:[&_li_strong]:[font-size:11.5px]
-        [@media(max-width:580px)]:[&_li_div_span]:[font-size:10px]
+        [&_li_div]:gap-[3px]
+        [&_li_strong]:truncate
+        [&_li_strong]:text-[13px]
+        [&_li_strong]:font-semibold
+        
+        
+        [&_li_div_span]:text-[#808295]
+        [&_li_div_span]:text-[11.5px]
+        [@media(max-width:1120px)]:mt-[20px]
+        [@media(max-width:1120px)]:[&_li]:min-h-[62px]
+        [@media(max-width:1120px)]:[&_li]:grid-cols-[8px_72px_32px_minmax(0,1fr)]
+        [@media(max-width:1120px)]:[&_li]:gap-[12px]
+        [@media(max-width:580px)]:mt-[18px]
+        [@media(max-width:580px)]:[&_li]:min-h-[58px]
+        [@media(max-width:580px)]:[&_li]:grid-cols-[8px_56px_28px_minmax(0,1fr)]
+        [@media(max-width:580px)]:[&_li]:gap-[9px]
+        [@media(max-width:580px)]:[&_time]:text-[10px]
+        [@media(max-width:580px)]:[&_li_strong]:text-[11.5px]
+        [@media(max-width:580px)]:[&_li_div_span]:text-[10px]
       `}>
               {activityItems.map((item) => (
                 <li
                   className={(`activity-item activity-item--${item.itemType}${item.failed ? " has-failures" : ""}`) + `
-        [&.activity-item--component_.activity-timeline-dot]:[border-color:#d4b2ff]
+        [&.activity-item--component_.activity-timeline-dot]:border-[#d4b2ff]
         [&.activity-item--component_.activity-timeline-dot]:[background:#9e63ee]
         [&.activity-item--component_.activity-timeline-dot]:[box-shadow:0_0_9px_#a15bff99]
-        [&.activity-item--widget_.activity-timeline-dot]:[border-color:#a7efff]
+        [&.activity-item--widget_.activity-timeline-dot]:border-[#a7efff]
         [&.activity-item--widget_.activity-timeline-dot]:[background:#45c7e8]
         [&.activity-item--widget_.activity-timeline-dot]:[box-shadow:0_0_9px_#45c7e899]
-        [&.has-failures_.activity-timeline-dot]:[border-color:#ffc0c7]
+        [&.has-failures_.activity-timeline-dot]:border-[#ffc0c7]
         [&.has-failures_.activity-timeline-dot]:[background:#ed6176]
         [&.has-failures_.activity-timeline-dot]:[box-shadow:0_0_9px_#ed617699]
-        [&.activity-item--component_.activity-marker]:[border-color:#7248a655]
-        [&.activity-item--component_.activity-marker]:[color:#c195ff]
-        [&.activity-item--component_.activity-marker]:[background:linear-gradient(145deg,_#a45af52c,_#7136c21c)]
-        [&.activity-item--widget_.activity-marker]:[border-color:#45c7e855]
-        [&.activity-item--widget_.activity-marker]:[color:#83e7fb]
-        [&.activity-item--widget_.activity-marker]:[background:linear-gradient(145deg,_#45c7e82c,_#2284a51c)]
-        [&.has-failures_.activity-marker]:[border-color:#9c405055]
-        [&.has-failures_.activity-marker]:[color:#ff899a]
-        [&.has-failures_.activity-marker]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
+        [&.activity-item--component_.activity-marker]:border-[#7248a655]
+        [&.activity-item--component_.activity-marker]:text-[#c195ff]
+        [&.activity-item--component_.activity-marker]:[background:linear-gradient(145deg,#a45af52c,#7136c21c)]
+        [&.activity-item--widget_.activity-marker]:border-[#45c7e855]
+        [&.activity-item--widget_.activity-marker]:text-[#83e7fb]
+        [&.activity-item--widget_.activity-marker]:[background:linear-gradient(145deg,#45c7e82c,#2284a51c)]
+        [&.has-failures_.activity-marker]:border-[#9c405055]
+        [&.has-failures_.activity-marker]:text-[#ff899a]
+        [&.has-failures_.activity-marker]:[background:linear-gradient(145deg,#d64d6937,#81233324)]
       `}
                   key={item.key}
                 >
                   <span className={`activity-timeline-dot
         relative
-        [z-index:1]
-        [width:8px]
-        [height:8px]
+        z-1
+        size-[8px]
+        
         [border:1px_solid_#a6ffd4]
-        [border-radius:50%]
+        rounded-[50%]
         [background:#3dc990]
         [box-shadow:0_0_9px_#37d99599]
       `} />
@@ -1552,21 +1552,21 @@ export function OverviewPage() {
                     {activityTime(item.completedAt)}
                   </time>
                   <span className={`activity-marker
-        [width:34px]
-        [height:34px]
+        size-[34px]
+        
         grid
-        [place-items:center]
+        place-items-center
         [border:1px_solid_#31845e55]
-        [border-radius:10px]
-        [color:#65e2ad]
-        [background:linear-gradient(145deg,_#49d89c29,_#2483581c)]
-        [&.activity-marker--failed]:[border-color:#9c405055]
-        [&.activity-marker--failed]:[color:#ff899a]
-        [&.activity-marker--failed]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
-        [@media(max-width:1120px)]:[width:30px]
-        [@media(max-width:1120px)]:[height:30px]
-        [@media(max-width:580px)]:[width:28px]
-        [@media(max-width:580px)]:[height:28px]
+        rounded-[10px]
+        text-[#65e2ad]
+        [background:linear-gradient(145deg,#49d89c29,#2483581c)]
+        [&.activity-marker--failed]:border-[#9c405055]
+        [&.activity-marker--failed]:text-[#ff899a]
+        [&.activity-marker--failed]:[background:linear-gradient(145deg,#d64d6937,#81233324)]
+        [@media(max-width:1120px)]:size-[30px]
+        
+        [@media(max-width:580px)]:size-[28px]
+        
       `}>
                     <Icon
                       name={
@@ -1594,83 +1594,83 @@ export function OverviewPage() {
             </ol>
           ) : (
             <div className={`activity-empty
-        [min-height:200px]
+        min-h-[200px]
         flex
         flex-col
         items-center
         justify-center
-        [padding:20px]
-        [text-align:center]
-        [&_.activity-marker]:[width:36px]
-        [&_.activity-marker]:[height:36px]
-        [&>strong]:[font-size:13px]
-        [&>strong]:[font-weight:640]
-        [&>p]:[max-width:280px]
-        [&>p]:[margin:6px_0_0]
-        [&>p]:[color:#8e90a2]
-        [&>p]:[font-size:12px]
-        [&>p]:[line-height:1.55]
+        p-[20px]
+        text-center
+        [&_.activity-marker]:size-[36px]
+        
+        [&>strong]:text-[13px]
+        [&>strong]:font-[640]
+        [&>p]:max-w-[280px]
+        [&>p]:m-[6px_0_0]
+        [&>p]:text-[#8e90a2]
+        [&>p]:text-[12px]
+        [&>p]:leading-[1.55]
       `}>
-              <div className={"activity-empty-icons flex [gap:10px] [margin-bottom:14px]"}>
+              <div className={"activity-empty-icons flex gap-[10px] mb-[14px]"}>
                 <span className={`activity-marker
         activity-marker--passed
-        [width:34px]
-        [height:34px]
+        size-[34px]
+        
         grid
-        [place-items:center]
+        place-items-center
         [border:1px_solid_#31845e55]
-        [border-radius:10px]
-        [color:#65e2ad]
-        [background:linear-gradient(145deg,_#49d89c29,_#2483581c)]
-        [&.activity-marker--failed]:[border-color:#9c405055]
-        [&.activity-marker--failed]:[color:#ff899a]
-        [&.activity-marker--failed]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
-        [@media(max-width:1120px)]:[width:30px]
-        [@media(max-width:1120px)]:[height:30px]
-        [@media(max-width:580px)]:[width:28px]
-        [@media(max-width:580px)]:[height:28px]
+        rounded-[10px]
+        text-[#65e2ad]
+        [background:linear-gradient(145deg,#49d89c29,#2483581c)]
+        [&.activity-marker--failed]:border-[#9c405055]
+        [&.activity-marker--failed]:text-[#ff899a]
+        [&.activity-marker--failed]:[background:linear-gradient(145deg,#d64d6937,#81233324)]
+        [@media(max-width:1120px)]:size-[30px]
+        
+        [@media(max-width:580px)]:size-[28px]
+        
       `}>
                   <Icon name="check" size={14} />
                 </span>
                 <span
                   className={`activity-marker
         activity-marker--component
-        [width:34px]
-        [height:34px]
+        size-[34px]
+        
         grid
-        [place-items:center]
+        place-items-center
         [border:1px_solid_#31845e55]
-        [border-radius:10px]
-        [color:#65e2ad]
-        [background:linear-gradient(145deg,_#49d89c29,_#2483581c)]
-        [&.activity-marker--failed]:[border-color:#9c405055]
-        [&.activity-marker--failed]:[color:#ff899a]
-        [&.activity-marker--failed]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
-        [@media(max-width:1120px)]:[width:30px]
-        [@media(max-width:1120px)]:[height:30px]
-        [@media(max-width:580px)]:[width:28px]
-        [@media(max-width:580px)]:[height:28px]
+        rounded-[10px]
+        text-[#65e2ad]
+        [background:linear-gradient(145deg,#49d89c29,#2483581c)]
+        [&.activity-marker--failed]:border-[#9c405055]
+        [&.activity-marker--failed]:text-[#ff899a]
+        [&.activity-marker--failed]:[background:linear-gradient(145deg,#d64d6937,#81233324)]
+        [@media(max-width:1120px)]:size-[30px]
+        
+        [@media(max-width:580px)]:size-[28px]
+        
       `}
                 >
                   <Icon name="components" size={14} />
                 </span>
                 <span className={`activity-marker
         activity-marker--failed
-        [width:34px]
-        [height:34px]
+        size-[34px]
+        
         grid
-        [place-items:center]
+        place-items-center
         [border:1px_solid_#31845e55]
-        [border-radius:10px]
-        [color:#65e2ad]
-        [background:linear-gradient(145deg,_#49d89c29,_#2483581c)]
-        [&.activity-marker--failed]:[border-color:#9c405055]
-        [&.activity-marker--failed]:[color:#ff899a]
-        [&.activity-marker--failed]:[background:linear-gradient(145deg,_#d64d6937,_#81233324)]
-        [@media(max-width:1120px)]:[width:30px]
-        [@media(max-width:1120px)]:[height:30px]
-        [@media(max-width:580px)]:[width:28px]
-        [@media(max-width:580px)]:[height:28px]
+        rounded-[10px]
+        text-[#65e2ad]
+        [background:linear-gradient(145deg,#49d89c29,#2483581c)]
+        [&.activity-marker--failed]:border-[#9c405055]
+        [&.activity-marker--failed]:text-[#ff899a]
+        [&.activity-marker--failed]:[background:linear-gradient(145deg,#d64d6937,#81233324)]
+        [@media(max-width:1120px)]:size-[30px]
+        
+        [@media(max-width:580px)]:size-[28px]
+        
       `}>
                   <Icon name="activity" size={14} />
                 </span>
@@ -1714,7 +1714,7 @@ export function ComponentsPage() {
   );
 
   return (
-    <div className={"component-library-page page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
+    <div className={"component-library-page page-stack flex flex-col gap-[28px] [@media(max-width:580px)]:gap-[20px]"}>
       <PageTitle
         eyebrow="LIBRARY / COMPONENTS"
         title="Components"
@@ -1722,61 +1722,61 @@ export function ComponentsPage() {
         action={
           <Link className={`button
         button-primary
-        [min-height:38px]
+        min-h-[38px]
         inline-flex
         items-center
         justify-center
-        [gap:8px]
-        [padding:0_16px]
+        gap-[8px]
+        p-[0_16px]
         [border:1px_solid_transparent]
-        [border-radius:9px]
-        [font-size:12.5px]
-        [font-weight:600]
-        [line-height:1]
-        [white-space:nowrap]
-        [cursor:pointer]
-        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
-        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
-        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
-        [&:disabled]:[cursor:not-allowed]
-        [&:disabled]:[opacity:0.52]
-        [&.button-primary]:[border-color:#8747d8]
-        [&.button-primary]:[color:white]
-        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        rounded-[9px]
+        text-[12.5px]
+        font-semibold
+        leading-none
+        whitespace-nowrap
+        cursor-pointer
+        [transition:filter_0.16s,transform_0.16s,background_0.16s,border-color_0.16s,box-shadow_0.16s]
+        [&:hover:not(:disabled)]:filter-[brightness(1.1)]
+        [&:hover:not(:disabled)]:transform-[translateY(-1px)]
+        disabled:cursor-not-allowed
+        disabled:opacity-[0.52]
+        [&.button-primary]:border-[#8747d8]
+        [&.button-primary]:text-[white]
+        [&.button-primary]:[background:linear-gradient(115deg,#7938cf,#5731a1)]
         [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
-        [&.button-quiet]:[border-color:#30313f]
-        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:border-[#30313f]
+        [&.button-quiet]:text-[#dad9e7]
         [&.button-quiet]:[background:#171821cc]
-        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:border-[#5a4773]
         [&.button-quiet:hover]:[background:#20202e]
       `} href="/playground">
             <Icon name="play" size={15} /> Open playground
           </Link>
         }
       />
-      <div className={"catalog-toolbar flex items-center [gap:12px] [@media(max-width:580px)]:flex-wrap"}>
+      <div className={"catalog-toolbar flex items-center gap-[12px] [@media(max-width:580px)]:flex-wrap"}>
         <label className={`catalog-search
-        [height:42px]
+        h-[42px]
         flex
         items-center
-        [gap:10px]
-        [padding:0_14px]
+        gap-[10px]
+        p-[0_14px]
         [border:1px_solid_#292a38]
-        [border-radius:10px]
-        [color:#9da0b5]
+        rounded-[10px]
+        text-[#9da0b5]
         [background:#111219]
-        [width:min(440px,_55%)]
-        [transition:border-color_0.15s,_box-shadow_0.15s]
-        [&_input]:[width:100%]
+        w-[min(440px,55%)]
+        [transition:border-color_0.15s,box-shadow_0.15s]
+        [&_input]:w-full
         [&_input]:[border:0]
         [&_input]:[outline:0]
-        [&_input]:[color:var(--foreground)]
+        [&_input]:text-(--foreground)
         [&_input]:[background:transparent]
-        [&_input]:[font-size:12.5px]
-        [&_input::placeholder]:[color:#7b7d90]
-        [&:focus-within]:[border-color:#8e56de]
-        [&:focus-within]:[box-shadow:0_0_0_3px_#9d5cff15]
-        [@media(max-width:580px)]:[width:100%]
+        [&_input]:text-[12.5px]
+        [&_input::placeholder]:text-[#7b7d90]
+        focus-within:border-[#8e56de]
+        focus-within:[box-shadow:0_0_0_3px_#9d5cff15]
+        [@media(max-width:580px)]:w-full
       `}>
           <Icon name="search" size={18} />
           <input
@@ -1788,25 +1788,25 @@ export function ComponentsPage() {
           <kbd>⌘ K</kbd>
         </label>
         <div className={`category-select
-        [height:42px]
+        h-[42px]
         flex
         items-center
-        [gap:8px]
-        [padding:0_10px]
+        gap-[8px]
+        p-[0_10px]
         [border:1px_solid_#2f303f]
-        [border-radius:10px]
-        [color:#9fa0b4]
+        rounded-[10px]
+        text-[#9fa0b4]
         [background:#12131b]
-        [min-width:190px]
-        [&>svg]:[flex:0_0_auto]
-        [&_.dropdown]:[flex:1]
-        [&_.dropdown]:[width:auto]
-        [&_.dropdown-trigger]:[min-height:38px]
-        [&_.dropdown-trigger]:[padding-inline:4px]
+        min-w-[190px]
+        [&>svg]:flex-[0_0_auto]
+        [&_.dropdown]:flex-1
+        [&_.dropdown]:w-auto
+        [&_.dropdown-trigger]:min-h-[38px]
+        [&_.dropdown-trigger]:px-[4px]
         [&_.dropdown-trigger]:[border:0]
         [&_.dropdown-trigger]:[background:transparent]
         [@media(max-width:580px)]:min-w-0
-        [@media(max-width:580px)]:[flex:1]
+        [@media(max-width:580px)]:flex-1
       `}>
           <Icon name="filter" size={17} />
           <Dropdown
@@ -1816,42 +1816,42 @@ export function ComponentsPage() {
             options={categories.map((item) => ({ label: item, value: item }))}
           />
         </div>
-        <span className={"catalog-count [margin-left:auto] [color:#9293a5] [font-size:12px] [font-weight:550] [@media(max-width:580px)]:[margin-left:auto]"}>
+        <span className={"catalog-count ml-auto text-[#9293a5] text-[12px] font-[550] [@media(max-width:580px)]:ml-auto"}>
           {filtered.length} {filtered.length === 1 ? "component" : "components"}
         </span>
       </div>
       {Object.keys(grouped).length ? (
         Object.entries(grouped).map(([group, items]) => (
-          <section className={"catalog-group flex flex-col [gap:16px]"} key={group}>
+          <section className={"catalog-group flex flex-col gap-[16px]"} key={group}>
             <div className={`catalog-group-heading
         flex
         items-center
-        [gap:10px]
-        [padding-bottom:12px]
+        gap-[10px]
+        pb-[12px]
         [border-bottom:1px_solid_#232431]
-        [&_h2]:[margin:0]
-        [&_h2]:[font-size:16px]
-        [&_h2]:[font-weight:650]
-        [&_h2]:[letter-spacing:-0.01em]
+        [&_h2]:m-0
+        [&_h2]:text-[16px]
+        [&_h2]:font-[650]
+        [&_h2]:tracking-[-0.01em]
         [&_span]:inline-flex
         [&_span]:items-center
-        [&_span]:[padding:2px_8px]
-        [&_span]:[border-radius:6px]
+        [&_span]:p-[2px_8px]
+        [&_span]:rounded-[6px]
         [&_span]:[background:#181924]
         [&_span]:[border:1px_solid_#262736]
-        [&_span]:[color:#a5a6b8]
-        [&_span]:[font:11px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
-        [&_span]:[font-weight:600]
+        [&_span]:text-[#a5a6b8]
+        [&_span]:[font:11px_ui-monospace,SFMono-Regular,Menlo,monospace]
+        [&_span]:font-semibold
       `}>
               <h2>{group}</h2>
               <span>{String(items.length).padStart(2, "0")}</span>
             </div>
             <div className={`component-grid
         grid
-        [grid-template-columns:repeat(auto-fill,_minmax(360px,_1fr))]
-        [gap:20px]
-        [@media(max-width:1120px)]:[grid-template-columns:repeat(2,_minmax(0,_1fr))]
-        [@media(max-width:580px)]:[grid-template-columns:1fr]
+        grid-cols-[repeat(auto-fill,minmax(360px,1fr))]
+        gap-[20px]
+        [@media(max-width:1120px)]:grid-cols-2
+        [@media(max-width:580px)]:grid-cols-[1fr]
       `}>
               {items.map((component) => (
                 <ComponentCard component={component} key={component.slug} />
@@ -1863,8 +1863,8 @@ export function ComponentsPage() {
         <section className={`panel
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#151620,_#101117)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#151620,#101117)]
         [box-shadow:0_8px_24px_#0004]
       `}>
           <EmptyState
@@ -1875,32 +1875,32 @@ export function ComponentsPage() {
               <button
                 className={`button
         button-quiet
-        [min-height:38px]
+        min-h-[38px]
         inline-flex
         items-center
         justify-center
-        [gap:8px]
-        [padding:0_16px]
+        gap-[8px]
+        p-[0_16px]
         [border:1px_solid_transparent]
-        [border-radius:9px]
-        [font-size:12.5px]
-        [font-weight:600]
-        [line-height:1]
-        [white-space:nowrap]
-        [cursor:pointer]
-        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
-        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
-        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
-        [&:disabled]:[cursor:not-allowed]
-        [&:disabled]:[opacity:0.52]
-        [&.button-primary]:[border-color:#8747d8]
-        [&.button-primary]:[color:white]
-        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        rounded-[9px]
+        text-[12.5px]
+        font-semibold
+        leading-none
+        whitespace-nowrap
+        cursor-pointer
+        [transition:filter_0.16s,transform_0.16s,background_0.16s,border-color_0.16s,box-shadow_0.16s]
+        [&:hover:not(:disabled)]:filter-[brightness(1.1)]
+        [&:hover:not(:disabled)]:transform-[translateY(-1px)]
+        disabled:cursor-not-allowed
+        disabled:opacity-[0.52]
+        [&.button-primary]:border-[#8747d8]
+        [&.button-primary]:text-[white]
+        [&.button-primary]:[background:linear-gradient(115deg,#7938cf,#5731a1)]
         [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
-        [&.button-quiet]:[border-color:#30313f]
-        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:border-[#30313f]
+        [&.button-quiet]:text-[#dad9e7]
         [&.button-quiet]:[background:#171821cc]
-        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:border-[#5a4773]
         [&.button-quiet:hover]:[background:#20202e]
       `}
                 type="button"
@@ -1932,7 +1932,7 @@ export function ComponentDetailPage({ slug }: { slug: string }) {
 
 export function WidgetsPage() {
   return (
-    <div className={"widget-library-page page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
+    <div className={"widget-library-page page-stack flex flex-col gap-[28px] [@media(max-width:580px)]:gap-[20px]"}>
       <PageTitle
         eyebrow="LIBRARY / WIDGETS"
         title="Widgets"
@@ -1940,32 +1940,32 @@ export function WidgetsPage() {
         action={
           <Link className={`button
         button-quiet
-        [min-height:38px]
+        min-h-[38px]
         inline-flex
         items-center
         justify-center
-        [gap:8px]
-        [padding:0_16px]
+        gap-[8px]
+        p-[0_16px]
         [border:1px_solid_transparent]
-        [border-radius:9px]
-        [font-size:12.5px]
-        [font-weight:600]
-        [line-height:1]
-        [white-space:nowrap]
-        [cursor:pointer]
-        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
-        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
-        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
-        [&:disabled]:[cursor:not-allowed]
-        [&:disabled]:[opacity:0.52]
-        [&.button-primary]:[border-color:#8747d8]
-        [&.button-primary]:[color:white]
-        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        rounded-[9px]
+        text-[12.5px]
+        font-semibold
+        leading-none
+        whitespace-nowrap
+        cursor-pointer
+        [transition:filter_0.16s,transform_0.16s,background_0.16s,border-color_0.16s,box-shadow_0.16s]
+        [&:hover:not(:disabled)]:filter-[brightness(1.1)]
+        [&:hover:not(:disabled)]:transform-[translateY(-1px)]
+        disabled:cursor-not-allowed
+        disabled:opacity-[0.52]
+        [&.button-primary]:border-[#8747d8]
+        [&.button-primary]:text-[white]
+        [&.button-primary]:[background:linear-gradient(115deg,#7938cf,#5731a1)]
         [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
-        [&.button-quiet]:[border-color:#30313f]
-        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:border-[#30313f]
+        [&.button-quiet]:text-[#dad9e7]
         [&.button-quiet]:[background:#171821cc]
-        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:border-[#5a4773]
         [&.button-quiet:hover]:[background:#20202e]
       `} href="/notes">
             <Icon name="plus" size={16} /> Propose a widget
@@ -1975,9 +1975,9 @@ export function WidgetsPage() {
       {widgets.length ? (
         <div className={`widget-catalog-grid
         grid
-        [grid-template-columns:repeat(auto-fill,_minmax(440px,_1fr))]
-        [gap:24px]
-        [@media(max-width:580px)]:[grid-template-columns:1fr]
+        grid-cols-[repeat(auto-fill,minmax(440px,1fr))]
+        gap-[24px]
+        [@media(max-width:580px)]:grid-cols-[1fr]
       `}>
           {widgets.map((widget) => (
             <Link
@@ -1985,29 +1985,29 @@ export function WidgetsPage() {
         widget-card
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
+        rounded-[14px]
         [background:linear-gradient(145deg,_#151620,_#101117)]
         [box-shadow:0_8px_24px_#0004]
         overflow-hidden
         [border:1px_solid_#2b283b]
-        [background:linear-gradient(160deg,_#161722,_#101117_80%)]
+        [background:linear-gradient(160deg,#161722,#101117_80%)]
         [box-shadow:0_12px_30px_#0004]
-        [transition:all_0.2s_cubic-bezier(0.2,_0.8,_0.2,_1)]
-        [&:hover]:[transform:translateY(-3px)]
-        [&:hover]:[border-color:#8b55d8]
-        [&:hover]:[box-shadow:0_18px_40px_#0006,_0_0_24px_#9d5cff18]
+        [transition:all_0.2s_cubic-bezier(0.2,0.8,0.2,1)]
+        [&:hover]:transform-[translateY(-3px)]
+        [&:hover]:border-[#8b55d8]
+        [&:hover]:[box-shadow:0_18px_40px_#0006,0_0_24px_#9d5cff18]
       `}
               href={`/playground?item=${widget.slug}`}
               key={widget.slug}
             >
               <div className={`widget-card__preview
-        [min-height:260px]
+        min-h-[260px]
         grid
-        [place-items:center]
-        [padding:24px]
+        place-items-center
+        p-[24px]
         [border-bottom:1px_solid_#232431]
-        [color:#c084fc]
-        [background:radial-gradient(ellipse_at_center,_#6b35b822,_transparent_65%),_repeating-linear-gradient(0deg,_transparent_0,_transparent_27px,_#ffffff05_28px),_repeating-linear-gradient(90deg,_transparent_0,_transparent_27px,_#ffffff05_28px),_#111218]
+        text-[#c084fc]
+        [background:radial-gradient(ellipse_at_center,#6b35b822,transparent_65%),repeating-linear-gradient(0deg,transparent_0,transparent_27px,#ffffff05_28px),repeating-linear-gradient(90deg,transparent_0,transparent_27px,#ffffff05_28px),#111218]
       `}>
                 {widget.slug === "mascot" ? (
                   <WidgetMascotPreview />
@@ -2016,36 +2016,36 @@ export function WidgetsPage() {
                 )}
               </div>
               <div className={`widget-card__body
-        [padding:22px_24px_24px]
+        p-[22px_24px_24px]
         [&>div]:flex
         [&>div]:items-center
         [&>div]:justify-between
-        [&>div]:[gap:10px]
-        [&_h2]:[margin:0]
-        [&_h2]:[font-size:18px]
-        [&_h2]:[font-weight:700]
-        [&_h2]:[letter-spacing:-0.015em]
+        [&>div]:gap-[10px]
+        [&_h2]:m-0
+        [&_h2]:text-[18px]
+        [&_h2]:font-bold
+        [&_h2]:tracking-[-0.015em]
         [&>span]:block
-        [&>span]:[margin-top:4px]
-        [&>span]:[color:#9293a5]
-        [&>span]:[font-size:11px]
-        [&>span]:[font-weight:600]
-        [&>span]:[text-transform:uppercase]
-        [&>span]:[letter-spacing:0.08em]
-        [&_p]:[min-height:44px]
-        [&_p]:[margin:12px_0_18px]
-        [&_p]:[color:#9da0b3]
-        [&_p]:[font-size:13.5px]
-        [&_p]:[line-height:1.6]
+        [&>span]:mt-[4px]
+        [&>span]:text-[#9293a5]
+        [&>span]:text-[11px]
+        [&>span]:font-semibold
+        [&>span]:uppercase
+        [&>span]:tracking-[0.08em]
+        [&_p]:min-h-[44px]
+        [&_p]:m-[12px_0_18px]
+        [&_p]:text-[#9da0b3]
+        [&_p]:text-[13.5px]
+        [&_p]:leading-[1.6]
         [&_code]:inline-flex
         [&_code]:items-center
-        [&_code]:[gap:6px]
-        [&_code]:[padding:5px_10px]
-        [&_code]:[border-radius:7px]
+        [&_code]:gap-[6px]
+        [&_code]:p-[5px_10px]
+        [&_code]:rounded-[7px]
         [&_code]:[background:#0c0d13]
         [&_code]:[border:1px_solid_#242533]
-        [&_code]:[color:#c49aff]
-        [&_code]:[font:11px/1.4_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+        [&_code]:text-[#c49aff]
+        [&_code]:[font:11px/1.4_ui-monospace,SFMono-Regular,Menlo,monospace]
       `}>
                 <div>
                   <h2>{widget.name}</h2>
@@ -2068,48 +2068,48 @@ export function WidgetsPage() {
         widget-empty-panel
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#151620,_#101117)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#151620,#101117)]
         [box-shadow:0_8px_24px_#0004]
         relative
-        [min-height:360px]
+        min-h-[360px]
         grid
-        [place-items:center]
+        place-items-center
         overflow-hidden
         [&_.empty-state]:relative
-        [&_.empty-state]:[z-index:1]
-        [&_.empty-state>p]:[max-width:440px]
-        [@media(max-width:580px)]:[min-height:300px]
+        [&_.empty-state]:z-1
+        [&_.empty-state>p]:max-w-[440px]
+        [@media(max-width:580px)]:min-h-[300px]
       `}>
           <div className={`widget-orbit
         absolute
-        [inset:0]
+        inset-0
         grid
-        [place-items:center]
-        [color:#8142d2]
-        [opacity:0.14]
+        place-items-center
+        text-[#8142d2]
+        opacity-[0.14]
         [&::before]:[content:""]
         [&::before]:absolute
-        [&::before]:[width:250px]
-        [&::before]:[height:120px]
+        [&::before]:w-[250px]
+        [&::before]:h-[120px]
         [&::before]:[border:1px_solid_#934df9]
-        [&::before]:[border-radius:50%]
-        [&::before]:[transform:rotate(-25deg)]
+        [&::before]:rounded-[50%]
+        [&::before]:transform-[rotate(-25deg)]
         [&::after]:[content:""]
         [&::after]:absolute
-        [&::after]:[width:340px]
-        [&::after]:[height:175px]
+        [&::after]:w-[340px]
+        [&::after]:h-[175px]
         [&::after]:[border:1px_solid_#934df9]
-        [&::after]:[border-radius:50%]
-        [&::after]:[transform:rotate(32deg)]
+        [&::after]:rounded-[50%]
+        [&::after]:transform-[rotate(32deg)]
         [&>span]:absolute
-        [&>span]:[width:6px]
-        [&>span]:[height:6px]
-        [&>span]:[border-radius:50%]
+        [&>span]:size-[6px]
+        
+        [&>span]:rounded-[50%]
         [&>span]:[background:#38d7d0]
         [&>span]:[box-shadow:0_0_12px_#38d7d0]
-        [&>span:first-child]:[transform:translate(135px,_-48px)]
-        [&>span:nth-child(2)]:[transform:translate(-105px,_64px)]
+        [&>span:first-child]:transform-[translate(135px,-48px)]
+        [&>span:nth-child(2)]:transform-[translate(-105px,64px)]
       `} aria-hidden="true">
             <span />
             <span />
@@ -2122,32 +2122,32 @@ export function WidgetsPage() {
             action={
               <Link href="/notes" className={`button
         button-primary
-        [min-height:38px]
+        min-h-[38px]
         inline-flex
         items-center
         justify-center
-        [gap:8px]
-        [padding:0_16px]
+        gap-[8px]
+        p-[0_16px]
         [border:1px_solid_transparent]
-        [border-radius:9px]
-        [font-size:12.5px]
-        [font-weight:600]
-        [line-height:1]
-        [white-space:nowrap]
-        [cursor:pointer]
-        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
-        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
-        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
-        [&:disabled]:[cursor:not-allowed]
-        [&:disabled]:[opacity:0.52]
-        [&.button-primary]:[border-color:#8747d8]
-        [&.button-primary]:[color:white]
-        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        rounded-[9px]
+        text-[12.5px]
+        font-semibold
+        leading-none
+        whitespace-nowrap
+        cursor-pointer
+        [transition:filter_0.16s,transform_0.16s,background_0.16s,border-color_0.16s,box-shadow_0.16s]
+        [&:hover:not(:disabled)]:filter-[brightness(1.1)]
+        [&:hover:not(:disabled)]:transform-[translateY(-1px)]
+        disabled:cursor-not-allowed
+        disabled:opacity-[0.52]
+        [&.button-primary]:border-[#8747d8]
+        [&.button-primary]:text-[white]
+        [&.button-primary]:[background:linear-gradient(115deg,#7938cf,#5731a1)]
         [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
-        [&.button-quiet]:[border-color:#30313f]
-        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:border-[#30313f]
+        [&.button-quiet]:text-[#dad9e7]
         [&.button-quiet]:[background:#171821cc]
-        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:border-[#5a4773]
         [&.button-quiet:hover]:[background:#20202e]
       `}>
                 Capture an idea <Icon name="arrow-right" size={15} />
@@ -2159,27 +2159,27 @@ export function WidgetsPage() {
       <div className={`widget-notes
         flex
         items-center
-        [gap:14px]
-        [padding:18px_22px]
+        gap-[14px]
+        p-[18px_22px]
         [border:1px_solid_#262736]
-        [border-radius:12px]
-        [background:linear-gradient(145deg,_#14151e,_#111217)]
-        [&>span]:[width:38px]
-        [&>span]:[height:38px]
-        [&>span]:[flex:0_0_auto]
+        rounded-[12px]
+        [background:linear-gradient(145deg,#14151e,#111217)]
+        [&>span]:size-[38px]
+        
+        [&>span]:flex-[0_0_auto]
         [&>span]:grid
-        [&>span]:[place-items:center]
-        [&>span]:[border-radius:10px]
+        [&>span]:place-items-center
+        [&>span]:rounded-[10px]
         [&>span]:[background:#9d5cff18]
         [&>span]:[border:1px_solid_#7545a944]
-        [&>span]:[color:#c084fc]
-        [&_p]:[margin:0]
-        [&_p]:[color:#9da0b3]
-        [&_p]:[font-size:13px]
-        [&_p]:[line-height:1.6]
-        [&_strong]:[color:#edeaf5]
-        [&_strong]:[font-weight:600]
-        [&_strong]:[margin-right:4px]
+        [&>span]:text-[#c084fc]
+        [&_p]:m-0
+        [&_p]:text-[#9da0b3]
+        [&_p]:text-[13px]
+        [&_p]:leading-[1.6]
+        [&_strong]:text-[#edeaf5]
+        [&_strong]:font-semibold
+        [&_strong]:mr-[4px]
       `}>
         <span>
           <Icon name="sparkles" size={16} />
@@ -2257,7 +2257,7 @@ export function NotesPage() {
   }
 
   return (
-    <div className={"page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
+    <div className={"page-stack flex flex-col gap-[28px] [@media(max-width:580px)]:gap-[20px]"}>
       <PageTitle
         eyebrow="WORKSPACE / NOTES"
         title="Notes"
@@ -2265,45 +2265,45 @@ export function NotesPage() {
       />
       <div className={`notes-layout
         grid
-        [grid-template-columns:minmax(340px,_400px)_minmax(0,_1fr)]
+        grid-cols-[minmax(340px,400px)_minmax(0,1fr)]
         [align-items:start]
-        [gap:24px]
-        [@media(max-width:820px)]:[grid-template-columns:1fr]
+        gap-[24px]
+        [@media(max-width:820px)]:grid-cols-[1fr]
       `}>
         <form className={`panel
         note-editor
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
+        rounded-[14px]
         [background:linear-gradient(145deg,_#1b1c20,_#111216)]
         [box-shadow:0_8px_24px_#0004]
-        [padding:22px_24px]
+        p-[22px_24px]
         [border:1px_solid_#272837]
-        [background:linear-gradient(150deg,_#1b1c20,_#111216)]
+        [background:linear-gradient(150deg,#1b1c20,#111216)]
       `} onSubmit={addNote}>
           <div className={`note-editor-heading
         flex
         items-center
-        [gap:12px]
-        [padding-bottom:16px]
+        gap-[12px]
+        pb-[16px]
         [border-bottom:1px_solid_#262736]
-        [margin-bottom:8px]
+        mb-[8px]
         [&>div]:flex
         [&>div]:flex-col
-        [&>div]:[gap:2px]
-        [&_strong]:[font-size:14px]
-        [&_strong]:[font-weight:650]
-        [&_small]:[color:#8a8b9e]
-        [&_small]:[font-size:11.5px]
+        [&>div]:gap-[2px]
+        [&_strong]:text-[14px]
+        [&_strong]:font-[650]
+        [&_small]:text-[#8a8b9e]
+        [&_small]:text-[11.5px]
       `}>
             <span className={`note-editor-icon
-        [width:36px]
-        [height:36px]
+        size-[36px]
+        
         grid
-        [place-items:center]
+        place-items-center
         [border:1px_solid_#6f42a6]
-        [border-radius:9px]
-        [color:#c084fc]
+        rounded-[9px]
+        text-[#c084fc]
         [background:#8e4bd520]
       `}>
               <Icon name="notes" size={17} />
@@ -2316,25 +2316,25 @@ export function NotesPage() {
           <div className={`control-label
         flex
         flex-col
-        [gap:8px]
-        [margin-top:16px]
-        [color:#cfd0de]
-        [font-size:12px]
-        [font-weight:600]
-        [&_.dropdown]:[width:100%]
-        [&_textarea]:[resize:vertical]
-        [&_textarea]:[min-height:120px]
-        [&_textarea]:[max-height:240px]
-        [&_textarea]:[overflow-y:auto]
-        [&_textarea]:[padding:12px]
+        gap-[8px]
+        mt-[16px]
+        text-[#cfd0de]
+        text-[12px]
+        font-semibold
+        [&_.dropdown]:w-full
+        [&_textarea]:resize-y
+        [&_textarea]:min-h-[120px]
+        [&_textarea]:max-h-[240px]
+        [&_textarea]:overflow-y-auto
+        [&_textarea]:p-[12px]
         [&_textarea]:[border:1px_solid_#343544]
-        [&_textarea]:[border-radius:8px]
-        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:rounded-[8px]
+        [&_textarea]:text-[#f2f1f8]
         [&_textarea]:[background:#111219]
-        [&_textarea]:[font-size:12.5px]
-        [&_textarea]:[line-height:1.6]
-        [&_textarea:focus-visible]:[border-color:#9865d2]
-        [&_textarea::placeholder]:[color:#7b7d90]
+        [&_textarea]:text-[12.5px]
+        [&_textarea]:leading-[1.6]
+        [&_textarea:focus-visible]:border-[#9865d2]
+        [&_textarea::placeholder]:text-[#7b7d90]
       `}>
             <span>Type</span>
             <Dropdown
@@ -2352,25 +2352,25 @@ export function NotesPage() {
           <label className={`control-label
         flex
         flex-col
-        [gap:8px]
-        [margin-top:16px]
-        [color:#cfd0de]
-        [font-size:12px]
-        [font-weight:600]
-        [&_.dropdown]:[width:100%]
-        [&_textarea]:[resize:vertical]
-        [&_textarea]:[min-height:120px]
-        [&_textarea]:[max-height:240px]
-        [&_textarea]:[overflow-y:auto]
-        [&_textarea]:[padding:12px]
+        gap-[8px]
+        mt-[16px]
+        text-[#cfd0de]
+        text-[12px]
+        font-semibold
+        [&_.dropdown]:w-full
+        [&_textarea]:resize-y
+        [&_textarea]:min-h-[120px]
+        [&_textarea]:max-h-[240px]
+        [&_textarea]:overflow-y-auto
+        [&_textarea]:p-[12px]
         [&_textarea]:[border:1px_solid_#343544]
-        [&_textarea]:[border-radius:8px]
-        [&_textarea]:[color:#f2f1f8]
+        [&_textarea]:rounded-[8px]
+        [&_textarea]:text-[#f2f1f8]
         [&_textarea]:[background:#111219]
-        [&_textarea]:[font-size:12.5px]
-        [&_textarea]:[line-height:1.6]
-        [&_textarea:focus-visible]:[border-color:#9865d2]
-        [&_textarea::placeholder]:[color:#7b7d90]
+        [&_textarea]:text-[12.5px]
+        [&_textarea]:leading-[1.6]
+        [&_textarea:focus-visible]:border-[#9865d2]
+        [&_textarea::placeholder]:text-[#7b7d90]
       `}>
             Note
             <textarea
@@ -2381,37 +2381,37 @@ export function NotesPage() {
               onChange={(event) => setText(event.target.value)}
             />
           </label>
-          <div className={"note-submit-row flex items-center justify-between [gap:10px] [margin-top:18px] [&>span]:[color:#8e90a2] [&>span]:[font-size:12px]"}>
+          <div className={"note-submit-row flex items-center justify-between gap-[10px] mt-[18px] [&>span]:text-[#8e90a2] [&>span]:text-[12px]"}>
             <span>{notes.length} saved locally</span>
             <button
               className={`button
         button-primary
-        [min-height:38px]
+        min-h-[38px]
         inline-flex
         items-center
         justify-center
-        [gap:8px]
-        [padding:0_16px]
+        gap-[8px]
+        p-[0_16px]
         [border:1px_solid_transparent]
-        [border-radius:9px]
-        [font-size:12.5px]
-        [font-weight:600]
-        [line-height:1]
-        [white-space:nowrap]
-        [cursor:pointer]
-        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
-        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
-        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
-        [&:disabled]:[cursor:not-allowed]
-        [&:disabled]:[opacity:0.52]
-        [&.button-primary]:[border-color:#8747d8]
-        [&.button-primary]:[color:white]
-        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        rounded-[9px]
+        text-[12.5px]
+        font-semibold
+        leading-none
+        whitespace-nowrap
+        cursor-pointer
+        [transition:filter_0.16s,transform_0.16s,background_0.16s,border-color_0.16s,box-shadow_0.16s]
+        [&:hover:not(:disabled)]:filter-[brightness(1.1)]
+        [&:hover:not(:disabled)]:transform-[translateY(-1px)]
+        disabled:cursor-not-allowed
+        disabled:opacity-[0.52]
+        [&.button-primary]:border-[#8747d8]
+        [&.button-primary]:text-[white]
+        [&.button-primary]:[background:linear-gradient(115deg,#7938cf,#5731a1)]
         [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
-        [&.button-quiet]:[border-color:#30313f]
-        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:border-[#30313f]
+        [&.button-quiet]:text-[#dad9e7]
         [&.button-quiet]:[background:#171821cc]
-        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:border-[#5a4773]
         [&.button-quiet:hover]:[background:#20202e]
       `}
               type="submit"
@@ -2425,14 +2425,14 @@ export function NotesPage() {
         notes-list-panel
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
+        rounded-[14px]
         [background:linear-gradient(145deg,_#1b1c20,_#111216)]
         [box-shadow:0_8px_24px_#0004]
-        [padding:22px]
+        p-[22px]
         [border:1px_solid_#272837]
-        [background:linear-gradient(150deg,_#1b1c20,_#111216)]
+        [background:linear-gradient(150deg,#1b1c20,#111216)]
       `}>
-          <div className={"notes-list-heading [margin-bottom:0]"}>
+          <div className={"notes-list-heading mb-0"}>
             <SectionTitle
               title="Your notes"
               detail="Saved in local browser storage"
@@ -2442,31 +2442,31 @@ export function NotesPage() {
             <ul className={`notes-list
         flex
         flex-col
-        [gap:14px]
-        [margin:16px_0_0]
-        [padding:0]
+        gap-[14px]
+        m-[16px_0_0]
+        p-0
         [list-style:none]
         [&_li]:relative
-        [&_li]:[padding:16px_46px_16px_18px]
+        [&_li]:p-[16px_46px_16px_18px]
         [&_li]:[border:1px_solid_#272837]
-        [&_li]:[border-radius:12px]
-        [&_li]:[background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        [&_li]:rounded-[12px]
+        [&_li]:[background:linear-gradient(145deg,#1b1c20,#111216)]
         [&_li]:[box-shadow:0_6px_18px_#0003]
-        [&_li]:[transition:border-color_0.16s,_transform_0.16s]
-        [&_li:hover]:[border-color:#6d42a8]
-        [&_li:hover]:[transform:translateY(-2px)]
+        [&_li]:[transition:border-color_0.16s,transform_0.16s]
+        [&_li:hover]:border-[#6d42a8]
+        [&_li:hover]:transform-[translateY(-2px)]
         [&_li>div]:flex
         [&_li>div]:items-center
         [&_li>div]:justify-between
-        [&_li>div]:[gap:10px]
-        [&_time]:[color:#808295]
-        [&_time]:[font-size:11.5px]
-        [&_p]:[margin:10px_0_0]
-        [&_p]:[color:#edeaf5]
-        [&_p]:[font-size:13.5px]
-        [&_p]:[line-height:1.65]
-        [&_p]:[white-space:pre-wrap]
-        [&_p]:[overflow-wrap:anywhere]
+        [&_li>div]:gap-[10px]
+        [&_time]:text-[#808295]
+        [&_time]:text-[11.5px]
+        [&_p]:m-[10px_0_0]
+        [&_p]:text-[#edeaf5]
+        [&_p]:text-[13.5px]
+        [&_p]:leading-[1.65]
+        [&_p]:whitespace-pre-wrap
+        [&_p]:wrap-anywhere
       `}>
               {notes.map((note) => (
                 <li key={note.id}>
@@ -2489,20 +2489,20 @@ export function NotesPage() {
                     type="button"
                     className={`note-delete
         absolute
-        [top:12px]
-        [right:12px]
-        [width:28px]
-        [height:28px]
+        top-[12px]
+        right-[12px]
+        size-[28px]
+        
         grid
-        [place-items:center]
+        place-items-center
         [border:1px_solid_transparent]
-        [border-radius:7px]
-        [color:#8e90a2]
+        rounded-[7px]
+        text-[#8e90a2]
         [background:transparent]
-        [cursor:pointer]
+        cursor-pointer
         [transition:all_0.15s]
-        [&:hover]:[border-color:#713647]
-        [&:hover]:[color:#ff8192]
+        [&:hover]:border-[#713647]
+        [&:hover]:text-[#ff8192]
         [&:hover]:[background:#551c2c]
       `}
                     onClick={() =>
@@ -2532,45 +2532,45 @@ export function NotesPage() {
 
 export function DocumentationPage() {
   return (
-    <div className={"page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
+    <div className={"page-stack flex flex-col gap-[28px] [@media(max-width:580px)]:gap-[20px]"}>
       <PageTitle
         eyebrow="LIBRARY / DOCUMENTATION"
         title="Library docs"
         description="How this workspace organizes, previews, and measures reusable UI pieces."
       />
-      <div className={"docs-grid grid [grid-template-columns:repeat(3,_minmax(0,_1fr))] [gap:16px] [@media(max-width:820px)]:[grid-template-columns:1fr]"}>
+      <div className={"docs-grid grid grid-cols-3 gap-[16px] [@media(max-width:820px)]:grid-cols-[1fr]"}>
         <section className={`panel
         docs-panel
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#1b1c20,#111216)]
         [box-shadow:0_8px_24px_#0004]
-        [min-height:190px]
-        [padding:20px]
-        [&_h2]:[margin:14px_0_6px]
-        [&_h2]:[font-size:15px]
-        [&>p]:[min-height:48px]
-        [&>p]:[margin:0_0_12px]
-        [&>p]:[color:#9da0b3]
-        [&>p]:[font-size:12.5px]
-        [&>p]:[line-height:1.6]
-        [&_code]:[color:#d3b2ff]
-        [&_code]:[font:11.5px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
-        [@media(max-width:580px)]:[min-height:0]
-        [@media(max-width:580px)]:[&>p]:[min-height:0]
+        min-h-[190px]
+        p-[20px]
+        [&_h2]:m-[14px_0_6px]
+        [&_h2]:text-[15px]
+        [&>p]:min-h-[48px]
+        [&>p]:m-[0_0_12px]
+        [&>p]:text-[#9da0b3]
+        [&>p]:text-[12.5px]
+        [&>p]:leading-[1.6]
+        [&_code]:text-[#d3b2ff]
+        [&_code]:[font:11.5px_ui-monospace,SFMono-Regular,Menlo,monospace]
+        [@media(max-width:580px)]:min-h-0
+        [@media(max-width:580px)]:[&>p]:min-h-0
       `}>
           <span className={`docs-icon
-        [width:36px]
-        [height:36px]
+        size-[36px]
+        
         grid
-        [place-items:center]
-        [border-radius:10px]
-        [color:#b883fb]
+        place-items-center
+        rounded-[10px]
+        text-[#b883fb]
         [background:#8748d51e]
-        [&.docs-icon--cyan]:[color:#47d8d0]
+        [&.docs-icon--cyan]:text-[#47d8d0]
         [&.docs-icon--cyan]:[background:#27b8b01a]
-        [&.docs-icon--green]:[color:#62dda6]
+        [&.docs-icon--green]:text-[#62dda6]
         [&.docs-icon--green]:[background:#33b9781a]
       `}>
             <Icon name="components" size={18} />
@@ -2584,13 +2584,13 @@ export function DocumentationPage() {
           <Link className={`text-link
         inline-flex
         items-center
-        [gap:6px]
-        [margin-top:1px]
-        [color:#c084fc]
-        [font-size:12px]
-        [font-weight:600]
-        [white-space:nowrap]
-        [&:hover]:[color:#d9b8ff]
+        gap-[6px]
+        mt-px
+        text-[#c084fc]
+        text-[12px]
+        font-semibold
+        whitespace-nowrap
+        [&:hover]:text-[#d9b8ff]
       `} href="/components">
             Browse components <Icon name="arrow-right" size={14} />
           </Link>
@@ -2599,35 +2599,35 @@ export function DocumentationPage() {
         docs-panel
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#1b1c20,#111216)]
         [box-shadow:0_8px_24px_#0004]
-        [min-height:190px]
-        [padding:20px]
-        [&_h2]:[margin:14px_0_6px]
-        [&_h2]:[font-size:15px]
-        [&>p]:[min-height:48px]
-        [&>p]:[margin:0_0_12px]
-        [&>p]:[color:#9da0b3]
-        [&>p]:[font-size:12.5px]
-        [&>p]:[line-height:1.6]
-        [&_code]:[color:#d3b2ff]
-        [&_code]:[font:11.5px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
-        [@media(max-width:580px)]:[min-height:0]
-        [@media(max-width:580px)]:[&>p]:[min-height:0]
+        min-h-[190px]
+        p-[20px]
+        [&_h2]:m-[14px_0_6px]
+        [&_h2]:text-[15px]
+        [&>p]:min-h-[48px]
+        [&>p]:m-[0_0_12px]
+        [&>p]:text-[#9da0b3]
+        [&>p]:text-[12.5px]
+        [&>p]:leading-[1.6]
+        [&_code]:text-[#d3b2ff]
+        [&_code]:[font:11.5px_ui-monospace,SFMono-Regular,Menlo,monospace]
+        [@media(max-width:580px)]:min-h-0
+        [@media(max-width:580px)]:[&>p]:min-h-0
       `}>
           <span className={`docs-icon
         docs-icon--cyan
-        [width:36px]
-        [height:36px]
+        size-[36px]
+        
         grid
-        [place-items:center]
-        [border-radius:10px]
-        [color:#b883fb]
+        place-items-center
+        rounded-[10px]
+        text-[#b883fb]
         [background:#8748d51e]
-        [&.docs-icon--cyan]:[color:#47d8d0]
+        [&.docs-icon--cyan]:text-[#47d8d0]
         [&.docs-icon--cyan]:[background:#27b8b01a]
-        [&.docs-icon--green]:[color:#62dda6]
+        [&.docs-icon--green]:text-[#62dda6]
         [&.docs-icon--green]:[background:#33b9781a]
       `}>
             <Icon name="play" size={18} />
@@ -2640,13 +2640,13 @@ export function DocumentationPage() {
           <Link className={`text-link
         inline-flex
         items-center
-        [gap:6px]
-        [margin-top:1px]
-        [color:#c084fc]
-        [font-size:12px]
-        [font-weight:600]
-        [white-space:nowrap]
-        [&:hover]:[color:#d9b8ff]
+        gap-[6px]
+        mt-px
+        text-[#c084fc]
+        text-[12px]
+        font-semibold
+        whitespace-nowrap
+        [&:hover]:text-[#d9b8ff]
       `} href="/playground">
             Open playground <Icon name="arrow-right" size={14} />
           </Link>
@@ -2655,35 +2655,35 @@ export function DocumentationPage() {
         docs-panel
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#1b1c20,#111216)]
         [box-shadow:0_8px_24px_#0004]
-        [min-height:190px]
-        [padding:20px]
-        [&_h2]:[margin:14px_0_6px]
-        [&_h2]:[font-size:15px]
-        [&>p]:[min-height:48px]
-        [&>p]:[margin:0_0_12px]
-        [&>p]:[color:#9da0b3]
-        [&>p]:[font-size:12.5px]
-        [&>p]:[line-height:1.6]
-        [&_code]:[color:#d3b2ff]
-        [&_code]:[font:11.5px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
-        [@media(max-width:580px)]:[min-height:0]
-        [@media(max-width:580px)]:[&>p]:[min-height:0]
+        min-h-[190px]
+        p-[20px]
+        [&_h2]:m-[14px_0_6px]
+        [&_h2]:text-[15px]
+        [&>p]:min-h-[48px]
+        [&>p]:m-[0_0_12px]
+        [&>p]:text-[#9da0b3]
+        [&>p]:text-[12.5px]
+        [&>p]:leading-[1.6]
+        [&_code]:text-[#d3b2ff]
+        [&_code]:[font:11.5px_ui-monospace,SFMono-Regular,Menlo,monospace]
+        [@media(max-width:580px)]:min-h-0
+        [@media(max-width:580px)]:[&>p]:min-h-0
       `}>
           <span className={`docs-icon
         docs-icon--green
-        [width:36px]
-        [height:36px]
+        size-[36px]
+        
         grid
-        [place-items:center]
-        [border-radius:10px]
-        [color:#b883fb]
+        place-items-center
+        rounded-[10px]
+        text-[#b883fb]
         [background:#8748d51e]
-        [&.docs-icon--cyan]:[color:#47d8d0]
+        [&.docs-icon--cyan]:text-[#47d8d0]
         [&.docs-icon--cyan]:[background:#27b8b01a]
-        [&.docs-icon--green]:[color:#62dda6]
+        [&.docs-icon--green]:text-[#62dda6]
         [&.docs-icon--green]:[background:#33b9781a]
       `}>
             <Icon name="tests" size={18} />
@@ -2696,13 +2696,13 @@ export function DocumentationPage() {
           <Link className={`text-link
         inline-flex
         items-center
-        [gap:6px]
-        [margin-top:1px]
-        [color:#c084fc]
-        [font-size:12px]
-        [font-weight:600]
-        [white-space:nowrap]
-        [&:hover]:[color:#d9b8ff]
+        gap-[6px]
+        mt-px
+        text-[#c084fc]
+        text-[12px]
+        font-semibold
+        whitespace-nowrap
+        [&:hover]:text-[#d9b8ff]
       `} href="/tests">
             View quality <Icon name="arrow-right" size={14} />
           </Link>
@@ -2712,10 +2712,10 @@ export function DocumentationPage() {
         docs-components
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#1b1c20,#111216)]
         [box-shadow:0_8px_24px_#0004]
-        [padding:20px]
+        p-[20px]
       `}>
         <SectionTitle
           title="Registered components"
@@ -2724,28 +2724,28 @@ export function DocumentationPage() {
         <div className={`docs-component-list
         flex
         flex-col
-        [margin-top:12px]
-        [&>a]:[min-height:56px]
+        mt-[12px]
+        [&>a]:min-h-[56px]
         [&>a]:flex
         [&>a]:items-center
-        [&>a]:[gap:14px]
-        [&>a]:[padding:10px_6px]
+        [&>a]:gap-[14px]
+        [&>a]:p-[10px_6px]
         [&>a]:[border-bottom:1px_solid_#252632]
         [&>a:last-child]:[border-bottom:0]
         [&>a>span]:min-w-0
-        [&>a>span]:[flex:1]
+        [&>a>span]:flex-1
         [&>a>span]:flex
         [&>a>span]:flex-col
-        [&>a>span]:[gap:4px]
-        [&_strong]:[font-size:13px]
-        [&_small]:overflow-hidden
-        [&_small]:[color:#8e90a2]
-        [&_small]:[font-size:11.5px]
-        [&_small]:[text-overflow:ellipsis]
-        [&_small]:[white-space:nowrap]
-        [&_code]:[color:#c49aff]
-        [&_code]:[font:11px_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
-        [&>a>svg]:[color:#9293a5]
+        [&>a>span]:gap-[4px]
+        [&_strong]:text-[13px]
+        [&_small]:truncate
+        [&_small]:text-[#8e90a2]
+        [&_small]:text-[11.5px]
+        
+        
+        [&_code]:text-[#c49aff]
+        [&_code]:[font:11px_ui-monospace,SFMono-Regular,Menlo,monospace]
+        [&>a>svg]:text-[#9293a5]
       `}>
           {components.map((component) => (
             <Link key={component.slug} href={`/components/${component.slug}`}>
@@ -2763,18 +2763,18 @@ export function DocumentationPage() {
         docs-usage
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#1b1c20,#111216)]
         [box-shadow:0_8px_24px_#0004]
-        [padding:20px]
-        [&_pre]:[overflow-x:auto]
-        [&_pre]:[margin:14px_0_0]
-        [&_pre]:[padding:16px]
+        p-[20px]
+        [&_pre]:overflow-x-auto
+        [&_pre]:m-[14px_0_0]
+        [&_pre]:p-[16px]
         [&_pre]:[border:1px_solid_#2a2b38]
-        [&_pre]:[border-radius:10px]
-        [&_pre]:[color:#ceabff]
+        [&_pre]:rounded-[10px]
+        [&_pre]:text-[#ceabff]
         [&_pre]:[background:#0b0c11]
-        [&_pre]:[font:12px/1.7_ui-monospace,_SFMono-Regular,_Menlo,_monospace]
+        [&_pre]:[font:12px/1.7_ui-monospace,SFMono-Regular,Menlo,monospace]
       `}>
         <SectionTitle
           title="Import and use"
@@ -2794,7 +2794,7 @@ export function DocumentationPage() {
 
 export function NotFoundPage() {
   return (
-    <div className={"page-stack flex flex-col [gap:28px] [@media(max-width:580px)]:[gap:20px]"}>
+    <div className={"page-stack flex flex-col gap-[28px] [@media(max-width:580px)]:gap-[20px]"}>
       <PageTitle
         eyebrow="LIBRARY / NOT FOUND"
         title="Nothing here yet"
@@ -2803,8 +2803,8 @@ export function NotFoundPage() {
       <section className={`panel
         min-w-0
         [border:1px_solid_#262735]
-        [border-radius:14px]
-        [background:linear-gradient(145deg,_#151620,_#101117)]
+        rounded-[14px]
+        [background:linear-gradient(145deg,#151620,#101117)]
         [box-shadow:0_8px_24px_#0004]
       `}>
         <EmptyState
@@ -2814,32 +2814,32 @@ export function NotFoundPage() {
           action={
             <Link className={`button
         button-primary
-        [min-height:38px]
+        min-h-[38px]
         inline-flex
         items-center
         justify-center
-        [gap:8px]
-        [padding:0_16px]
+        gap-[8px]
+        p-[0_16px]
         [border:1px_solid_transparent]
-        [border-radius:9px]
-        [font-size:12.5px]
-        [font-weight:600]
-        [line-height:1]
-        [white-space:nowrap]
-        [cursor:pointer]
-        [transition:filter_0.16s,_transform_0.16s,_background_0.16s,_border-color_0.16s,_box-shadow_0.16s]
-        [&:hover:not(:disabled)]:[filter:brightness(1.1)]
-        [&:hover:not(:disabled)]:[transform:translateY(-1px)]
-        [&:disabled]:[cursor:not-allowed]
-        [&:disabled]:[opacity:0.52]
-        [&.button-primary]:[border-color:#8747d8]
-        [&.button-primary]:[color:white]
-        [&.button-primary]:[background:linear-gradient(115deg,_#7938cf,_#5731a1)]
+        rounded-[9px]
+        text-[12.5px]
+        font-semibold
+        leading-none
+        whitespace-nowrap
+        cursor-pointer
+        [transition:filter_0.16s,transform_0.16s,background_0.16s,border-color_0.16s,box-shadow_0.16s]
+        [&:hover:not(:disabled)]:filter-[brightness(1.1)]
+        [&:hover:not(:disabled)]:transform-[translateY(-1px)]
+        disabled:cursor-not-allowed
+        disabled:opacity-[0.52]
+        [&.button-primary]:border-[#8747d8]
+        [&.button-primary]:text-[white]
+        [&.button-primary]:[background:linear-gradient(115deg,#7938cf,#5731a1)]
         [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
-        [&.button-quiet]:[border-color:#30313f]
-        [&.button-quiet]:[color:#dad9e7]
+        [&.button-quiet]:border-[#30313f]
+        [&.button-quiet]:text-[#dad9e7]
         [&.button-quiet]:[background:#171821cc]
-        [&.button-quiet:hover]:[border-color:#5a4773]
+        [&.button-quiet:hover]:border-[#5a4773]
         [&.button-quiet:hover]:[background:#20202e]
       `} href="/components">
               Browse components

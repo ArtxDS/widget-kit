@@ -1,7 +1,7 @@
 "use client";
 
 import type { TestRunSummary } from "@/lib/quality";
-import { Check, X, Clock } from "lucide-react";
+import { Check, Clock, X } from "lucide-react";
 
 interface HeatstripProps {
   history: TestRunSummary[];
@@ -9,7 +9,6 @@ interface HeatstripProps {
 }
 
 export function Heatstrip({ history, loading = false }: HeatstripProps) {
-  // Chronological order: oldest #1 to newest #20
   const runs = [...history.slice(0, 20)].reverse();
 
   return (
@@ -56,14 +55,14 @@ export function Heatstrip({ history, loading = false }: HeatstripProps) {
                   <span className="text-[10px] text-zinc-500 font-semibold">
                     #{index + 1}
                   </span>
-                  <span className="font-semibold text-zinc-200 max-w-[80px] truncate">
+                  <span className="font-semibold text-zinc-200 max-w-20 truncate">
                     {run.itemName}
                   </span>
                   <span className="text-violet-300 font-bold">
                     {run.durationMs}ms
                   </span>
                   <span
-                    className={`inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold ${
+                    className={`inline-flex items-center justify-center size-4  rounded-full text-[10px] font-bold ${
                       isFailed
                         ? "bg-rose-900 text-rose-200"
                         : "bg-violet-900 text-violet-200"

@@ -47,21 +47,21 @@ export function LatencyTimeline({
       : null;
 
   return (
-    <div className="flex flex-col justify-between h-full w-full">
+    <div className="flex flex-col justify-between size-full ">
       <div className="flex items-center justify-between pb-3 border-b border-[#1c1e26]">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_8px_rgba(124,58,237,0.5)]" />
+          <span className="size-2  rounded-full bg-violet-400 shadow-[0_0_8px_rgba(124,58,237,0.5)]" />
           <span className="text-xs font-semibold tracking-wider uppercase text-zinc-400">
             Latency Timeline Vitest
           </span>
         </div>
         <div className="flex items-center gap-3 text-[11px] font-mono text-zinc-400">
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-sm bg-emerald-500 inline-block" />
+            <span className="size-2  rounded-sm bg-emerald-500 inline-block" />
             OK
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-sm bg-rose-500 inline-block" />
+            <span className="size-2  rounded-sm bg-rose-500 inline-block" />
             Falha
           </span>
           {averageDurationMs !== null && (
@@ -82,7 +82,7 @@ export function LatencyTimeline({
         <div className="relative flex-1 flex flex-col justify-end pl-3">
           {avgBottomPercent !== null && (
             <div
-              className="absolute left-0 right-0 z-10 flex items-center pointer-events-none"
+              className="absolute inset-x-0  z-10 flex items-center pointer-events-none"
               style={{ bottom: `${avgBottomPercent}%` }}
             >
               <div className="w-full border-b border-dashed border-violet-500/60" />
@@ -100,7 +100,7 @@ export function LatencyTimeline({
 
           <div className="relative z-20 flex-1 flex items-end gap-1.5 pb-6">
             {runs.length === 0 ? (
-              <div className="w-full h-full flex items-center justify-center text-xs text-zinc-500 font-mono">
+              <div className="size-full  flex items-center justify-center text-xs text-zinc-500 font-mono">
                 {loading
                   ? "Carregando histórico do runner..."
                   : "Nenhuma execução registrada no banco de dados"}
@@ -155,7 +155,7 @@ export function LatencyTimeline({
                             {new Date(run.completedAt).toLocaleTimeString()}
                           </div>
                         </div>
-                        <div className="w-2 h-2 bg-[#181a22] border-r border-b border-[#2d303d] rotate-45 -mt-1" />
+                        <div className="size-2  bg-[#181a22] border-r border-b border-[#2d303d] rotate-45 -mt-1" />
                       </div>
                     )}
 

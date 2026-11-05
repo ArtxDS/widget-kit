@@ -58,35 +58,35 @@ export function Dropdown({
         aria-haspopup="menu"
         aria-label={label}
         className={`dropdown-trigger
-        [width:100%]
-        [min-height:38px]
+        w-full
+        min-h-[38px]
         flex
         items-center
         justify-between
-        [gap:10px]
-        [padding:0_12px]
+        gap-[10px]
+        p-[0_12px]
         [border:1px_solid_#414248]
-        [border-radius:8px]
-        [color:#e2e2e5]
-        [background:linear-gradient(180deg,_#242529,_#1b1c20)]
-        [text-align:left]
-        [font-size:12px]
-        [cursor:pointer]
-        [transition:border-color_0.15s,_background_0.15s,_box-shadow_0.15s]
-        [&:hover]:[border-color:#55565c]
+        rounded-[8px]
+        text-[#e2e2e5]
+        [background:linear-gradient(180deg,#242529,#1b1c20)]
+        text-left
+        text-[12px]
+        cursor-pointer
+        [transition:border-color_0.15s,background_0.15s,box-shadow_0.15s]
+        [&:hover]:border-[#55565c]
         [&:hover]:[background:#2b2c30]
-        [&[aria-expanded="true"]]:[border-color:#55565c]
-        [&[aria-expanded="true"]]:[background:#2b2c30]
-        [&[aria-expanded="true"]]:[box-shadow:0_0_0_3px_#ffffff0d]
+        aria-expanded:border-[#55565c]
+        aria-expanded:[background:#2b2c30]
+        aria-expanded:[box-shadow:0_0_0_3px_#ffffff0d]
         [&>span]:min-w-0
-        [&>span]:overflow-hidden
-        [&>span]:[text-overflow:ellipsis]
-        [&>span]:[white-space:nowrap]
-        [&>svg]:[flex:0_0_auto]
-        [&>svg]:[color:#9fa0b4]
+        [&>span]:truncate
+        
+        
+        [&>svg]:flex-[0_0_auto]
+        [&>svg]:text-[#9fa0b4]
         [&>svg]:[transition:transform_0.16s]
-        [&>svg.is-open]:[transform:rotate(180deg)]
-        [&>svg.is-open]:[color:#e0e0e3]
+        [&>svg.is-open]:transform-[rotate(180deg)]
+        [&>svg.is-open]:text-[#e0e0e3]
       `}
         onClick={() => setOpen((current) => !current)}
         ref={triggerRef}
@@ -97,17 +97,17 @@ export function Dropdown({
       </button>
       <div className={`dropdown-menu
         absolute
-        [z-index:60]
-        [top:calc(100%_+_6px)]
-        [left:0]
-        [min-width:100%]
-        [width:max-content]
-        [max-width:min(280px,_calc(100vw_-_36px))]
-        [max-height:260px]
-        [overflow-y:auto]
-        [padding:6px]
+        z-60
+        top-[calc(100%+6px)]
+        left-0
+        min-w-full
+        w-max
+        max-w-[min(280px,calc(100vw-36px))]
+        max-h-[260px]
+        overflow-y-auto
+        p-[6px]
         [border:1px_solid_#414248]
-        [border-radius:10px]
+        rounded-[10px]
         [background:#202125]
         [box-shadow:0_14px_38px_#0009]
       `} id={menuId} role="menu" aria-label={label} hidden={!open}>
@@ -115,27 +115,27 @@ export function Dropdown({
           <button
             aria-checked={option.value === value}
             className={(`dropdown-option${option.value === value ? " is-selected" : ""}`) + `
-        [width:100%]
-        [min-height:36px]
+        w-full
+        min-h-[36px]
         flex
         items-center
         justify-between
-        [gap:18px]
-        [padding:0_12px]
+        gap-[18px]
+        p-[0_12px]
         [border:0]
-        [border-radius:7px]
-        [color:#c4c4d2]
+        rounded-[7px]
+        text-[#c4c4d2]
         [background:transparent]
-        [text-align:left]
-        [font-size:12px]
-        [cursor:pointer]
-        [&:hover]:[color:white]
+        text-left
+        text-[12px]
+        cursor-pointer
+        [&:hover]:text-[white]
         [&:hover]:[background:#2c2d32]
-        [&:focus-visible]:[color:white]
-        [&:focus-visible]:[background:#2c2d32]
-        [&.is-selected]:[color:#f0f0f2]
+        focus-visible:text-[white]
+        focus-visible:[background:#2c2d32]
+        [&.is-selected]:text-[#f0f0f2]
         [&.is-selected]:[background:#292a30]
-        [&>svg]:[color:#c6c7cc]
+        [&>svg]:text-[#c6c7cc]
       `}
             key={option.value}
             onClick={() => {

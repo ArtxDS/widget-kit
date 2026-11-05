@@ -46,7 +46,7 @@ export function TestsStudioPage() {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-800/60">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="size-1.5  rounded-full bg-emerald-400 animate-pulse" />
               Live
             </span>
             <span className="text-[11px] font-mono text-zinc-500 bg-[#121318] border border-[#20222b] px-2 py-0.5 rounded">
@@ -56,7 +56,7 @@ export function TestsStudioPage() {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-100 tracking-tight">
             Tests & Performance Studio
           </h1>
-          <p className="text-sm text-zinc-400 mt-1 max-w-2xl leading-relaxed">
+          <p className="text-sm/relaxed text-zinc-400 mt-1 max-w-2xl ">
             Real-time telemetry for Vitest suites, assertion health, and runner latency analysis.
           </p>
         </div>

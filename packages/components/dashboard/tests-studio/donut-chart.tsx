@@ -31,10 +31,10 @@ export function DonutChart({
     total > 0 ? (passedRatio * 100).toFixed(1) : null;
 
   return (
-    <div className="flex flex-col items-center justify-between h-full w-full">
+    <div className="flex flex-col items-center justify-between size-full ">
       <div className="w-full flex items-center justify-between pb-3 border-b border-[#1c1e26]">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-violet-400 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
+          <span className="size-2  rounded-full bg-violet-400 shadow-[0_0_8px_rgba(139,92,246,0.5)]" />
           <span className="text-xs font-semibold tracking-wider uppercase text-zinc-400">
             Vitest Pass Rate
           </span>
@@ -46,7 +46,7 @@ export function DonutChart({
 
       <div className="relative my-5 flex items-center justify-center">
         <svg
-          className="w-40 h-40 overflow-visible"
+          className="size-40  overflow-visible"
           viewBox="0 0 100 100"
           aria-hidden="true"
         >

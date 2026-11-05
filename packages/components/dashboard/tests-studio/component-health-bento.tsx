@@ -207,7 +207,7 @@ export function ComponentHealthBento({
                 </div>
 
                 {/* Target Description */}
-                <p className="text-xs text-zinc-400 mt-1.5 line-clamp-2 leading-relaxed">
+                <p className="text-xs/relaxed text-zinc-400 mt-1.5 line-clamp-2 ">
                   {target.description}
                 </p>
 
@@ -287,7 +287,7 @@ export function ComponentHealthBento({
                               className="flex items-center gap-2 p-1.5 rounded-md bg-[#181a22] border border-[#20222b] text-[11px]"
                             >
                               <span
-                                className={`w-4 h-4 rounded-full flex items-center justify-center shrink-0 ${
+                                className={`size-4  rounded-full flex items-center justify-center shrink-0 ${
                                   isPass
                                     ? "bg-violet-950/80 text-violet-400"
                                     : "bg-rose-950/80 text-rose-400"
