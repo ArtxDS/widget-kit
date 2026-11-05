@@ -6,10 +6,18 @@ export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   test: {
     environment: "jsdom",
-    setupFiles: ["./packages/test/setup.ts"],
+    environmentOptions: {
+      jsdom: {
+        url: "http://localhost:3000",
+      },
+    },
+    setupFiles: ["./tests/setup.ts"],
+    restoreMocks: true,
+    unstubGlobals: true,
+    clearMocks: true,
     include: [
-      "packages/**/*.test.ts",
-      "packages/**/*.test.tsx",
+      "tests/**/*.{test,spec}.{ts,tsx,js,jsx}",
+      "packages/**/*.{test,spec}.{ts,tsx,js,jsx}",
     ],
     coverage: {
       provider: "v8",
