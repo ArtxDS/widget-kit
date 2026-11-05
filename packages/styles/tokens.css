@@ -46,4 +46,26 @@
   --wk-font-sans: Inter, ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", sans-serif;
   --wk-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --wk-toast-border: #34313f;
+  --wk-toast-bg-from: #191923;
+  --wk-toast-bg-to: #111219;
+  --wk-toast-shadow: #000a;
+  --wk-toast-accent: #9d5cff16;
+  --wk-toast-foreground: #e9e7f1;
+  --wk-toast-title: #f1eff7;
+  --wk-toast-muted: #9293a7;
+  --wk-toast-close: #858698;
+  --wk-toast-close-hover-bg: #ffffff0a;
+  --wk-toast-close-hover: #e2ddec;
+  --wk-toast-loading: #76e8e7;
+  --wk-toast-success: #70e1ad;
+  --wk-toast-warning: #f2c76f;
+  --wk-toast-error: #ff899a;
+  --wk-toast-step: #77798b;
+  --wk-toast-step-current: #d8f4f2;
+  --wk-toast-step-border: #434451;
+  --wk-toast-step-current-border: #42adb1;
+  --wk-toast-step-error-border: #b54e5e;
+  --wk-toast-step-pending: #656778;
 }

@@ -24,7 +24,6 @@ export default defineConfig({
       include: [
         "packages/components/ui/**",
         "packages/widgets/**",
-        "packages/hooks/**",
         "packages/lib/**",
       ],
       exclude: [

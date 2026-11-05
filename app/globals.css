@@ -94,3 +94,76 @@ body::-webkit-scrollbar {
     transition-duration: 0.01ms !important;
   }
 }
+
+.category-select .dropdown-trigger:hover,
+.category-select .dropdown-trigger[aria-expanded="true"] {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.category-select .dropdown-trigger:focus-visible {
+  outline: none;
+  outline-offset: 0;
+  box-shadow: none;
+}
+
+.category-select .dropdown-trigger[aria-expanded="true"] > svg.is-open {
+  color: #9fa0b4;
+}
+
+.toast-preview-frame {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.component-library-mini-preview {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.component-library-mini-preview > .badge-preview {
+  flex: 0 0 auto;
+}
+
+.component-library-mini-preview__toast {
+  min-width: 0;
+  flex: 0 1 88px;
+  max-width: 88px;
+}
+
+.toast-preview-frame--compact {
+  min-width: 0;
+}
+
+.stat-card-preview--component .app-toast {
+  gap: 6px;
+  padding: 6px 8px;
+  border-radius: 7px;
+}
+
+.stat-card-preview--component .app-toast__icon {
+  width: 14px;
+  height: 14px;
+}
+
+.stat-card-preview--component .app-toast__title {
+  font-size: 10px;
+}
+
+.stat-card-preview--component .app-toast__description {
+  display: none;
+}
+
+@keyframes dashboard-skeleton-shimmer {
+  to {
+    background-position-x: -200%;
+  }
+}
+

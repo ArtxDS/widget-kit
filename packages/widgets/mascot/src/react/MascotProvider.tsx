@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { LookTarget, MascotInstance, MascotOptions } from "../core/types";
+import type { LookTarget, MascotInstance, MascotOptions, SpeechContent } from "../core/types";
 import { Mascot } from "./Mascot";
 
 type MascotContextValue = {
@@ -34,20 +34,24 @@ export function MascotProvider({
 }) {
   const [instance, setInstance] = useState<MascotInstance | null>(null);
   const [mood, setMood] = useState("idle");
-  const [muted, setMuted] = useState(false);
+  const [muted, setMutedState] = useState(false);
   const [lastSpeech, setLastSpeech] = useState<string | null>(null);
 
   const onReady = useCallback((next: MascotInstance) => {
     setInstance(next);
     next.on("moodchange", (event) => setMood(event.mood));
-    const originalSay = next.say.bind(next);
-    next.say = (content, opts) => {
+    next.on("speech", (content: SpeechContent) => {
+      console.log("PROVIDER_SPEECH", content);
       const text =
         typeof content === "string"
           ? content
           : [content.title, content.text].filter(Boolean).join(" ");
       setLastSpeech(text || null);
-      originalSay(content, opts);
+    });
+    const originalMute = next.mute.bind(next);
+    next.mute = (value) => {
+      setMutedState(value);
+      originalMute(value);
     };
   }, []);
 

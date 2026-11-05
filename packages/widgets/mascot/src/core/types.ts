@@ -143,6 +143,7 @@ export type MascotOutEvent =
   | "wake"
   | "sleep"
   | "moodchange"
+  | "speech"
   | "waveend";
 
 export type MascotOutPayload = {
@@ -152,6 +153,7 @@ export type MascotOutPayload = {
   wake: { from: string };
   sleep: { mood: "sleepy" | "sleeping" };
   moodchange: { mood: string; previous: string };
+  speech: SpeechContent;
   waveend: Record<string, never>;
 };
 

@@ -103,3 +103,26 @@ describe("createMascot", () => {
     mascot.destroy();
   });
 });
+
+describe("createMascot sanitization", () => {
+  beforeEach(() => {
+    resetMascotIdCounter();
+    mockBrowser();
+  });
+
+  afterEach(() => {
+    document.body.innerHTML = "";
+    vi.unstubAllGlobals();
+  });
+
+  it("removes script tags from custom SVG slots", () => {
+    const host = document.createElement("div");
+    document.body.append(host);
+    const mascot = createMascot(host, {
+      parts: { accessory: { svg: "<g><script>alert(1)</script><circle cx=\"1\"/></g>" } },
+    });
+    expect(host.innerHTML).not.toContain("<script");
+    expect(host.innerHTML).toContain("<circle");
+    mascot.destroy();
+  });
+});

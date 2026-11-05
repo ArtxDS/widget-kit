@@ -13,6 +13,7 @@ import {
 import {
   emptyQualitySnapshot,
   itemTestKey,
+  type ItemTestResult,
   type QualitySnapshot,
   type TestTargetType,
 } from "@/lib/quality";
@@ -106,7 +107,7 @@ export function QualityProvider({ children }: { children: ReactNode }) {
         throw new Error(data?.error ?? "Could not load the quality report.");
       }
       const data = (await response.json()) as QualitySnapshot & {
-        componentTests?: Record<string, any>;
+        componentTests?: Record<string, ItemTestResult>;
       };
       const itemTests = { ...(data.itemTests ?? {}) };
       if (data.componentTests) {
@@ -184,7 +185,7 @@ export function QualityProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ itemType, itemSlug }),
         });
         const data = (await response.json()) as QualitySnapshot & {
-          componentTests?: Record<string, any>;
+          componentTests?: Record<string, ItemTestResult>;
         };
         const itemTests = { ...(data.itemTests ?? {}) };
         if (data.componentTests) {

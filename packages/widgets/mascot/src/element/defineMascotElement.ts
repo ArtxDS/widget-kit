@@ -101,6 +101,7 @@ export function defineMascotElement(tag = TAG): CustomElementConstructor {
         "wake",
         "sleep",
         "moodchange",
+        "speech",
         "waveend",
       ] as const;
       for (const type of events) {

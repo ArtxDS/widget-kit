@@ -52,23 +52,6 @@
   opacity: 0.9;
 }
 
-.category-select .dropdown-trigger:hover,
-.category-select .dropdown-trigger[aria-expanded="true"] {
-  border-color: transparent;
-  background: transparent;
-  box-shadow: none;
-}
-
-.category-select .dropdown-trigger:focus-visible {
-  outline: none;
-  outline-offset: 0;
-  box-shadow: none;
-}
-
-.category-select .dropdown-trigger[aria-expanded="true"] > svg.is-open {
-  color: #9fa0b4;
-}
-
 .app-toast-viewport {
   position: fixed;
   z-index: 100;
@@ -88,65 +71,16 @@
   width: 100%;
 }
 
-.toast-preview-frame {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
-}
-
-.component-library-mini-preview {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  align-items: center;
-  gap: 8px;
-}
-
-.component-library-mini-preview > .badge-preview {
-  flex: 0 0 auto;
-}
-
-.component-library-mini-preview__toast {
-  min-width: 0;
-  flex: 0 1 88px;
-  max-width: 88px;
-}
-
-.toast-preview-frame--compact {
-  min-width: 0;
-}
-
-.stat-card-preview--component .app-toast {
-  gap: 6px;
-  padding: 6px 8px;
-  border-radius: 7px;
-}
-
-.stat-card-preview--component .app-toast__icon {
-  width: 14px;
-  height: 14px;
-}
-
-.stat-card-preview--component .app-toast__title {
-  font-size: 10px;
-}
-
-.stat-card-preview--component .app-toast__description {
-  display: none;
-}
-
 .app-toast {
   display: flex;
   align-items: flex-start;
   gap: 11px;
   padding: 14px 15px;
-  border: 1px solid #34313f;
+  border: 1px solid var(--wk-toast-border, #34313f);
   border-radius: 12px;
-  background: linear-gradient(145deg, #191923, #111219 82%);
-  box-shadow: 0 18px 50px #000a, 0 0 24px #9d5cff16;
-  color: #e9e7f1;
+  background: linear-gradient(145deg, var(--wk-toast-bg-from, #191923), var(--wk-toast-bg-to, #111219) 82%);
+  box-shadow: 0 18px 50px var(--wk-toast-shadow, #000a), 0 0 24px var(--wk-toast-accent, #9d5cff16);
+  color: var(--wk-toast-foreground, #e9e7f1);
   pointer-events: auto;
   visibility: hidden;
   opacity: 0;
@@ -191,21 +125,21 @@
 
 .app-toast--loading .app-toast__icon,
 .app-toast__step--current {
-  color: #76e8e7;
+  color: var(--wk-toast-loading, #76e8e7);
 }
 
 .app-toast--success .app-toast__icon,
 .app-toast__step--complete {
-  color: #70e1ad;
+  color: var(--wk-toast-success, #70e1ad);
 }
 
 .app-toast--warning .app-toast__icon {
-  color: #f2c76f;
+  color: var(--wk-toast-warning, #f2c76f);
 }
 
 .app-toast--error .app-toast__icon,
 .app-toast__step--error {
-  color: #ff899a;
+  color: var(--wk-toast-error, #ff899a);
 }
 
 .app-toast__icon.is-spinning,
@@ -223,7 +157,7 @@
 
 .app-toast__title {
   overflow: hidden;
-  color: #f1eff7;
+  color: var(--wk-toast-title, #f1eff7);
   font-size: 13px;
   font-weight: 650;
   text-overflow: ellipsis;
@@ -236,7 +170,7 @@
 
 .app-toast__description {
   margin: 0;
-  color: #9293a7;
+  color: var(--wk-toast-muted, #9293a7);
   font-size: 11px;
   line-height: 1.45;
 }
@@ -257,13 +191,13 @@
   border: 0;
   border-radius: 7px;
   background: transparent;
-  color: #858698;
+  color: var(--wk-toast-close, #858698);
   cursor: pointer;
 }
 
 .app-toast__close:hover {
-  background: #ffffff0a;
-  color: #e2ddec;
+  background: var(--wk-toast-close-hover-bg, #ffffff0a);
+  color: var(--wk-toast-close-hover, #e2ddec);
 }
 
 .app-toast__steps {
@@ -279,13 +213,13 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  color: #77798b;
+  color: var(--wk-toast-step, #77798b);
   font-size: 11px;
   line-height: 1.4;
 }
 
 .app-toast__step--current {
-  color: #d8f4f2;
+  color: var(--wk-toast-step-current, #d8f4f2);
 }
 
 .app-toast__step-icon {
@@ -294,23 +228,23 @@
   height: 16px;
   flex: 0 0 auto;
   place-items: center;
-  border: 1px solid #434451;
+  border: 1px solid var(--wk-toast-step-border, #434451);
   border-radius: 50%;
 }
 
 .app-toast__step--current .app-toast__step-icon {
-  border-color: #42adb1;
+  border-color: var(--wk-toast-step-current-border, #42adb1);
 }
 
 .app-toast__step--error .app-toast__step-icon {
-  border-color: #b54e5e;
+  border-color: var(--wk-toast-step-error-border, #b54e5e);
 }
 
 .app-toast__step-pending {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background: #656778;
+  background: var(--wk-toast-step-pending, #656778);
 }
 
 @keyframes app-toast-spin {
@@ -335,14 +269,7 @@
   }
 }
 
-@keyframes dashboard-skeleton-shimmer {
-  to {
-    background-position-x: -200%;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .dashboard-skeleton,
   .app-toast,
   .app-toast__icon.is-spinning,
   .app-toast__step--current svg {

@@ -3,6 +3,11 @@ import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vite";
 import { resolve } from "path";
 
+const clientEntries = new Set([
+  resolve(__dirname, "packages/index.ts"),
+  resolve(__dirname, "packages/components/ui/index.ts"),
+]);
+
 export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   publicDir: false,
@@ -11,13 +16,14 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, "packages/index.ts"),
         components: resolve(__dirname, "packages/components/ui/index.ts"),
+        core: resolve(__dirname, "packages/core.ts"),
       },
       formats: ["es"],
     },
     outDir: "dist",
     emptyOutDir: true,
     rollupOptions: {
-      external: ["react", "react-dom", "react/jsx-runtime"],
+      external: ["react", "react-dom", "react/jsx-runtime", "dompurify"],
       output: {
         globals: {
           react: "React",
@@ -25,6 +31,10 @@ export default defineConfig({
           "react/jsx-runtime": "ReactJSXRuntime",
         },
         assetFileNames: "styles/[name][extname]",
+        banner: (chunk) =>
+          chunk.facadeModuleId && clientEntries.has(chunk.facadeModuleId)
+            ? '"use client";'
+            : "",
       },
     },
     sourcemap: true,

@@ -16,6 +16,7 @@ import {
   type MoodMachine,
 } from "./state";
 import { buildMascotSvg, DEFAULT_PARTS } from "./svg";
+import { sanitizeSvg } from "./sanitize";
 import { applyThemeVars, resolveTheme } from "./theme";
 import type {
   LookTarget,
@@ -160,7 +161,7 @@ export function createMascot(
   root.dataset.mascot = prefix;
   root.style.width = sizeToCss(opts.size);
   applyThemeVars(root, tokens);
-  root.innerHTML = buildMascotSvg(prefix, opts.parts);
+  root.innerHTML = sanitizeSvg(buildMascotSvg(prefix, opts.parts));
   container.appendChild(root);
 
   const svg = qs<SVGSVGElement>(root, "svg");
@@ -222,6 +223,7 @@ export function createMascot(
     if (!bubble || muted) return;
     renderSpeech(bubble, content);
     bubble.hidden = false;
+    bus.emitOut("speech", content);
     if (durationMs === null) return;
     const ms = durationMs ?? bubbleOpts?.durationMs ?? 3200;
     later(hideBubble, ms);

@@ -1,4 +1,4 @@
-export type { BadgeTone } from "../components/ui";
+export type { BadgeProps, BadgeTone } from "../components/ui";
 export type {
   ToastMode,
   ToastPlacement,
@@ -9,9 +9,11 @@ export type {
 } from "../components/ui";
 export type {
   EventReaction,
+  MascotAvatarProps,
   MascotInstance,
   MascotOptions,
   MascotOutEvent,
+  MascotProps,
   MoodDef,
   ThemePreset,
   ThemeTokens,

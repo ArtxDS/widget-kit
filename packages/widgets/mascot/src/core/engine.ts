@@ -51,6 +51,7 @@ export function createEngine(
   let raf = 0;
   let running = false;
   const eyes: EyeNode[] = [];
+  const timers = new Set<number>();
 
   function collectEyes(): void {
     eyes.length = 0;
@@ -78,9 +79,11 @@ export function createEngine(
   function blink(double = false): void {
     blinkAt = performance.now();
     if (double) {
-      window.setTimeout(() => {
+      const id = window.setTimeout(() => {
+        timers.delete(id);
         blinkAt = performance.now();
       }, BLINK_MS + 110);
+      timers.add(id);
     }
   }
 
@@ -258,6 +261,8 @@ export function createEngine(
     running = false;
     if (raf) cancelAnimationFrame(raf);
     raf = 0;
+    for (const id of timers) window.clearTimeout(id);
+    timers.clear();
   }
 
   return {

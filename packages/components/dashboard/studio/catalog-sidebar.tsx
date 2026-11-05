@@ -57,10 +57,12 @@ export function CatalogSidebar({ pathname }: { pathname: string }) {
         : null;
 
   useEffect(() => {
-    if (hideCatalogHeader) {
+    if (!hideCatalogHeader) return;
+    const timer = window.setTimeout(() => {
       setCollapsed(false);
       setQuery("");
-    }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [hideCatalogHeader]);
 
   function routeIsActive(href: string) {

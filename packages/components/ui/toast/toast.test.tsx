@@ -1,3 +1,4 @@
+import { createRef } from "react";
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { Toast } from "./toast";
@@ -80,5 +81,62 @@ describe("Toast", () => {
     expect(screen.getByText("Changes saved").closest("section")).toHaveClass(
       "is-closed",
     );
+  });
+
+  it("applies inert only while closed", () => {
+    const { rerender } = render(
+      <Toast open title="Changes saved" variant="success" />,
+    );
+
+    expect(screen.getByRole("status")).not.toHaveAttribute("inert");
+
+    rerender(<Toast open={false} title="Changes saved" variant="success" />);
+
+    expect(screen.getByText("Changes saved").closest("section")).toHaveAttribute(
+      "inert",
+    );
+  });
+});
+
+describe("Toast accessibility and API", () => {
+  it("applies a custom className", () => {
+    render(<Toast className="custom-toast" open title="Saved" variant="success" />);
+    expect(screen.getByRole("status")).toHaveClass("custom-toast");
+  });
+
+  it("forwards a ref to the notification", () => {
+    const ref = createRef<HTMLElement>();
+    render(<Toast open ref={ref} title="Saved" variant="success" />);
+    expect(ref.current).toBe(screen.getByRole("status"));
+  });
+
+  it("uses a configurable close label", () => {
+    const onClose = vi.fn();
+    render(
+      <Toast closeLabel="Fechar" onClose={onClose} open title="Saved" variant="success" />,
+    );
+    expect(screen.getByRole("button", { name: "Fechar" })).toBeInTheDocument();
+  });
+
+  it("calls onClose when Escape is pressed", () => {
+    const onClose = vi.fn();
+    render(<Toast onClose={onClose} open title="Saved" variant="success" />);
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
+  it("does not expose aria-live while closed", () => {
+    render(<Toast open={false} title="Saved" variant="error" />);
+    expect(screen.getByText("Saved").closest("section")).not.toHaveAttribute(
+      "aria-live",
+    );
+  });
+
+  it("forwards native props", () => {
+    render(
+      <Toast data-testid="toast" id="toast-1" open title="Saved" variant="success" />,
+    );
+    const toast = screen.getByTestId("toast");
+    expect(toast).toHaveAttribute("id", "toast-1");
   });
 });

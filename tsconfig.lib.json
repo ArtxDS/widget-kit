@@ -14,14 +14,12 @@
   },
   "include": [
     "packages/index.ts",
+    "packages/core.ts",
     "packages/components/ui/**/*.ts",
     "packages/components/ui/**/*.tsx",
     "packages/widgets/**/*.ts",
     "packages/widgets/**/*.tsx",
-    "packages/hooks/**/*.ts",
-    "packages/hooks/**/*.tsx",
-    "packages/types/**/*.ts",
-    "packages/lib/tailwind.ts"
+    "packages/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

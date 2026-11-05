@@ -22,3 +22,14 @@ describe("MascotAvatar", () => {
     expect(container.querySelector("[data-mouth]")).toBeTruthy();
   });
 });
+
+describe("MascotAvatar theme", () => {
+  it("applies and updates theme variables", () => {
+    const { container, rerender } = render(<MascotAvatar mood="idle" theme="aurora" />);
+    const node = container.firstChild as HTMLElement;
+    expect(node.style.getPropertyValue("--mascot-accent-a")).toBe("#9945FF");
+
+    rerender(<MascotAvatar mood="idle" theme="ocean" />);
+    expect(node.style.getPropertyValue("--mascot-accent-a")).toBe("#0EA5E9");
+  });
+});

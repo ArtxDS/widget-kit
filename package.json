@@ -2,34 +2,44 @@
   "name": "@artxds/widget-kit",
   "version": "0.1.0",
   "description": "Personal library of reusable React components, widgets, hooks, and utilities.",
-  "private": true,
+  "type": "module",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "types": "./dist/types/index.d.ts"
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./components": {
-      "import": "./dist/components.mjs",
-      "types": "./dist/types/components/ui/index.d.ts"
+      "types": "./dist/types/components/ui/index.d.ts",
+      "import": "./dist/components.js",
+      "default": "./dist/components.js"
+    },
+    "./core": {
+      "types": "./dist/types/core.d.ts",
+      "import": "./dist/core.js",
+      "default": "./dist/core.js"
     },
     "./styles": "./packages/styles/index.css",
     "./styles/tokens.css": "./packages/styles/tokens.css",
     "./styles/components.css": "./packages/styles/components.css",
+    "./styles/mascot.css": "./packages/styles/mascot.css",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.mjs",
-  "module": "./dist/index.mjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
   "files": [
     "dist",
     "packages/styles",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",
     "start": "next start",
-    "postinstall": "prisma generate",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
@@ -40,25 +50,18 @@
     "lib:build": "vite build --config vite.lib.config.ts && tsc --project tsconfig.lib.json --emitDeclarationOnly",
     "lib:build:watch": "vite build --config vite.lib.config.ts --watch",
     "lib:typecheck": "tsc --project tsconfig.lib.json --noEmit",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepack": "npm run lib:build",
+    "prepublishOnly": "npm run lib:typecheck && npm test"
   },
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
   },
-  "dependencies": {
+  "devDependencies": {
     "@next/env": "^16.4.5",
     "@prisma/adapter-pg": "^7.10.1",
     "@prisma/client": "^7.10.1",
-    "lucide-react": "^1.67.0",
-    "next": "16.4.5",
-    "pg": "^8.23.1",
-    "prisma": "^7.10.1",
-    "react": ">=18",
-    "react-dom": ">=18",
-    "zod": "^4.6.7"
-  },
-  "devDependencies": {
     "@tailwindcss/turbopack": "^4",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^6.9.1",
@@ -73,11 +76,21 @@
     "eslint-config-next": "16.4.5",
     "eslint-plugin-better-tailwindcss": "^4.10.0",
     "jsdom": "^29.1.1",
+    "lucide-react": "^1.67.0",
     "msw": "^2.15.0",
+    "next": "16.4.5",
+    "pg": "^8.23.1",
+    "prisma": "^7.10.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vite": "^7.3.7",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.12"
+    "vitest": "^4.1.12",
+    "zod": "^4.6.7"
+  },
+  "dependencies": {
+    "dompurify": "^3.4.17"
   }
 }

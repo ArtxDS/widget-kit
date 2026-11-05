@@ -1,5 +1,5 @@
 export { Badge, Toast } from "./components/ui";
-export type { BadgeTone } from "./components/ui";
+export type { BadgeProps, BadgeTone } from "./components/ui";
 
 export type {
   ToastMode,
@@ -26,9 +26,11 @@ export {
   mono,
 } from "./widgets/mascot/src";
 export type {
+  MascotAvatarProps,
   MascotInstance,
   MascotOptions,
   MascotOutEvent,
+  MascotProps,
   MoodDef,
   ThemePreset,
   ThemeTokens,

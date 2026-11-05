@@ -1,8 +1,8 @@
 "use client";
 
 import type { ComponentDefinition } from "@/lib/catalog";
-import { components, getComponent, getWidget, widgets } from "@/lib/catalog";
-import type { TestCase, TestRunSummary, TestTargetType } from "@/lib/quality";
+import { components, getComponent, widgets } from "@/lib/catalog";
+import type { TestRunSummary, TestTargetType } from "@/lib/quality";
 import { itemTestKey } from "@/lib/quality";
 import { Badge, type BadgeTone } from "@artxds/widget-kit";
 import { Toast } from "@/components/ui";
@@ -24,14 +24,6 @@ import type { IconName } from "../shared/icon";
 import { Icon } from "../shared/icon";
 import { WidgetKitStudio } from "../studio";
 import { TestsStudioPage } from "../tests-studio";
-
-const badgeTones = [
-  { label: "Purple", value: "purple" },
-  { label: "Cyan", value: "cyan" },
-  { label: "Green", value: "green" },
-  { label: "Amber", value: "amber" },
-  { label: "Muted", value: "muted" },
-];
 
 function PageTitle({
   eyebrow,
@@ -311,80 +303,6 @@ function TestStatus({
   );
 }
 
-function TestCaseList({ assertions }: { assertions: TestCase[] }) {
-  return (
-    <ul className={`component-test-cases
-        flex
-        flex-col
-        gap-[9px]
-        m-[16px_0_0]
-        p-0
-        [list-style:none]
-        [&>li]:min-h-[52px]
-        [&>li]:flex
-        [&>li]:items-center
-        [&>li]:gap-[12px]
-        [&>li]:p-[10px_14px]
-        [&>li]:[border:1px_solid_#262734]
-        [&>li]:rounded-[9px]
-        [&>li]:[background:#14151e]
-      `}>
-      {assertions.map((testCase, index) => (
-        <li key={`${testCase.name}-${index}`}>
-          <span
-            className={(`test-case-icon test-case-icon--${testCase.status}`) + `
-        size-[28px]
-        
-        flex-[0_0_auto]
-        grid
-        place-items-center
-        rounded-[50%]
-        text-[#65dca9]
-        [background:#43ca901d]
-        [&.test-case-icon--failed]:text-[#ff8798]
-        [&.test-case-icon--failed]:[background:#d64d691c]
-        [&.test-case-icon--pending]:text-[#a7a8b8]
-        [&.test-case-icon--pending]:[background:#88889a1c]
-      `}
-          >
-            <Icon
-              name={testCase.status === "passed" ? "check" : "activity"}
-              size={14}
-            />
-          </span>
-          <span className={`test-case-copy
-        min-w-0
-        flex-1
-        flex
-        flex-col
-        gap-[3px]
-        [&_strong]:wrap-anywhere
-        [&_strong]:text-[#dad9e5]
-        [&_strong]:text-[13px]
-        [&_strong]:font-[570]
-        [&_small]:text-[#888a9c]
-        [&_small]:text-[11px]
-        [&_small]:capitalize
-      `}>
-            <strong>{testCase.name}</strong>
-            <small>{testCase.status}</small>
-          </span>
-          <Badge
-            tone={
-              testCase.status === "passed"
-                ? "green"
-                : testCase.status === "failed"
-                  ? "amber"
-                  : "muted"
-            }
-          >
-            {testCase.status}
-          </Badge>
-        </li>
-      ))}
-    </ul>
-  );
-}
 
 function ComponentCard({ component }: { component: ComponentDefinition }) {
   return (
