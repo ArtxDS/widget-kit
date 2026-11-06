@@ -74,7 +74,7 @@ export function buildMascotSvg(
 
   const logo =
     chestSlot ??
-    `<g transform="translate(222 322) scale(.5) translate(-160 -246)" fill="${ref(prefix, "bar")}"><use href="#${id(prefix, "logo")}"/></g>`;
+    `<g transform="translate(222 322) scale(.5) translate(-160 -246)" fill="${ref(prefix, "bar")}"><path d="M143 232H181L176 239H138Z"/><path d="M138 243H176L181 250H143Z"/><path d="M143 254H181L176 261H138Z"/></g>`;
 
   return `
 <svg class="wk-mascot__svg" viewBox="0 0 400 430" xmlns="http://www.w3.org/2000/svg" tabindex="-1" focusable="false">
@@ -127,7 +127,7 @@ export function buildMascotSvg(
     <filter id="${id(prefix, "b4")}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5"/></filter>
     <filter id="${id(prefix, "b2")}" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="2.2"/></filter>
     <path id="${id(prefix, "bodyP")}" d="M200 224C250 224 276 262 280 312C284 360 252 392 200 392C148 392 116 360 120 312C124 262 150 224 200 224Z"/>
-    <clipPath id="${id(prefix, "bodyC")}"><use href="#${id(prefix, "bodyP")}"/></clipPath>
+    <clipPath id="${id(prefix, "bodyC")}"><path d="M200 224C250 224 276 262 280 312C284 360 252 392 200 392C148 392 116 360 120 312C124 262 150 224 200 224Z"/></clipPath>
     <g id="${id(prefix, "logo")}"><path d="M143 232H181L176 239H138Z"/><path d="M138 243H176L181 250H143Z"/><path d="M143 254H181L176 261H138Z"/></g>
   </defs>
 
@@ -145,14 +145,14 @@ export function buildMascotSvg(
       </g>
       <g data-node="armR" transform="translate(268 268) rotate(-18)">${wing(prefix)}</g>
     </g>
-    <use href="#${id(prefix, "bodyP")}" fill="${ref(prefix, "pe")}"/>
-    <use href="#${id(prefix, "bodyP")}" fill="${ref(prefix, "shade")}"/>
+    <path d="M200 224C250 224 276 262 280 312C284 360 252 392 200 392C148 392 116 360 120 312C124 262 150 224 200 224Z" fill="${ref(prefix, "pe")}"/>
+    <path d="M200 224C250 224 276 262 280 312C284 360 252 392 200 392C148 392 116 360 120 312C124 262 150 224 200 224Z" fill="${ref(prefix, "shade")}"/>
     <g data-part="chest"${visibility(chest !== "none")} clip-path="${ref(prefix, "bodyC")}">
       <path d="M110 210H290V252Q262 262 232 262Q214 262 208 276Q204 300 182 302Q160 302 160 278Q158 264 140 262Q124 258 110 252Z" fill="${ref(prefix, "sh")}"/>
       <path d="M110 250Q140 262 160 266Q190 252 225 268Q256 262 290 250V256Q256 268 228 272Q208 262 180 274Q150 270 110 256Z" fill="#fff" opacity=".28"/>
       <ellipse cx="152" cy="308" rx="11" ry="46" fill="#fff" opacity=".75" filter="${ref(prefix, "b2")}" transform="rotate(8 152 308)"/>
     </g>
-    <use href="#${id(prefix, "bodyP")}" fill="none" stroke="var(--mascot-shell-edge, #6d4fc0)" stroke-opacity=".16"/>
+    <path d="M200 224C250 224 276 262 280 312C284 360 252 392 200 392C148 392 116 360 120 312C124 262 150 224 200 224Z" fill="none" stroke="var(--mascot-shell-edge, #6d4fc0)" stroke-opacity=".16"/>
     <g data-node="chest-glyph"${visibility(chest !== "none")}>${logo}</g>
     <circle cx="178" cy="336" r="3" fill="#2a2347"/>
   </g>

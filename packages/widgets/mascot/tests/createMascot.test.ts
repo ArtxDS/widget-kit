@@ -125,4 +125,15 @@ describe("createMascot sanitization", () => {
     expect(host.innerHTML).toContain("<circle");
     mascot.destroy();
   });
+
+  it("keeps the mascot body after sanitization", () => {
+    const host = document.createElement("div");
+    document.body.append(host);
+    const mascot = createMascot(host);
+    expect(host.querySelector('[data-node="body"]')).toBeTruthy();
+    expect(
+      host.querySelector('[data-node="body"] path[fill*="-pe"]'),
+    ).toBeTruthy();
+    mascot.destroy();
+  });
 });
