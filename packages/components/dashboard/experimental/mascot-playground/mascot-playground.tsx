@@ -18,7 +18,7 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import { Dropdown } from "../shared/dropdown";
+import { ChoiceControl } from "../../shared/choice-group";
 
 const moods = [
   "idle",
@@ -710,7 +710,7 @@ export function MascotPlaygroundControls({
       `}
       >
         <span>Theme preset</span>
-        <Dropdown
+        <ChoiceControl
           label="Theme preset"
           value={theme}
           onChange={(value) => applyPreset(value as ThemePreset)}
@@ -782,7 +782,7 @@ export function MascotPlaygroundControls({
       `}
       >
         <span>Mood</span>
-        <Dropdown
+        <ChoiceControl
           label="Mood"
           value={mood}
           onChange={(value) => {
@@ -819,7 +819,7 @@ export function MascotPlaygroundControls({
       `}
       >
         <span>Accessory</span>
-        <Dropdown
+        <ChoiceControl
           label="Accessory"
           value={accessory}
           onChange={(value) =>
@@ -854,7 +854,7 @@ export function MascotPlaygroundControls({
       `}
       >
         <span>Bubble</span>
-        <Dropdown
+        <ChoiceControl
           label="Bubble"
           value={bubblePosition}
           onChange={(value) =>
@@ -1079,6 +1079,7 @@ export function WidgetMascotPreview({ size = 136 }: { size?: number }) {
   return (
     <Mascot
       aria-label="Mascot widget preview"
+      style={{ width: size }}
       options={{
         theme: "aurora",
         size,

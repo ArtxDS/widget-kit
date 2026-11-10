@@ -6,6 +6,7 @@ import { resolve } from "path";
 const clientEntries = new Set([
   resolve(__dirname, "packages/index.ts"),
   resolve(__dirname, "packages/components/ui/index.ts"),
+  resolve(__dirname, "packages/widgets/assistant/src/index.ts"),
 ]);
 
 export default defineConfig({
@@ -17,6 +18,18 @@ export default defineConfig({
         index: resolve(__dirname, "packages/index.ts"),
         components: resolve(__dirname, "packages/components/ui/index.ts"),
         core: resolve(__dirname, "packages/core.ts"),
+        assistant: resolve(
+          __dirname,
+          "packages/widgets/assistant/src/index.ts",
+        ),
+        "assistant-core": resolve(
+          __dirname,
+          "packages/widgets/assistant/src/core/index.ts",
+        ),
+        "assistant-transport": resolve(
+          __dirname,
+          "packages/widgets/assistant/src/transport/index.ts",
+        ),
       },
       formats: ["es"],
     },

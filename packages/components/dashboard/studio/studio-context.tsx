@@ -13,7 +13,7 @@ export type StudioMode = "preview" | "playground";
 export type StudioViewport = "desktop" | "tablet" | "mobile";
 export type InspectorTab = "props" | "docs" | "examples";
 export type OutputTab = "react" | "tokens" | "install" | "tests";
-export type BadgeTone = "purple" | "cyan" | "green" | "amber" | "muted";
+export type BadgeTone = "purple" | "cyan" | "green" | "amber" | "red" | "muted";
 export type ToastVariant = "loading" | "success" | "warning" | "error";
 export type ToastMode = "normal" | "steps";
 

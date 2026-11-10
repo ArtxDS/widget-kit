@@ -28,3 +28,15 @@ Retain qualifying friction even if it is later fixed or worked around; record th
 Before the final response, run one reporting pass. If candidates remain, from this file's directory run `npx --no-install next internal agent-feedback-instructions` once without piping or truncating its output. Follow its output or error guidance. If a network sandbox blocks it, retry with network access; if it still returns no output, continue normally.
 
 <!-- END:nextjs-agent-feedback -->
+
+## Assistant Framework
+
+Before implementing or changing Assistant code, read `ASSISTANT_ARCHITECTURE.md`.
+
+- Keep a single package. Assistant lives in `packages/widgets/assistant/`; do not introduce a monorepo, workspaces, or a separate package.
+- Preserve layer boundaries: `core/` is pure (no React, DOM, network, or providers); `runtime/` is headless (no React, DOM, or direct `fetch`); `transport/` owns I/O only; `react/` is client-only; `server/` is reserved and server-only.
+- Do not export Assistant from the package root. Use explicit subpaths: `@artxds/widget-kit/assistant`, `/assistant/core`, and `/assistant/transport`. Do not publish `/assistant/server` until real server code exists.
+- Only the `/assistant` React entry may receive `"use client"`. Core, Runtime, and Transport must remain usable in Node without DOM.
+- Keep LLM provider SDKs, credentials, domain prompts, tools, and consumer-specific data out of the client library. The consumer owns its endpoint, authentication, domain logic, and persistence.
+- `MockTransport` must remain deterministic and network-free; tests must not require a real LLM or provider.
+- Prefer additive changes to exports, protocol events, and types. Do not break existing consumers or alter unrelated public entry points.

@@ -38,3 +38,61 @@ model ItemTestCase {
 
   @@index([itemTestRunId])
 }
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum NoteType {
+  BUG
+  IDEA
+  IMPROVEMENT
+  DECISION
+  CHANGELOG
+}
+
+enum NoteStatus {
+  OPEN
+  IN_PROGRESS
+  DONE
+}
+
+model User {
+  id             String   @id @default(cuid())
+  supabaseUserId String   @unique
+  email          String?
+  name           String?
+  avatarUrl      String?
+  role           Role     @default(USER)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  authoredNotes Note[] @relation("AuthoredNotes")
+  editedNotes   Note[] @relation("EditedNotes")
+}
+
+
+model Note {
+  id             String     @id @default(cuid())
+  title          String
+  type           NoteType
+  content        String     @default("")
+  typeData       Json?
+  tags           String[]   @default([])
+  componentSlug  String?
+  priority       String?
+  status         NoteStatus @default(OPEN)
+  authorId       String
+  author         User       @relation("AuthoredNotes", fields: [authorId], references: [id])
+  lastEditedById String?
+  lastEditedBy   User?      @relation("EditedNotes", fields: [lastEditedById], references: [id])
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  @@index([type])
+  @@index([status])
+  @@index([authorId])
+  @@index([componentSlug])
+  @@index([createdAt(sort: Desc)])
+}

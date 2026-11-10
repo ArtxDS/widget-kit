@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from "react";
 
-export type BadgeTone = "purple" | "cyan" | "green" | "amber" | "muted";
+export type BadgeTone = "purple" | "cyan" | "green" | "amber" | "red" | "muted";
 
 export type BadgeProps = HTMLAttributes<HTMLSpanElement> & {
   tone?: BadgeTone;

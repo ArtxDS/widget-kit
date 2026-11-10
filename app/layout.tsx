@@ -1,4 +1,4 @@
-import { DashboardShell } from "@/components/dashboard/shell/dashboard-shell";
+import { AppShell } from "@/components/dashboard/shell/app-shell";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
@@ -77,7 +77,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         [&_kbd]:[background:#181923]
         [&_kbd]:[font:11px_ui-monospace,SFMono-Regular,Menlo,monospace]
       `}>
-        <DashboardShell>{children}</DashboardShell>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

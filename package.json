@@ -19,10 +19,26 @@
       "import": "./dist/core.js",
       "default": "./dist/core.js"
     },
+    "./assistant": {
+      "types": "./dist/types/widgets/assistant/src/index.d.ts",
+      "import": "./dist/assistant.js",
+      "default": "./dist/assistant.js"
+    },
+    "./assistant/core": {
+      "types": "./dist/types/widgets/assistant/src/core/index.d.ts",
+      "import": "./dist/assistant-core.js",
+      "default": "./dist/assistant-core.js"
+    },
+    "./assistant/transport": {
+      "types": "./dist/types/widgets/assistant/src/transport/index.d.ts",
+      "import": "./dist/assistant-transport.js",
+      "default": "./dist/assistant-transport.js"
+    },
     "./styles": "./packages/styles/index.css",
     "./styles/tokens.css": "./packages/styles/tokens.css",
     "./styles/components.css": "./packages/styles/components.css",
     "./styles/mascot.css": "./packages/styles/mascot.css",
+    "./styles/assistant.css": "./packages/styles/assistant.css",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -92,6 +108,9 @@
     "zod": "^4.6.7"
   },
   "dependencies": {
-    "dompurify": "^3.4.17"
+    "@supabase/ssr": "^0.12.7",
+    "@supabase/supabase-js": "^2.119.0",
+    "dompurify": "^3.4.17",
+    "server-only": "^0.0.1"
   }
 }

@@ -48,6 +48,16 @@ export const widgets: WidgetDefinition[] = [
     source: "packages/widgets/mascot/src",
     test: "packages/widgets/mascot/tests",
   },
+  {
+    slug: "assistant",
+    name: "Assistant",
+    category: "Widgets",
+    description:
+      "Headless chat assistant with streaming, tool execution, confirmation, cancellation, and CSS-variable theming.",
+    status: "Ready",
+    source: "packages/widgets/assistant/src",
+    test: "packages/widgets/assistant/tests",
+  },
 ];
 
 export function getComponent(slug: string) {

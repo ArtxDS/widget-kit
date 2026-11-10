@@ -2,6 +2,8 @@
 
 import type { ComponentDefinition } from "@/lib/catalog";
 import { components, getComponent, widgets } from "@/lib/catalog";
+import type { NoteDto, NoteStatus, NoteType } from "@/lib/notes";
+import { noteStatusLabels, noteTypeLabels } from "@/lib/notes";
 import type { TestRunSummary, TestTargetType } from "@/lib/quality";
 import { itemTestKey } from "@/lib/quality";
 import { Badge, type BadgeTone } from "@artxds/widget-kit";
@@ -12,13 +14,17 @@ import {
   useEffect,
   useMemo,
   useState,
-  type FormEvent,
   type ReactNode,
 } from "react";
 import {
   WidgetMascotPreview,
-} from "../mascot-playground";
+} from "../experimental/mascot-playground";
+import {
+  WidgetAssistantPreview,
+} from "../experimental/assistant-playground";
 import { useQuality } from "../quality/quality-provider";
+import { useCurrentUser } from "../auth/use-current-user";
+import { fetchNotes } from "../notes/api";
 import { Dropdown } from "../shared/dropdown";
 import type { IconName } from "../shared/icon";
 import { Icon } from "../shared/icon";
@@ -789,9 +795,10 @@ function TestHistoryGraph({ history }: { history: OverviewTestRun[] }) {
   );
 }
 
-type OverviewActivity = {
+type OverviewTestActivity = {
+  kind: "test";
   key: string;
-  completedAt: string;
+  occurredAt: string;
   durationMs: number;
   total: number;
   passed: number;
@@ -800,19 +807,51 @@ type OverviewActivity = {
   itemType: TestTargetType;
 };
 
+type OverviewNoteActivity = {
+  kind: "note";
+  key: string;
+  occurredAt: string;
+  noteTitle: string;
+  noteType: NoteType;
+  noteStatus: NoteStatus;
+};
+
+type OverviewActivity = OverviewTestActivity | OverviewNoteActivity;
+
 function activityTime(date: string) {
   return `${new Intl.DateTimeFormat("en-US", { hour: "numeric", minute: "2-digit", timeZone: "UTC" }).format(new Date(date))} UTC`;
 }
 
 export function OverviewPage() {
   const { snapshot, loading } = useQuality();
+  const [recentNotes, setRecentNotes] = useState<NoteDto[]>([]);
+  const [notesLoading, setNotesLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchNotes({ limit: 6 })
+      .then((notes) => {
+        if (!cancelled) setRecentNotes(notes);
+      })
+      .catch(() => {
+        if (!cancelled) setRecentNotes([]);
+      })
+      .finally(() => {
+        if (!cancelled) setNotesLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const chartHistory: OverviewTestRun[] = snapshot.history ?? [];
   const latestTestRun = chartHistory[0];
-  const activityItems: OverviewActivity[] = chartHistory
-    .slice(0, 4)
+  const testActivity: OverviewTestActivity[] = chartHistory
+    .slice(0, 6)
     .map((item) => ({
-      key: `${item.itemType}-${item.itemSlug}-${item.completedAt}`,
-      completedAt: item.completedAt,
+      kind: "test",
+      key: `test-${item.itemType}-${item.itemSlug}-${item.completedAt}`,
+      occurredAt: item.completedAt,
       durationMs: item.durationMs,
       total: item.total,
       passed: item.passed,
@@ -820,6 +859,18 @@ export function OverviewPage() {
       itemName: item.itemName,
       itemType: item.itemType,
     }));
+  const noteActivity: OverviewNoteActivity[] = recentNotes.map((note) => ({
+    kind: "note",
+    key: `note-${note.id}`,
+    occurredAt: note.createdAt,
+    noteTitle: note.title,
+    noteType: note.type,
+    noteStatus: note.status,
+  }));
+  const activityItems: OverviewActivity[] = [...testActivity, ...noteActivity]
+    .sort((left, right) => Date.parse(right.occurredAt) - Date.parse(left.occurredAt))
+    .slice(0, 4);
+  const activityLoading = loading || notesLoading;
   const averageItemDurationMs = snapshot.averageItemDurationMs;
   const itemDurationHistory = chartHistory
     .slice(0, 8)
@@ -980,7 +1031,12 @@ export function OverviewPage() {
             icon="widgets"
             color="cyan"
             href="/widgets"
-            visual={<WidgetMascotPreview size={36} />}
+            visual={
+              <div className="flex items-center gap-4">
+                <WidgetMascotPreview size={32} />
+                <WidgetAssistantPreview size={32} />
+              </div>
+            }
             visualType="widget"
           />
           <StatCard
@@ -1194,7 +1250,7 @@ export function OverviewPage() {
           </div>
         </section>
 
-        <section aria-busy={loading} className={`panel
+        <section aria-busy={activityLoading} className={`panel
         activity-panel
         min-w-0
         [border:1px_solid_#262735]
@@ -1259,7 +1315,7 @@ export function OverviewPage() {
               View all <Icon name="arrow-right" size={14} />
             </Link>
           </div>
-          {loading ? (
+          {activityLoading ? (
             <ol
               aria-hidden="true"
               className={`activity-list
@@ -1434,13 +1490,16 @@ export function OverviewPage() {
       `}>
               {activityItems.map((item) => (
                 <li
-                  className={(`activity-item activity-item--${item.itemType}${item.failed ? " has-failures" : ""}`) + `
+                  className={(`activity-item activity-item--${item.kind === "note" ? "note" : item.itemType}${item.kind === "test" && item.failed ? " has-failures" : ""}`) + `
         [&.activity-item--component_.activity-timeline-dot]:border-[#d4b2ff]
         [&.activity-item--component_.activity-timeline-dot]:[background:#9e63ee]
         [&.activity-item--component_.activity-timeline-dot]:[box-shadow:0_0_9px_#a15bff99]
         [&.activity-item--widget_.activity-timeline-dot]:border-[#a7efff]
         [&.activity-item--widget_.activity-timeline-dot]:[background:#45c7e8]
         [&.activity-item--widget_.activity-timeline-dot]:[box-shadow:0_0_9px_#45c7e899]
+        [&.activity-item--note_.activity-timeline-dot]:border-[#d4b2ff]
+        [&.activity-item--note_.activity-timeline-dot]:[background:#9e63ee]
+        [&.activity-item--note_.activity-timeline-dot]:[box-shadow:0_0_9px_#a15bff99]
         [&.has-failures_.activity-timeline-dot]:border-[#ffc0c7]
         [&.has-failures_.activity-timeline-dot]:[background:#ed6176]
         [&.has-failures_.activity-timeline-dot]:[box-shadow:0_0_9px_#ed617699]
@@ -1450,6 +1509,9 @@ export function OverviewPage() {
         [&.activity-item--widget_.activity-marker]:border-[#45c7e855]
         [&.activity-item--widget_.activity-marker]:text-[#83e7fb]
         [&.activity-item--widget_.activity-marker]:[background:linear-gradient(145deg,#45c7e82c,#2284a51c)]
+        [&.activity-item--note_.activity-marker]:border-[#7248a655]
+        [&.activity-item--note_.activity-marker]:text-[#c195ff]
+        [&.activity-item--note_.activity-marker]:[background:linear-gradient(145deg,#a45af52c,#7136c21c)]
         [&.has-failures_.activity-marker]:border-[#9c405055]
         [&.has-failures_.activity-marker]:text-[#ff899a]
         [&.has-failures_.activity-marker]:[background:linear-gradient(145deg,#d64d6937,#81233324)]
@@ -1466,8 +1528,8 @@ export function OverviewPage() {
         [background:#3dc990]
         [box-shadow:0_0_9px_#37d99599]
       `} />
-                  <time dateTime={item.completedAt}>
-                    {activityTime(item.completedAt)}
+                  <time dateTime={item.occurredAt}>
+                    {activityTime(item.occurredAt)}
                   </time>
                   <span className={`activity-marker
         size-[34px]
@@ -1488,24 +1550,38 @@ export function OverviewPage() {
       `}>
                     <Icon
                       name={
-                        item.failed
-                          ? "activity"
-                          : item.itemType === "component"
-                            ? "components"
-                            : "widgets"
+                        item.kind === "note"
+                          ? "notes"
+                          : item.failed
+                            ? "activity"
+                            : item.itemType === "component"
+                              ? "components"
+                              : "widgets"
                       }
                       size={16}
                     />
                   </span>
                   <div>
-                    <strong>
-                      {item.itemName} {item.itemType} tests{" "}
-                      {item.failed ? "failed" : "passed"}
-                    </strong>
-                    <span>
-                      {item.passed}/{item.total} passed · {item.failed} failed ·{" "}
-                      {item.durationMs} ms
-                    </span>
+                    {item.kind === "note" ? (
+                      <>
+                        <strong>Created note “{item.noteTitle}”</strong>
+                        <span>
+                          {noteTypeLabels[item.noteType]} ·{" "}
+                          {noteStatusLabels[item.noteStatus]}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <strong>
+                          {item.itemName} {item.itemType} tests{" "}
+                          {item.failed ? "failed" : "passed"}
+                        </strong>
+                        <span>
+                          {item.passed}/{item.total} passed · {item.failed} failed ·{" "}
+                          {item.durationMs} ms
+                        </span>
+                      </>
+                    )}
                   </div>
                 </li>
               ))}
@@ -1849,6 +1925,9 @@ export function ComponentDetailPage({ slug }: { slug: string }) {
 }
 
 export function WidgetsPage() {
+  const { user: currentUser } = useCurrentUser();
+  const isAdmin = currentUser?.role === "ADMIN";
+
   return (
     <div className={"widget-library-page page-stack flex flex-col gap-[28px] [@media(max-width:580px)]:gap-[20px]"}>
       <PageTitle
@@ -1856,6 +1935,7 @@ export function WidgetsPage() {
         title="Widgets"
         description="Larger, composed experiences built from the component library."
         action={
+          isAdmin ? undefined : (
           <Link className={`button
         button-quiet
         min-h-[38px]
@@ -1885,16 +1965,17 @@ export function WidgetsPage() {
         [&.button-quiet]:[background:#171821cc]
         [&.button-quiet:hover]:border-[#5a4773]
         [&.button-quiet:hover]:[background:#20202e]
-      `} href="/notes">
+      `} href={currentUser ? "/notes" : "/login?next=/widgets"}>
             <Icon name="plus" size={16} /> Propose a widget
           </Link>
+          )
         }
       />
       {widgets.length ? (
         <div className={`widget-catalog-grid
         grid
-        grid-cols-[repeat(auto-fill,minmax(440px,1fr))]
-        gap-[24px]
+        grid-cols-[repeat(auto-fill,minmax(300px,1fr))]
+        gap-[16px]
         [@media(max-width:580px)]:grid-cols-[1fr]
       `}>
           {widgets.map((widget) => (
@@ -1919,51 +2000,55 @@ export function WidgetsPage() {
               key={widget.slug}
             >
               <div className={`widget-card__preview
-        min-h-[260px]
+        min-h-[180px]
         grid
         place-items-center
-        p-[24px]
+        p-[16px]
         [border-bottom:1px_solid_#232431]
         text-[#c084fc]
         [background:radial-gradient(ellipse_at_center,#6b35b822,transparent_65%),repeating-linear-gradient(0deg,transparent_0,transparent_27px,#ffffff05_28px),repeating-linear-gradient(90deg,transparent_0,transparent_27px,#ffffff05_28px),#111218]
       `}>
                 {widget.slug === "mascot" ? (
                   <WidgetMascotPreview />
+                ) : widget.slug === "assistant" ? (
+                  <div className="wk-assistant-host">
+                    <WidgetAssistantPreview />
+                  </div>
                 ) : (
                   <Icon name="widgets" size={25} />
                 )}
               </div>
               <div className={`widget-card__body
-        p-[22px_24px_24px]
+        p-[16px_18px_18px]
         [&>div]:flex
         [&>div]:items-center
         [&>div]:justify-between
-        [&>div]:gap-[10px]
+        [&>div]:gap-[8px]
         [&_h2]:m-0
-        [&_h2]:text-[18px]
+        [&_h2]:text-[16px]
         [&_h2]:font-bold
         [&_h2]:tracking-[-0.015em]
         [&>span]:block
-        [&>span]:mt-[4px]
+        [&>span]:mt-[2px]
         [&>span]:text-[#9293a5]
-        [&>span]:text-[11px]
+        [&>span]:text-[10.5px]
         [&>span]:font-semibold
         [&>span]:uppercase
         [&>span]:tracking-[0.08em]
-        [&_p]:min-h-[44px]
-        [&_p]:m-[12px_0_18px]
+        [&_p]:min-h-[32px]
+        [&_p]:m-[8px_0_12px]
         [&_p]:text-[#9da0b3]
-        [&_p]:text-[13.5px]
-        [&_p]:leading-[1.6]
+        [&_p]:text-[12.5px]
+        [&_p]:leading-normal
         [&_code]:inline-flex
         [&_code]:items-center
-        [&_code]:gap-[6px]
-        [&_code]:p-[5px_10px]
-        [&_code]:rounded-[7px]
+        [&_code]:gap-[4px]
+        [&_code]:p-[3px_8px]
+        [&_code]:rounded-[6px]
         [&_code]:[background:#0c0d13]
         [&_code]:[border:1px_solid_#242533]
         [&_code]:text-[#c49aff]
-        [&_code]:[font:11px/1.4_ui-monospace,SFMono-Regular,Menlo,monospace]
+        [&_code]:[font:10px/1.4_ui-monospace,SFMono-Regular,Menlo,monospace]
       `}>
                 <div>
                   <h2>{widget.name}</h2>
@@ -2131,322 +2216,7 @@ export function TestsPage() {
   return <TestsStudioPage />;
 }
 
-type Note = { id: string; text: string; createdAt: string; kind: string };
-
-export function NotesPage() {
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [text, setText] = useState("");
-  const [kind, setKind] = useState("Improvement");
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      try {
-        const saved = window.localStorage.getItem("widget-kit-notes");
-        if (saved) setNotes(JSON.parse(saved) as Note[]);
-      } catch {
-        setNotes([]);
-      } finally {
-        setReady(true);
-      }
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    if (ready)
-      window.localStorage.setItem("widget-kit-notes", JSON.stringify(notes));
-  }, [notes, ready]);
-
-  function addNote(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    setNotes((current) => [
-      {
-        id: crypto.randomUUID(),
-        text: trimmed,
-        createdAt: new Date().toISOString(),
-        kind,
-      },
-      ...current,
-    ]);
-    setText("");
-  }
-
-  return (
-    <div className={"page-stack flex flex-col gap-[28px] [@media(max-width:580px)]:gap-[20px]"}>
-      <PageTitle
-        eyebrow="WORKSPACE / NOTES"
-        title="Notes"
-        description="A lightweight local scratchpad for implementation decisions, known issues, and ideas."
-      />
-      <div className={`notes-layout
-        grid
-        grid-cols-[minmax(340px,400px)_minmax(0,1fr)]
-        [align-items:start]
-        gap-[24px]
-        [@media(max-width:820px)]:grid-cols-[1fr]
-      `}>
-        <form className={`panel
-        note-editor
-        min-w-0
-        [border:1px_solid_#262735]
-        rounded-[14px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
-        [box-shadow:0_8px_24px_#0004]
-        p-[22px_24px]
-        [border:1px_solid_#272837]
-        [background:linear-gradient(150deg,#1b1c20,#111216)]
-      `} onSubmit={addNote}>
-          <div className={`note-editor-heading
-        flex
-        items-center
-        gap-[12px]
-        pb-[16px]
-        [border-bottom:1px_solid_#262736]
-        mb-[8px]
-        [&>div]:flex
-        [&>div]:flex-col
-        [&>div]:gap-[2px]
-        [&_strong]:text-[14px]
-        [&_strong]:font-[650]
-        [&_small]:text-[#8a8b9e]
-        [&_small]:text-[11.5px]
-      `}>
-            <span className={`note-editor-icon
-        size-[36px]
-        
-        grid
-        place-items-center
-        [border:1px_solid_#6f42a6]
-        rounded-[9px]
-        text-[#c084fc]
-        [background:#8e4bd520]
-      `}>
-              <Icon name="notes" size={17} />
-            </span>
-            <div>
-              <strong>Capture a thought</strong>
-              <small>Stored in this browser only</small>
-            </div>
-          </div>
-          <div className={`control-label
-        flex
-        flex-col
-        gap-[8px]
-        mt-[16px]
-        text-[#cfd0de]
-        text-[12px]
-        font-semibold
-        [&_.dropdown]:w-full
-        [&_textarea]:resize-y
-        [&_textarea]:min-h-[120px]
-        [&_textarea]:max-h-[240px]
-        [&_textarea]:overflow-y-auto
-        [&_textarea]:p-[12px]
-        [&_textarea]:[border:1px_solid_#343544]
-        [&_textarea]:rounded-[8px]
-        [&_textarea]:text-[#f2f1f8]
-        [&_textarea]:[background:#111219]
-        [&_textarea]:text-[12.5px]
-        [&_textarea]:leading-[1.6]
-        [&_textarea:focus-visible]:border-[#9865d2]
-        [&_textarea::placeholder]:text-[#7b7d90]
-      `}>
-            <span>Type</span>
-            <Dropdown
-              label="Type"
-              value={kind}
-              onChange={setKind}
-              options={[
-                "Improvement",
-                "Known issue",
-                "Component idea",
-                "Decision",
-              ].map((item) => ({ label: item, value: item }))}
-            />
-          </div>
-          <label className={`control-label
-        flex
-        flex-col
-        gap-[8px]
-        mt-[16px]
-        text-[#cfd0de]
-        text-[12px]
-        font-semibold
-        [&_.dropdown]:w-full
-        [&_textarea]:resize-y
-        [&_textarea]:min-h-[120px]
-        [&_textarea]:max-h-[240px]
-        [&_textarea]:overflow-y-auto
-        [&_textarea]:p-[12px]
-        [&_textarea]:[border:1px_solid_#343544]
-        [&_textarea]:rounded-[8px]
-        [&_textarea]:text-[#f2f1f8]
-        [&_textarea]:[background:#111219]
-        [&_textarea]:text-[12.5px]
-        [&_textarea]:leading-[1.6]
-        [&_textarea:focus-visible]:border-[#9865d2]
-        [&_textarea::placeholder]:text-[#7b7d90]
-      `}>
-            Note
-            <textarea
-              aria-label="Note text"
-              placeholder="What should you remember?"
-              rows={5}
-              value={text}
-              onChange={(event) => setText(event.target.value)}
-            />
-          </label>
-          <div className={"note-submit-row flex items-center justify-between gap-[10px] mt-[18px] [&>span]:text-[#8e90a2] [&>span]:text-[12px]"}>
-            <span>{notes.length} saved locally</span>
-            <button
-              className={`button
-        button-primary
-        min-h-[38px]
-        inline-flex
-        items-center
-        justify-center
-        gap-[8px]
-        p-[0_16px]
-        [border:1px_solid_transparent]
-        rounded-[9px]
-        text-[12.5px]
-        font-semibold
-        leading-none
-        whitespace-nowrap
-        cursor-pointer
-        [transition:filter_0.16s,transform_0.16s,background_0.16s,border-color_0.16s,box-shadow_0.16s]
-        [&:hover:not(:disabled)]:filter-[brightness(1.1)]
-        [&:hover:not(:disabled)]:transform-[translateY(-1px)]
-        disabled:cursor-not-allowed
-        disabled:opacity-[0.52]
-        [&.button-primary]:border-[#8747d8]
-        [&.button-primary]:text-[white]
-        [&.button-primary]:[background:linear-gradient(115deg,#7938cf,#5731a1)]
-        [&.button-primary]:[box-shadow:0_4px_18px_#662ab544]
-        [&.button-quiet]:border-[#30313f]
-        [&.button-quiet]:text-[#dad9e7]
-        [&.button-quiet]:[background:#171821cc]
-        [&.button-quiet:hover]:border-[#5a4773]
-        [&.button-quiet:hover]:[background:#20202e]
-      `}
-              type="submit"
-              disabled={!text.trim()}
-            >
-              <Icon name="plus" size={15} /> Add note
-            </button>
-          </div>
-        </form>
-        <section className={`panel
-        notes-list-panel
-        min-w-0
-        [border:1px_solid_#262735]
-        rounded-[14px]
-        [background:linear-gradient(145deg,_#1b1c20,_#111216)]
-        [box-shadow:0_8px_24px_#0004]
-        p-[22px]
-        [border:1px_solid_#272837]
-        [background:linear-gradient(150deg,#1b1c20,#111216)]
-      `}>
-          <div className={"notes-list-heading mb-0"}>
-            <SectionTitle
-              title="Your notes"
-              detail="Saved in local browser storage"
-            />
-          </div>
-          {notes.length ? (
-            <ul className={`notes-list
-        flex
-        flex-col
-        gap-[14px]
-        m-[16px_0_0]
-        p-0
-        [list-style:none]
-        [&_li]:relative
-        [&_li]:p-[16px_46px_16px_18px]
-        [&_li]:[border:1px_solid_#272837]
-        [&_li]:rounded-[12px]
-        [&_li]:[background:linear-gradient(145deg,#1b1c20,#111216)]
-        [&_li]:[box-shadow:0_6px_18px_#0003]
-        [&_li]:[transition:border-color_0.16s,transform_0.16s]
-        [&_li:hover]:border-[#6d42a8]
-        [&_li:hover]:transform-[translateY(-2px)]
-        [&_li>div]:flex
-        [&_li>div]:items-center
-        [&_li>div]:justify-between
-        [&_li>div]:gap-[10px]
-        [&_time]:text-[#808295]
-        [&_time]:text-[11.5px]
-        [&_p]:m-[10px_0_0]
-        [&_p]:text-[#edeaf5]
-        [&_p]:text-[13.5px]
-        [&_p]:leading-[1.65]
-        [&_p]:whitespace-pre-wrap
-        [&_p]:wrap-anywhere
-      `}>
-              {notes.map((note) => (
-                <li key={note.id}>
-                  <div>
-                    <Badge
-                      tone={
-                        note.kind === "Known issue"
-                          ? "amber"
-                          : note.kind === "Component idea"
-                            ? "purple"
-                            : "cyan"
-                      }
-                    >
-                      {note.kind}
-                    </Badge>
-                    <time>{new Date(note.createdAt).toLocaleString()}</time>
-                  </div>
-                  <p>{note.text}</p>
-                  <button
-                    type="button"
-                    className={`note-delete
-        absolute
-        top-[12px]
-        right-[12px]
-        size-[28px]
-        
-        grid
-        place-items-center
-        [border:1px_solid_transparent]
-        rounded-[7px]
-        text-[#8e90a2]
-        [background:transparent]
-        cursor-pointer
-        [transition:all_0.15s]
-        [&:hover]:border-[#713647]
-        [&:hover]:text-[#ff8192]
-        [&:hover]:[background:#551c2c]
-      `}
-                    onClick={() =>
-                      setNotes((current) =>
-                        current.filter((item) => item.id !== note.id),
-                      )
-                    }
-                    aria-label={`Delete note: ${note.text}`}
-                  >
-                    <Icon name="close" size={15} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <EmptyState
-              icon="notes"
-              title="Your scratchpad is empty"
-              description="Capture a small improvement, known issue, or component idea. Notes stay in this browser."
-            />
-          )}
-        </section>
-      </div>
-    </div>
-  );
-}
+export { NotesPage } from "../notes";
 
 export function DocumentationPage() {
   return (

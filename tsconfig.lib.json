@@ -29,7 +29,8 @@
     "packages/test",
     "app",
     "**/*.test.ts",
-    "**/*.test.tsx"
+    "**/*.test.tsx",
+    "packages/widgets/assistant/examples/**"
   ]
 }
 

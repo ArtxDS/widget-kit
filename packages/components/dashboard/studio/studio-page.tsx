@@ -20,7 +20,12 @@ import {
   MascotPlaygroundControls,
   MascotPlaygroundStage,
   useMascotPlayground,
-} from "../mascot-playground";
+} from "../experimental/mascot-playground";
+import {
+  AssistantPlaygroundControls,
+  AssistantPlaygroundStage,
+  useAssistantPlayground,
+} from "../experimental/assistant-playground";
 import {
   StudioProvider,
   useStudio,
@@ -52,7 +57,7 @@ const outputTabs: { value: OutputTab; label: string }[] = [
   { value: "tests", label: "Tests" },
 ];
 
-const badgeTones: BadgeTone[] = ["purple", "cyan", "green", "amber", "muted"];
+const badgeTones: BadgeTone[] = ["purple", "cyan", "green", "amber", "red", "muted"];
 const toastVariants: ToastVariant[] = ["loading", "success", "warning", "error"];
 const toastModes: ToastMode[] = ["normal", "steps"];
 
@@ -79,9 +84,11 @@ export function WidgetKitStudio({
   initialItem?: string;
   initialMode: StudioMode;
 }) {
-  const validInitial = initialItem && (getComponent(initialItem) || getWidget(initialItem))
-    ? initialItem
-    : (components[0]?.slug ?? widgets[0]?.slug ?? "badge");
+  const validInitial =
+    initialItem && (getComponent(initialItem) || getWidget(initialItem))
+      ? initialItem
+      : widgets.find((widget) => widget.slug === "assistant")?.slug ??
+        (components[0]?.slug ?? widgets[0]?.slug ?? "badge");
 
   return (
     <StudioProvider initialItem={validInitial} initialMode={initialMode}>
@@ -94,6 +101,7 @@ function StudioWorkspace() {
   const { state, dispatch } = useStudio();
   const { component, widget, itemName } = useStudioItem();
   const mascotPlayground = useMascotPlayground();
+  const assistantPlayground = useAssistantPlayground();
   const { snapshot, loading, runningItemKey, runItemTests } = useQuality();
   const [copyNotice, setCopyNotice] = useState("");
   const [sourceExpanded, setSourceExpanded] = useState(false);
@@ -139,6 +147,7 @@ function StudioWorkspace() {
 
   const isMascot = state.item === "mascot";
   const isToast = state.item === "toast";
+  const isAssistant = state.item === "assistant";
   const isDocsExpanded = state.inspectorTab === "docs" && sourceExpanded;
   const itemType = widget ? "widget" : "component";
   const testKey = itemTestKey(itemType, state.item);
@@ -147,11 +156,25 @@ function StudioWorkspace() {
   const testRunning = runningItemKey === testKey;
   const code = useMemo(() => {
     if (isMascot) return `import { Mascot } from "@artxds/widget-kit";\n\n${mascotPlayground.snippet}`;
+    if (isAssistant) {
+      return `import { AssistantWidget } from "@artxds/widget-kit/assistant";\nimport { HttpTransport } from "@artxds/widget-kit/assistant/transport";\nimport "@artxds/widget-kit/styles/assistant.css";\n\nconst transport = new HttpTransport({ endpoint: "/api/assistant" });\n\n<AssistantWidget transport={transport} position="bottom-right" suggestions={["Track my order", "Show my balance"]} />`;
+    }
     if (isToast) {
       return `import { Toast } from "@artxds/widget-kit";\n\n<Toast\n  open={${state.toastOpen}}\n  variant="${state.toastVariant}"\n  mode="${state.toastMode}"\n  placement="inline"\n  title="${state.toastVariant === "loading" ? "Saving changes" : "Changes saved"}"\n/>`;
     }
     return `import { Badge } from "@artxds/widget-kit";\n\n<Badge tone="${state.badgeTone}"${state.badgeDot ? " dot" : ""}>${state.badgeLabel}</Badge>`;
-  }, [isMascot, isToast, mascotPlayground.snippet, state.badgeDot, state.badgeLabel, state.badgeTone, state.toastMode, state.toastOpen, state.toastVariant]);
+  }, [
+    isMascot,
+    isAssistant,
+    isToast,
+    mascotPlayground.snippet,
+    state.badgeDot,
+    state.badgeLabel,
+    state.badgeTone,
+    state.toastMode,
+    state.toastOpen,
+    state.toastVariant,
+  ]);
 
   const output = useMemo(() => {
     if (state.outputTab === "tokens") {
@@ -170,6 +193,7 @@ function StudioWorkspace() {
   function resetProps() {
     dispatch({ type: "reset-props" });
     if (isMascot) mascotPlayground.reset();
+    if (isAssistant) assistantPlayground.resetTransport();
   }
 
   async function copyOutput(value = output, successMessage = "Copied to clipboard") {
@@ -188,7 +212,7 @@ function StudioWorkspace() {
 
   return (
     <div className={`studio-workspace${isDocsExpanded ? " studio-workspace--docs-expanded" : ""}`}>
-      <main className="studio-main" aria-label={`${itemName} component workspace`}>
+      <main className="studio-main" aria-label={`${itemName} widget workspace`}>
         <div className="studio-toolbar">
           <div className="studio-mode-tabs" role="tablist" aria-label="Workspace mode">
             {(["preview", "playground"] as const).map((mode) => (
@@ -227,11 +251,15 @@ function StudioWorkspace() {
           </div>
         </div>
 
-        <section className={`studio-stage studio-stage--${state.viewport} studio-stage--${state.mode}`} aria-label={`${itemName} live preview`}>
+        <section className={`studio-stage studio-stage--${state.viewport} studio-stage--${state.mode}${isAssistant ? " studio-stage--assistant" : ""}`} aria-label={`${itemName} live preview`}>
           <StageFloor tone={widget ? "experimental" : "core"} />
-          <div className={`studio-canvas studio-canvas--${state.viewport}${isMascot ? " studio-canvas--mascot" : ""}`}>
+          <div
+            className={`studio-canvas studio-canvas--${state.viewport}${isMascot ? " studio-canvas--mascot" : ""}${isAssistant ? " studio-canvas--assistant" : ""}`}
+          >
             {isMascot ? (
               <MascotPlaygroundStage playground={mascotPlayground} />
+            ) : isAssistant ? (
+              <AssistantPlaygroundStage playground={assistantPlayground} />
             ) : isToast ? (
               <Toast
                 description={state.toastVariant === "loading" ? "Working on your changes…" : "Your update is ready."}
@@ -326,6 +354,8 @@ function StudioWorkspace() {
               badgeDot={state.badgeDot}
               badgeLabel={state.badgeLabel}
               badgeTone={state.badgeTone}
+              assistantPlayground={assistantPlayground}
+              isAssistant={isAssistant}
               isMascot={isMascot}
               isToast={isToast}
               mascotPlayground={mascotPlayground}
@@ -360,9 +390,11 @@ function StudioWorkspace() {
 }
 
 function PropsInspector({
+  assistantPlayground,
   badgeDot,
   badgeLabel,
   badgeTone,
+  isAssistant,
   isMascot,
   isToast,
   mascotPlayground,
@@ -376,9 +408,11 @@ function PropsInspector({
   toastOpen,
   toastVariant,
 }: {
+  assistantPlayground: ReturnType<typeof useAssistantPlayground>;
   badgeDot: boolean;
   badgeLabel: string;
   badgeTone: BadgeTone;
+  isAssistant: boolean;
   isMascot: boolean;
   isToast: boolean;
   mascotPlayground: ReturnType<typeof useMascotPlayground>;
@@ -398,6 +432,11 @@ function PropsInspector({
         <>
           <InspectorGroup title="Appearance & Tokens"><MascotPlaygroundControls playground={mascotPlayground} /></InspectorGroup>
           <InspectorGroup title="Behavior"><div className="studio-prop-note">The live widget responds to pointer movement and the selected behavior props.</div></InspectorGroup>
+        </>
+      ) : isAssistant ? (
+        <>
+          <InspectorGroup title="Placement & State"><AssistantPlaygroundControls playground={assistantPlayground} /></InspectorGroup>
+          <InspectorGroup title="Behavior"><div className="studio-prop-note">The assistant uses MockTransport in the playground. Replace the transport with your own HttpTransport to connect a real endpoint.</div></InspectorGroup>
         </>
       ) : isToast ? (
         <>
@@ -608,6 +647,7 @@ function tokenOutput(
       cyan: { background: "#25b8b21a", color: "#5de6df", border: "#2a9b9555" },
       green: { background: "#33b9781a", color: "#62dda6", border: "#2a8a5e55" },
       amber: { background: "#c48a001a", color: "#f5c66d", border: "#9a6a0055" },
+      red: { background: "#ff788a1a", color: "#ff788a", border: "#ff788a44" },
       muted: { background: "#1b1c27", color: "#9293a7", border: "#2e2f3c" },
     };
     const selected = tokens[tone];
@@ -615,6 +655,9 @@ function tokenOutput(
   }
   if (item === "mascot") {
     return `/* Mascot theme tokens */\n--mascot-accent-a: ${mascotTokens.accentA};\n--mascot-accent-b: ${mascotTokens.accentB};\n--mascot-eye-color: ${mascotTokens.eye};`;
+  }
+  if (item === "assistant") {
+    return `/* Assistant widget tokens */\n--wk-assistant-accent: #9d5cff;\n--wk-assistant-bg: #101117;\n--wk-assistant-panel-radius: 18px;\n--wk-assistant-panel-width: 25rem;\n--wk-assistant-panel-height: min(42rem, calc(100dvh - 3rem));`;
   }
   return `/* Shared widget kit design tokens */\n--wk-purple: #9d5cff;\n--wk-cyan: #31d9d2;\n--wk-green: #57e0ac;\n--wk-background: #090a0e;\n--wk-surface: #101117;\n--wk-foreground: #f2f1f8;\n--wk-radius-md: 8px;`;
 }

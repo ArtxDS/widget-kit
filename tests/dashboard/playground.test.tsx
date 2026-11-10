@@ -10,7 +10,7 @@ import {
 
 describe("dashboard pages", () => {
   it("updates the badge preview and code for tone and dot settings", async () => {
-    const { user } = renderWithQuality(<PlaygroundPage />);
+    const { user } = renderWithQuality(<PlaygroundPage initialItem="badge" />);
 
     await selectMenuOption(user, "Color tone", "Purple");
     const dotSwitch = screen.getByRole("switch", { name: "Show status dot" });
@@ -27,7 +27,7 @@ describe("dashboard pages", () => {
     const { user } = renderWithQuality(<PlaygroundPage initialItem="mascot" />);
 
     expect(await screen.findByRole("img", { name: "Playground mascot" })).toBeInTheDocument();
-    await selectMenuOption(user, "Theme preset", "ocean");
+    await user.click(screen.getByRole("button", { name: "ocean" }));
     await user.click(screen.getByRole("button", { name: "say" }));
     expect(await screen.findByText("Eu sou o mascote.")).toBeInTheDocument();
     expect(getGeneratedCode()).toContain('theme: "ocean"');
