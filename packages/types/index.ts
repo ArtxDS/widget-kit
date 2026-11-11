@@ -6,6 +6,8 @@ export type {
   ToastStep,
   ToastStepStatus,
   ToastVariant,
+  ToastOptions,
+  ToastContextValue,
 } from "../components/ui";
 export type {
   EventReaction,

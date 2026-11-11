@@ -34,7 +34,7 @@ export function Status() {
 | Import | Contents |
 | --- | --- |
 | `@artxds/widget-kit` | React components and widgets |
-| `@artxds/widget-kit/components` | `Badge` and `Toast` |
+| `@artxds/widget-kit/components` | `Badge`, `Toast`, `ToastProvider`, and `useToast` |
 | `@artxds/widget-kit/core` | Framework-agnostic mascot core, safe to import on the server |
 | `@artxds/widget-kit/assistant` | Modular conversational assistant React widget, launcher, panel, triggers, and hooks |
 | `@artxds/widget-kit/assistant/core` | Assistant headless core and runtime, safe to import on the server/Node |
@@ -46,6 +46,35 @@ export function Status() {
 | `@artxds/widget-kit/styles/assistant.css` | Assistant widget CSS only |
 
 The React entrypoints ship the `"use client"` directive. In the Next.js App Router they can be imported from Server Components; wrap the usage in your own client component when passing callbacks such as `onClose` or `onReady`. Import `@artxds/widget-kit/core` for server-safe core utilities.
+
+
+## Toasts
+
+Wrap your app in `ToastProvider` and trigger notifications with `useToast`:
+
+```tsx
+import { ToastProvider, useToast } from "@artxds/widget-kit";
+
+export function App({ children }) {
+  return <ToastProvider>{children}</ToastProvider>;
+}
+
+export function SaveButton() {
+  const { success, loading, update, dismiss } = useToast();
+  return (
+    <button
+      onClick={() => {
+        const id = loading("Saving changes");
+        window.setTimeout(() => update(id, { title: "Changes saved", variant: "success" }), 500);
+      }}
+    >
+      Save
+    </button>
+  );
+}
+```
+
+`useToast` exposes `toast`, `success`, `error`, `warning`, `info`, `loading`, `update`, `dismiss`, and `showToast`. Loading toasts are persistent by default; other variants dismiss automatically.
 
 ## Development
 

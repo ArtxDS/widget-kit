@@ -1,4 +1,4 @@
-export { Badge, Toast } from "./components/ui";
+export { Badge, Toast, ToastProvider, useToast } from "./components/ui";
 export type { BadgeProps, BadgeTone } from "./components/ui";
 
 export type {
@@ -8,6 +8,8 @@ export type {
   ToastStep,
   ToastStepStatus,
   ToastVariant,
+  ToastOptions,
+  ToastContextValue,
 } from "./components/ui";
 
 export {

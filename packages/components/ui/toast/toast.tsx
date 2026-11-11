@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useRef } from "react";
 import {
   Check,
   CheckCircle2,
+  Info,
   CircleX,
   LoaderCircle,
   TriangleAlert,
@@ -12,7 +13,7 @@ import {
 } from "lucide-react";
 import type { HTMLAttributes } from "react";
 
-export type ToastVariant = "loading" | "success" | "warning" | "error";
+export type ToastVariant = "loading" | "success" | "warning" | "error" | "info";
 export type ToastMode = "normal" | "steps";
 export type ToastPlacement = "viewport" | "inline";
 export type ToastStepStatus = "complete" | "current" | "pending" | "error";
@@ -39,6 +40,7 @@ const variantIcons: Record<ToastVariant, LucideIcon> = {
   success: CheckCircle2,
   warning: TriangleAlert,
   error: CircleX,
+  info: Info,
 };
 
 const stepIcons: Partial<Record<ToastStepStatus, LucideIcon>> = {

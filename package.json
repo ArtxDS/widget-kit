@@ -1,6 +1,6 @@
 {
   "name": "@artxds/widget-kit",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "Personal library of reusable React components, widgets, hooks, and utilities.",
   "type": "module",
   "exports": {

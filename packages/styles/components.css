@@ -137,6 +137,10 @@
   color: var(--wk-toast-warning, #f2c76f);
 }
 
+.app-toast--info .app-toast__icon {
+  color: var(--wk-toast-info, #8b9dff);
+}
+
 .app-toast--error .app-toast__icon,
 .app-toast__step--error {
   color: var(--wk-toast-error, #ff899a);
